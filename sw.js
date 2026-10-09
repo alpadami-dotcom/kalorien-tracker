@@ -5,7 +5,11 @@
 // zuerst" waere schneller, zeigt nach einem Update aber noch einmal die alte
 // Version - fuer eine App, die sich gerade oft aendert, die falsche Wahl.
 
-const SPEICHER = "kalorien-v1";
+// GitHub Pages schickt "max-age=600": Ohne Gegenmassnahme liefert der
+// Browser bis zu 10 Minuten lang die alte Datei aus seinem HTTP-Cache, und
+// ein Update kommt nicht an. "no-cache" fragt jedes Mal nach - dank ETag
+// kostet das bei unveraenderten Dateien nur eine kurze "304"-Antwort.
+const SPEICHER = "kalorien-v2";
 const KERN = [
   "./", "index.html", "stil.css", "app.js", "naehrwerte.js",
   "daten/usda.json", "daten/lebensmittel.json",
@@ -13,7 +17,8 @@ const KERN = [
 ];
 
 self.addEventListener("install", (ev) => {
-  ev.waitUntil(caches.open(SPEICHER).then((c) => c.addAll(KERN)));
+  ev.waitUntil(caches.open(SPEICHER).then((c) =>
+    c.addAll(KERN.map((pfad) => new Request(pfad, { cache: "no-cache" })))));
   self.skipWaiting();
 });
 
@@ -31,17 +36,20 @@ self.addEventListener("fetch", (ev) => {
 
   // Barcode-Bibliothek vom CDN: versioniert, aendert sich nie - Cache zuerst.
   if (url.hostname === "cdn.jsdelivr.net" || url.hostname === "fastly.jsdelivr.net") {
-    ev.respondWith(caches.match(ev.request).then((treffer) => treffer || holeUndMerke(ev.request)));
+    ev.respondWith(caches.match(ev.request).then((treffer) => treffer || holeUndMerke(ev.request, "default")));
     return;
   }
   // Open Food Facts und /api: immer live, nie zwischenspeichern.
   if (url.origin !== self.location.origin || url.pathname.includes("/api/")) return;
 
-  ev.respondWith(holeUndMerke(ev.request).catch(() => caches.match(ev.request, { ignoreSearch: true })));
+  ev.respondWith(holeUndMerke(ev.request, "no-cache").catch(() => caches.match(ev.request, { ignoreSearch: true })));
 });
 
-async function holeUndMerke(anfrage) {
-  const antwort = await fetch(anfrage);
+async function holeUndMerke(anfrage, httpCache) {
+  // Seitenaufrufe (mode "navigate") lassen sich nicht mit eigenen Optionen
+  // kopieren - fetch() wirft sonst. Dann ueber die blanke Adresse holen.
+  const ziel = anfrage.mode === "navigate" ? anfrage.url : anfrage;
+  const antwort = await fetch(ziel, { cache: httpCache });
   if (antwort.ok) {
     const kopie = antwort.clone();
     caches.open(SPEICHER).then((c) => c.put(anfrage, kopie));
