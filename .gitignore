@@ -1,0 +1,4 @@
+.env
+daten/roh/
+__pycache__/
+.env.txt

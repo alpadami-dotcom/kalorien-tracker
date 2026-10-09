@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Kalorien">
+<meta name="theme-color" content="#f6f5f1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#161714" media="(prefers-color-scheme: dark)">
+<title>Kalorien</title>
+<link rel="stylesheet" href="stil.css">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+</head>
+<body>
+
+<header class="kopf">
+  <button class="pfeil" id="tag-zurueck" aria-label="Vorheriger Tag">‹</button>
+  <button class="datum" id="datum">Heute</button>
+  <button class="pfeil" id="tag-vor" aria-label="Nächster Tag">›</button>
+</header>
+
+<main>
+  <section class="bilanz">
+    <div class="kcal-zeile">
+      <div>
+        <div class="kcal-zahl" id="kcal-gegessen">0</div>
+        <div class="klein">kcal gegessen</div>
+      </div>
+      <button class="rest" id="ziel-knopf">
+        <div class="kcal-rest" id="kcal-rest">2000</div>
+        <div class="klein" id="rest-text">übrig von 2000</div>
+      </button>
+    </div>
+    <div class="balken"><div id="kcal-balken"></div></div>
+    <div class="makros">
+      <div><span class="punkt p"></span><b id="m-protein">0</b> g Protein</div>
+      <div><span class="punkt k"></span><b id="m-kh">0</b> g Kohlenh.</div>
+      <div><span class="punkt f"></span><b id="m-fett">0</b> g Fett</div>
+    </div>
+  </section>
+
+  <section class="eingabe">
+    <form id="text-form" autocomplete="off">
+      <input id="text" type="text" enterkeyhint="send"
+             placeholder="z. B. 2 mittelgroße Bananen">
+      <button type="submit" id="senden" aria-label="Eintragen">➜</button>
+    </form>
+    <div class="knoepfe">
+      <label class="knopf" id="foto-knopf">
+        <input type="file" accept="image/*" capture="environment" id="foto" hidden>
+        📷 Foto vom Essen
+      </label>
+      <label class="knopf">
+        <input type="file" accept="image/*" capture="environment" id="barcode-foto" hidden>
+        ▥ Barcode
+      </label>
+    </div>
+    <div class="hinweis" id="ki-hinweis" hidden>
+      Tippe z. B. „2 Bananen“ oder „200 g Hähnchen“ – Enter trägt den obersten Treffer ein.
+    </div>
+    <ul class="vorschlaege" id="vorschlaege"></ul>
+  </section>
+
+  <section>
+    <h2>Gegessen</h2>
+    <ul class="liste" id="liste"></ul>
+    <p class="leer" id="leer">Noch nichts eingetragen.</p>
+  </section>
+</main>
+
+<!-- Pruefen: was die KI / Suche / der Barcode gefunden hat, vor dem Eintragen -->
+<dialog id="pruefen">
+  <form method="dialog" class="blatt">
+    <h2 id="pruefen-titel">Prüfen</h2>
+    <p class="rueckfrage" id="rueckfrage" hidden></p>
+    <ul id="kandidaten"></ul>
+    <div class="summe" id="pruefen-summe"></div>
+    <div class="aktionen">
+      <button value="abbruch" class="zweit">Abbrechen</button>
+      <button value="ok" id="eintragen" class="erst">Eintragen</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="laden" id="laden" hidden><div class="kreisel"></div><span id="laden-text">Einen Moment …</span></div>
+<div class="meldung" id="meldung" hidden></div>
+
+<script src="naehrwerte.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

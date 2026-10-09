@@ -1,0 +1,993 @@
+[
+ {
+  "name": "Banane",
+  "aliase": [
+   "Bananen"
+  ],
+  "fdc": "173944"
+ },
+ {
+  "name": "Apfel",
+  "aliase": [
+   "Äpfel"
+  ],
+  "fdc": "171688"
+ },
+ {
+  "name": "Birne",
+  "aliase": [
+   "Birnen"
+  ],
+  "fdc": "169118"
+ },
+ {
+  "name": "Orange",
+  "aliase": [
+   "Apfelsine",
+   "Orangen"
+  ],
+  "fdc": "169097"
+ },
+ {
+  "name": "Erdbeeren",
+  "aliase": [
+   "Erdbeere"
+  ],
+  "fdc": "167762"
+ },
+ {
+  "name": "Weintrauben",
+  "aliase": [
+   "Trauben"
+  ],
+  "fdc": "174683"
+ },
+ {
+  "name": "Heidelbeeren",
+  "aliase": [
+   "Blaubeeren"
+  ],
+  "fdc": "171711"
+ },
+ {
+  "name": "Himbeeren",
+  "aliase": [],
+  "fdc": "167755"
+ },
+ {
+  "name": "Kirschen",
+  "aliase": [],
+  "fdc": "171719"
+ },
+ {
+  "name": "Pflaume",
+  "aliase": [
+   "Pflaumen",
+   "Zwetschge"
+  ],
+  "fdc": "169949"
+ },
+ {
+  "name": "Pfirsich",
+  "aliase": [
+   "Pfirsiche"
+  ],
+  "fdc": "169928"
+ },
+ {
+  "name": "Wassermelone",
+  "aliase": [
+   "Melone"
+  ],
+  "fdc": "167765"
+ },
+ {
+  "name": "Ananas",
+  "aliase": [],
+  "fdc": "169124"
+ },
+ {
+  "name": "Kiwi",
+  "aliase": [],
+  "fdc": "168153"
+ },
+ {
+  "name": "Mango",
+  "aliase": [],
+  "fdc": "169910"
+ },
+ {
+  "name": "Avocado",
+  "aliase": [],
+  "fdc": "171705"
+ },
+ {
+  "name": "Zitrone",
+  "aliase": [],
+  "fdc": "167746"
+ },
+ {
+  "name": "Brokkoli",
+  "aliase": [
+   "Brokkoli roh"
+  ],
+  "fdc": "170379"
+ },
+ {
+  "name": "Brokkoli gekocht",
+  "aliase": [],
+  "fdc": "169967"
+ },
+ {
+  "name": "Tomate",
+  "aliase": [
+   "Tomaten"
+  ],
+  "fdc": "170457"
+ },
+ {
+  "name": "Gurke",
+  "aliase": [
+   "Salatgurke"
+  ],
+  "fdc": "168409"
+ },
+ {
+  "name": "Karotte",
+  "aliase": [
+   "Möhre",
+   "Karotten",
+   "Möhren"
+  ],
+  "fdc": "170393"
+ },
+ {
+  "name": "Paprika",
+  "aliase": [
+   "Paprika rot"
+  ],
+  "fdc": "170108"
+ },
+ {
+  "name": "Zwiebel",
+  "aliase": [
+   "Zwiebeln"
+  ],
+  "fdc": "170000"
+ },
+ {
+  "name": "Eisbergsalat",
+  "aliase": [],
+  "fdc": "169248"
+ },
+ {
+  "name": "Blattsalat",
+  "aliase": [
+   "Salat",
+   "Kopfsalat"
+  ],
+  "fdc": "169249"
+ },
+ {
+  "name": "Spinat",
+  "aliase": [],
+  "fdc": "168462"
+ },
+ {
+  "name": "Champignons",
+  "aliase": [
+   "Pilze"
+  ],
+  "fdc": "169251"
+ },
+ {
+  "name": "Erbsen",
+  "aliase": [],
+  "fdc": "170017"
+ },
+ {
+  "name": "Mais (Dose)",
+  "aliase": [
+   "Mais"
+  ],
+  "fdc": "169214"
+ },
+ {
+  "name": "Kidneybohnen (Dose)",
+  "aliase": [
+   "Kidneybohnen"
+  ],
+  "fdc": "174285"
+ },
+ {
+  "name": "Zucchini",
+  "aliase": [],
+  "fdc": "169291"
+ },
+ {
+  "name": "Blumenkohl",
+  "aliase": [],
+  "fdc": "169986"
+ },
+ {
+  "name": "Weißkohl",
+  "aliase": [
+   "Kohl"
+  ],
+  "fdc": "169975"
+ },
+ {
+  "name": "Spargel",
+  "aliase": [],
+  "fdc": "168389"
+ },
+ {
+  "name": "Grüne Bohnen",
+  "aliase": [
+   "Bohnen"
+  ],
+  "fdc": "169961"
+ },
+ {
+  "name": "Aubergine",
+  "aliase": [],
+  "fdc": "169228"
+ },
+ {
+  "name": "Knoblauch",
+  "aliase": [],
+  "fdc": "169230"
+ },
+ {
+  "name": "Grünkohl",
+  "aliase": [],
+  "fdc": "168421"
+ },
+ {
+  "name": "Radieschen",
+  "aliase": [],
+  "fdc": "169276"
+ },
+ {
+  "name": "Oliven",
+  "aliase": [],
+  "fdc": "169094"
+ },
+ {
+  "name": "Kartoffeln gekocht",
+  "aliase": [
+   "Kartoffel",
+   "Kartoffeln",
+   "Salzkartoffeln"
+  ],
+  "fdc": "170440"
+ },
+ {
+  "name": "Ofenkartoffel",
+  "aliase": [
+   "Backkartoffel"
+  ],
+  "fdc": "170093"
+ },
+ {
+  "name": "Pommes (Backofen)",
+  "aliase": [
+   "Pommes",
+   "Pommes frites"
+  ],
+  "fdc": "169264"
+ },
+ {
+  "name": "Pommes (Fast Food)",
+  "aliase": [],
+  "fdc": "170698"
+ },
+ {
+  "name": "Süßkartoffel",
+  "aliase": [],
+  "fdc": "168483"
+ },
+ {
+  "name": "Reis gekocht",
+  "aliase": [
+   "Reis"
+  ],
+  "fdc": "169753"
+ },
+ {
+  "name": "Reis roh",
+  "aliase": [],
+  "fdc": "168877"
+ },
+ {
+  "name": "Vollkornreis gekocht",
+  "aliase": [
+   "Naturreis"
+  ],
+  "fdc": "169704"
+ },
+ {
+  "name": "Nudeln gekocht",
+  "aliase": [
+   "Nudeln",
+   "Pasta",
+   "Spaghetti"
+  ],
+  "fdc": "169737"
+ },
+ {
+  "name": "Nudeln roh",
+  "aliase": [],
+  "fdc": "169736"
+ },
+ {
+  "name": "Vollkornnudeln gekocht",
+  "aliase": [
+   "Vollkornnudeln"
+  ],
+  "fdc": "168910"
+ },
+ {
+  "name": "Eiernudeln gekocht",
+  "aliase": [
+   "Eiernudeln"
+  ],
+  "fdc": "168919"
+ },
+ {
+  "name": "Haferflocken",
+  "aliase": [
+   "Hafer"
+  ],
+  "fdc": "173904"
+ },
+ {
+  "name": "Knuspermüsli",
+  "aliase": [
+   "Granola"
+  ],
+  "fdc": "171646"
+ },
+ {
+  "name": "Couscous gekocht",
+  "aliase": [
+   "Couscous"
+  ],
+  "fdc": "169700"
+ },
+ {
+  "name": "Quinoa gekocht",
+  "aliase": [
+   "Quinoa"
+  ],
+  "fdc": "168917"
+ },
+ {
+  "name": "Mehl",
+  "aliase": [
+   "Weizenmehl"
+  ],
+  "fdc": "168894"
+ },
+ {
+  "name": "Toastbrot",
+  "aliase": [
+   "Weißbrot",
+   "Toast"
+  ],
+  "fdc": "174924"
+ },
+ {
+  "name": "Vollkornbrot",
+  "aliase": [],
+  "fdc": "172688"
+ },
+ {
+  "name": "Mehrkornbrot",
+  "aliase": [],
+  "fdc": "168013"
+ },
+ {
+  "name": "Roggenbrot",
+  "aliase": [],
+  "fdc": "172684"
+ },
+ {
+  "name": "Brötchen",
+  "aliase": [
+   "Semmel",
+   "Schrippe"
+  ],
+  "fdc": "172795"
+ },
+ {
+  "name": "Burgerbrötchen",
+  "aliase": [],
+  "fdc": "172796"
+ },
+ {
+  "name": "Croissant",
+  "aliase": [],
+  "fdc": "174987"
+ },
+ {
+  "name": "Bagel",
+  "aliase": [],
+  "fdc": "174899"
+ },
+ {
+  "name": "Wrap",
+  "aliase": [
+   "Tortilla"
+  ],
+  "fdc": "175037"
+ },
+ {
+  "name": "Salzstangen",
+  "aliase": [],
+  "fdc": "167555"
+ },
+ {
+  "name": "Pfannkuchen",
+  "aliase": [
+   "Pancakes"
+  ],
+  "fdc": "175009"
+ },
+ {
+  "name": "Waffeln",
+  "aliase": [
+   "Waffel"
+  ],
+  "fdc": "175039"
+ },
+ {
+  "name": "Vollmilch",
+  "aliase": [
+   "Milch"
+  ],
+  "fdc": "171265"
+ },
+ {
+  "name": "Fettarme Milch",
+  "aliase": [],
+  "fdc": "171267"
+ },
+ {
+  "name": "Joghurt natur",
+  "aliase": [
+   "Joghurt"
+  ],
+  "fdc": "171284"
+ },
+ {
+  "name": "Griechischer Joghurt",
+  "aliase": [],
+  "fdc": "171304"
+ },
+ {
+  "name": "Skyr",
+  "aliase": [
+   "Magerjoghurt"
+  ],
+  "fdc": "170894"
+ },
+ {
+  "name": "Hüttenkäse",
+  "aliase": [
+   "Cottage Cheese"
+  ],
+  "fdc": "172179"
+ },
+ {
+  "name": "Gouda",
+  "aliase": [
+   "Käse"
+  ],
+  "fdc": "171241"
+ },
+ {
+  "name": "Mozzarella",
+  "aliase": [],
+  "fdc": "170845"
+ },
+ {
+  "name": "Parmesan",
+  "aliase": [],
+  "fdc": "170848"
+ },
+ {
+  "name": "Feta",
+  "aliase": [
+   "Schafskäse"
+  ],
+  "fdc": "173420"
+ },
+ {
+  "name": "Cheddar",
+  "aliase": [],
+  "fdc": "173414"
+ },
+ {
+  "name": "Emmentaler",
+  "aliase": [],
+  "fdc": "171251"
+ },
+ {
+  "name": "Brie",
+  "aliase": [],
+  "fdc": "172177"
+ },
+ {
+  "name": "Camembert",
+  "aliase": [],
+  "fdc": "172178"
+ },
+ {
+  "name": "Frischkäse",
+  "aliase": [],
+  "fdc": "173418"
+ },
+ {
+  "name": "Ricotta",
+  "aliase": [],
+  "fdc": "170851"
+ },
+ {
+  "name": "Butter",
+  "aliase": [],
+  "fdc": "173430"
+ },
+ {
+  "name": "Sahne",
+  "aliase": [
+   "Schlagsahne"
+  ],
+  "fdc": "170859"
+ },
+ {
+  "name": "Saure Sahne",
+  "aliase": [
+   "Schmand"
+  ],
+  "fdc": "171257"
+ },
+ {
+  "name": "Ei",
+  "aliase": [
+   "Eier",
+   "Ei roh"
+  ],
+  "fdc": "171287"
+ },
+ {
+  "name": "Ei gekocht",
+  "aliase": [
+   "Frühstücksei"
+  ],
+  "fdc": "173424"
+ },
+ {
+  "name": "Spiegelei",
+  "aliase": [],
+  "fdc": "173423"
+ },
+ {
+  "name": "Rührei",
+  "aliase": [],
+  "fdc": "172187"
+ },
+ {
+  "name": "Eiweiß",
+  "aliase": [
+   "Eiklar"
+  ],
+  "fdc": "172183"
+ },
+ {
+  "name": "Hähnchenbrust roh",
+  "aliase": [
+   "Hähnchen",
+   "Hühnchen",
+   "Hühnerbrust"
+  ],
+  "fdc": "171077"
+ },
+ {
+  "name": "Hähnchenbrust gebraten",
+  "aliase": [],
+  "fdc": "171477"
+ },
+ {
+  "name": "Putenbrust roh",
+  "aliase": [
+   "Pute"
+  ],
+  "fdc": "174515"
+ },
+ {
+  "name": "Putenbrust gebraten",
+  "aliase": [],
+  "fdc": "174516"
+ },
+ {
+  "name": "Rinderhack roh",
+  "aliase": [
+   "Hackfleisch"
+  ],
+  "fdc": "174036"
+ },
+ {
+  "name": "Rinderhack gebraten",
+  "aliase": [],
+  "fdc": "171799"
+ },
+ {
+  "name": "Rinderhack mager gebraten",
+  "aliase": [],
+  "fdc": "171794"
+ },
+ {
+  "name": "Steak",
+  "aliase": [
+   "Rindersteak"
+  ],
+  "fdc": "168634"
+ },
+ {
+  "name": "Schweinefilet",
+  "aliase": [],
+  "fdc": "168250"
+ },
+ {
+  "name": "Bratwurst",
+  "aliase": [],
+  "fdc": "171620"
+ },
+ {
+  "name": "Würstchen",
+  "aliase": [
+   "Wiener",
+   "Hotdog"
+  ],
+  "fdc": "172968"
+ },
+ {
+  "name": "Kochschinken",
+  "aliase": [
+   "Schinken"
+  ],
+  "fdc": "173864"
+ },
+ {
+  "name": "Salami",
+  "aliase": [],
+  "fdc": "174603"
+ },
+ {
+  "name": "Speck",
+  "aliase": [
+   "Bacon"
+  ],
+  "fdc": "167914"
+ },
+ {
+  "name": "Lachs roh",
+  "aliase": [
+   "Lachs"
+  ],
+  "fdc": "175167"
+ },
+ {
+  "name": "Lachs gebraten",
+  "aliase": [],
+  "fdc": "175168"
+ },
+ {
+  "name": "Thunfisch (Dose)",
+  "aliase": [
+   "Thunfisch"
+  ],
+  "fdc": "173709"
+ },
+ {
+  "name": "Kabeljau",
+  "aliase": [
+   "Dorsch"
+  ],
+  "fdc": "171956"
+ },
+ {
+  "name": "Garnelen",
+  "aliase": [
+   "Shrimps"
+  ],
+  "fdc": "175180"
+ },
+ {
+  "name": "Forelle",
+  "aliase": [],
+  "fdc": "172004"
+ },
+ {
+  "name": "Linsen gekocht",
+  "aliase": [
+   "Linsen"
+  ],
+  "fdc": "172421"
+ },
+ {
+  "name": "Kichererbsen gekocht",
+  "aliase": [
+   "Kichererbsen"
+  ],
+  "fdc": "173757"
+ },
+ {
+  "name": "Tofu",
+  "aliase": [],
+  "fdc": "172475"
+ },
+ {
+  "name": "Hummus",
+  "aliase": [],
+  "fdc": "174289"
+ },
+ {
+  "name": "Mandeln",
+  "aliase": [],
+  "fdc": "170567"
+ },
+ {
+  "name": "Walnüsse",
+  "aliase": [],
+  "fdc": "170187"
+ },
+ {
+  "name": "Cashews",
+  "aliase": [
+   "Cashewkerne"
+  ],
+  "fdc": "170162"
+ },
+ {
+  "name": "Erdnüsse",
+  "aliase": [],
+  "fdc": "173806"
+ },
+ {
+  "name": "Erdnussbutter",
+  "aliase": [
+   "Erdnussmus"
+  ],
+  "fdc": "172470"
+ },
+ {
+  "name": "Sonnenblumenkerne",
+  "aliase": [],
+  "fdc": "170562"
+ },
+ {
+  "name": "Chiasamen",
+  "aliase": [
+   "Chia"
+  ],
+  "fdc": "170554"
+ },
+ {
+  "name": "Leinsamen",
+  "aliase": [],
+  "fdc": "169414"
+ },
+ {
+  "name": "Olivenöl",
+  "aliase": [
+   "Öl"
+  ],
+  "fdc": "171413"
+ },
+ {
+  "name": "Rapsöl",
+  "aliase": [],
+  "fdc": "172336"
+ },
+ {
+  "name": "Sonnenblumenöl",
+  "aliase": [],
+  "fdc": "171017"
+ },
+ {
+  "name": "Mayonnaise",
+  "aliase": [
+   "Mayo"
+  ],
+  "fdc": "171009"
+ },
+ {
+  "name": "Ketchup",
+  "aliase": [],
+  "fdc": "168556"
+ },
+ {
+  "name": "Tomatensoße",
+  "aliase": [
+   "Tomatensauce",
+   "Nudelsoße"
+  ],
+  "fdc": "171192"
+ },
+ {
+  "name": "Marmelade",
+  "aliase": [
+   "Konfitüre"
+  ],
+  "fdc": "169641"
+ },
+ {
+  "name": "Nuss-Nougat-Creme",
+  "aliase": [
+   "Nutella"
+  ],
+  "fdc": "168000"
+ },
+ {
+  "name": "Honig",
+  "aliase": [],
+  "fdc": "169640"
+ },
+ {
+  "name": "Zucker",
+  "aliase": [],
+  "fdc": "169655"
+ },
+ {
+  "name": "Ahornsirup",
+  "aliase": [],
+  "fdc": "169661"
+ },
+ {
+  "name": "Zartbitterschokolade",
+  "aliase": [
+   "Bitterschokolade"
+  ],
+  "fdc": "170273"
+ },
+ {
+  "name": "Milchschokolade",
+  "aliase": [
+   "Schokolade"
+  ],
+  "fdc": "167587"
+ },
+ {
+  "name": "Vanilleeis",
+  "aliase": [
+   "Eis",
+   "Eiscreme"
+  ],
+  "fdc": "167575"
+ },
+ {
+  "name": "Kekse",
+  "aliase": [
+   "Cookies"
+  ],
+  "fdc": "172716"
+ },
+ {
+  "name": "Donut",
+  "aliase": [],
+  "fdc": "172758"
+ },
+ {
+  "name": "Rührkuchen",
+  "aliase": [
+   "Kuchen"
+  ],
+  "fdc": "172704"
+ },
+ {
+  "name": "Chips",
+  "aliase": [
+   "Kartoffelchips"
+  ],
+  "fdc": "169677"
+ },
+ {
+  "name": "Popcorn (ohne Fett)",
+  "aliase": [
+   "Popcorn"
+  ],
+  "fdc": "167959"
+ },
+ {
+  "name": "Pizza Margherita (TK)",
+  "aliase": [
+   "Pizza"
+  ],
+  "fdc": "170317"
+ },
+ {
+  "name": "Pizza Salami (TK)",
+  "aliase": [],
+  "fdc": "172096"
+ },
+ {
+  "name": "Hamburger",
+  "aliase": [
+   "Burger"
+  ],
+  "fdc": "170693"
+ },
+ {
+  "name": "Cheeseburger",
+  "aliase": [],
+  "fdc": "170691"
+ },
+ {
+  "name": "Burrito",
+  "aliase": [],
+  "fdc": "173278"
+ },
+ {
+  "name": "Kaffee schwarz",
+  "aliase": [
+   "Kaffee"
+  ],
+  "fdc": "171890"
+ },
+ {
+  "name": "Tee",
+  "aliase": [
+   "Schwarztee"
+  ],
+  "fdc": "173227"
+ },
+ {
+  "name": "Cola",
+  "aliase": [],
+  "fdc": "174852"
+ },
+ {
+  "name": "Orangensaft",
+  "aliase": [
+   "O-Saft"
+  ],
+  "fdc": "169098"
+ },
+ {
+  "name": "Apfelsaft",
+  "aliase": [],
+  "fdc": "173933"
+ },
+ {
+  "name": "Bier",
+  "aliase": [],
+  "fdc": "168746"
+ },
+ {
+  "name": "Rotwein",
+  "aliase": [
+   "Wein"
+  ],
+  "fdc": "173190"
+ },
+ {
+  "name": "Weißwein",
+  "aliase": [],
+  "fdc": "174837"
+ },
+ {
+  "name": "Proteinpulver",
+  "aliase": [
+   "Whey",
+   "Eiweißpulver"
+  ],
+  "fdc": "173180"
+ },
+ {
+  "name": "Wasser",
+  "aliase": [],
+  "fdc": "173647"
+ }
+]

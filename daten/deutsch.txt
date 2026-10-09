@@ -1,0 +1,195 @@
+# Deutsche Namen -> USDA-Eintrag (SR Legacy)
+# Format:  Deutscher Name | USDA-Beschreibung (exakt oder eindeutiger Anfang) | weitere Suchwoerter
+# Nach jeder Aenderung:  python daten/baue_daten.py
+#
+# Bewusst NICHT drin: Lebensmittel, fuer die es in der USDA kein passendes
+# Gegenstueck gibt (Magerquark, Gummibaerchen, Laugenbrezel). Lieber eine
+# ehrliche KI-Schaetzung als ein falscher Tabellenwert, der exakt aussieht.
+
+# --- Obst ---
+Banane | Bananas, raw | Bananen
+Apfel | Apples, raw, with skin | Äpfel
+Birne | Pears, raw | Birnen
+Orange | Oranges, raw, all commercial varieties | Apfelsine, Orangen
+Erdbeeren | Strawberries, raw | Erdbeere
+Weintrauben | Grapes, red or green (European type | Trauben
+Heidelbeeren | Blueberries, raw | Blaubeeren
+Himbeeren | Raspberries, raw
+Kirschen | Cherries, sweet, raw
+Pflaume | Plums, raw | Pflaumen, Zwetschge
+Pfirsich | Peaches, yellow, raw | Pfirsiche
+Wassermelone | Watermelon, raw | Melone
+Ananas | Pineapple, raw, all varieties
+Kiwi | Kiwifruit, green, raw
+Mango | Mangos, raw
+Avocado | Avocados, raw, all commercial varieties
+Zitrone | Lemons, raw, without peel
+
+# --- Gemuese ---
+Brokkoli | Broccoli, raw | Brokkoli roh
+Brokkoli gekocht | Broccoli, cooked, boiled, drained, without salt
+Tomate | Tomatoes, red, ripe, raw, year round average | Tomaten
+Gurke | Cucumber, with peel, raw | Salatgurke
+Karotte | Carrots, raw | Möhre, Karotten, Möhren
+Paprika | Peppers, sweet, red, raw | Paprika rot
+Zwiebel | Onions, raw | Zwiebeln
+Eisbergsalat | Lettuce, iceberg (includes crisphead types), raw
+Blattsalat | Lettuce, green leaf, raw | Salat, Kopfsalat
+Spinat | Spinach, raw
+Champignons | Mushrooms, white, raw | Pilze
+Erbsen | Peas, green, frozen, cooked, boiled, drained, without salt
+Mais (Dose) | Corn, sweet, yellow, canned, whole kernel, drained solids | Mais
+Kidneybohnen (Dose) | Beans, kidney, red, mature seeds, canned, drained solids | Kidneybohnen
+Zucchini | Squash, summer, zucchini, includes skin, raw
+Blumenkohl | Cauliflower, raw
+Weißkohl | Cabbage, raw | Kohl
+Spargel | Asparagus, raw
+Grüne Bohnen | Beans, snap, green, raw | Bohnen
+Aubergine | Eggplant, raw
+Knoblauch | Garlic, raw
+Grünkohl | Kale, raw
+Radieschen | Radishes, raw
+Oliven | Olives, ripe, canned (small-extra large)
+
+# --- Kartoffeln ---
+Kartoffeln gekocht | Potatoes, boiled, cooked without skin, flesh, without salt | Kartoffel, Kartoffeln, Salzkartoffeln
+Ofenkartoffel | Potatoes, baked, flesh and skin, without salt | Backkartoffel
+Pommes (Backofen) | Potatoes, french fried, all types, salt added in processing, frozen, home-prepared, oven heated | Pommes, Pommes frites
+Pommes (Fast Food) | Fast foods, potato, french fried in vegetable oil
+Süßkartoffel | Sweet potato, cooked, baked in skin, flesh, without salt
+
+# --- Getreide, Nudeln, Reis ---
+Reis gekocht | Rice, white, long-grain, regular, cooked, enriched | Reis
+Reis roh | Rice, white, long-grain, regular, raw, enriched
+Vollkornreis gekocht | Rice, brown, long-grain, cooked | Naturreis
+Nudeln gekocht | Pasta, cooked, enriched, without added salt | Nudeln, Pasta, Spaghetti
+Nudeln roh | Pasta, dry, enriched
+Vollkornnudeln gekocht | Pasta, whole-wheat, cooked | Vollkornnudeln
+Eiernudeln gekocht | Noodles, egg, cooked, enriched | Eiernudeln
+Haferflocken | Cereals, oats, regular and quick, not fortified, dry | Hafer
+Knuspermüsli | Cereals ready-to-eat, granola, homemade | Granola
+Couscous gekocht | Couscous, cooked | Couscous
+Quinoa gekocht | Quinoa, cooked | Quinoa
+Mehl | Wheat flour, white, all-purpose, enriched, bleached | Weizenmehl
+
+# --- Brot und Backwaren ---
+Toastbrot | Bread, white, commercially prepared (includes soft bread crumbs) | Weißbrot, Toast
+Vollkornbrot | Bread, whole-wheat, commercially prepared
+Mehrkornbrot | Bread, multi-grain (includes whole-grain)
+Roggenbrot | Bread, rye
+Brötchen | Rolls, french | Semmel, Schrippe
+Burgerbrötchen | Rolls, hamburger or hotdog, plain
+Croissant | Croissants, butter
+Bagel | Bagels, plain, enriched, with calcium propionate (includes onion, poppy, sesame)
+Wrap | Tortillas, ready-to-bake or -fry, flour, refrigerated | Tortilla
+Salzstangen | Snacks, pretzels, hard, plain, salted
+Pfannkuchen | Pancakes, plain, prepared from recipe | Pancakes
+Waffeln | Waffles, plain, prepared from recipe | Waffel
+
+# --- Milchprodukte ---
+Vollmilch | Milk, whole, 3.25% milkfat, with added vitamin D | Milch
+Fettarme Milch | Milk, reduced fat, fluid, 2% milkfat, with added vitamin A and vitamin D
+Joghurt natur | Yogurt, plain, whole milk | Joghurt
+Griechischer Joghurt | Yogurt, Greek, plain, whole milk
+Skyr | Yogurt, Greek, plain, nonfat | Magerjoghurt
+Hüttenkäse | Cheese, cottage, creamed, large or small curd | Cottage Cheese
+Gouda | Cheese, gouda | Käse
+Mozzarella | Cheese, mozzarella, whole milk
+Parmesan | Cheese, parmesan, hard
+Feta | Cheese, feta | Schafskäse
+Cheddar | Cheese, cheddar
+Emmentaler | Cheese, swiss
+Brie | Cheese, brie
+Camembert | Cheese, camembert
+Frischkäse | Cheese, cream
+Ricotta | Cheese, ricotta, whole milk
+Butter | Butter, without salt
+Sahne | Cream, fluid, heavy whipping | Schlagsahne
+Saure Sahne | Cream, sour, cultured | Schmand
+
+# --- Eier ---
+Ei | Egg, whole, raw, fresh | Eier, Ei roh
+Ei gekocht | Egg, whole, cooked, hard-boiled | Frühstücksei
+Spiegelei | Egg, whole, cooked, fried
+Rührei | Egg, whole, cooked, scrambled
+Eiweiß | Egg, white, raw, fresh | Eiklar
+
+# --- Fleisch und Wurst ---
+Hähnchenbrust roh | Chicken, broiler or fryers, breast, skinless, boneless, meat only, raw | Hähnchen, Hühnchen, Hühnerbrust
+Hähnchenbrust gebraten | Chicken, broilers or fryers, breast, meat only, cooked, roasted
+Putenbrust roh | Turkey, retail parts, breast, meat only, raw | Pute
+Putenbrust gebraten | Turkey, retail parts, breast, meat only, cooked, roasted
+Rinderhack roh | Beef, ground, 80% lean meat / 20% fat, raw | Hackfleisch
+Rinderhack gebraten | Beef, ground, 80% lean meat / 20% fat, crumbles, cooked, pan-browned
+Rinderhack mager gebraten | Beef, ground, 90% lean meat / 10% fat, crumbles, cooked, pan-browned
+Steak | Beef, top sirloin, steak, separable lean only, trimmed to 0" fat, all grades, cooked, broiled | Rindersteak
+Schweinefilet | Pork, fresh, loin, tenderloin, separable lean only, cooked, roasted
+Bratwurst | Bratwurst, pork, cooked
+Würstchen | Frankfurter, meat | Wiener, Hotdog
+Kochschinken | Ham, sliced, regular (approximately 11% fat) | Schinken
+Salami | Salami, Italian, pork
+Speck | Pork, cured, bacon, cooked, baked | Bacon
+
+# --- Fisch ---
+Lachs roh | Fish, salmon, Atlantic, farmed, raw | Lachs
+Lachs gebraten | Fish, salmon, Atlantic, farmed, cooked, dry heat
+Thunfisch (Dose) | Fish, tuna, light, canned in water, drained solids | Thunfisch
+Kabeljau | Fish, cod, Atlantic, cooked, dry heat | Dorsch
+Garnelen | Crustaceans, shrimp, cooked | Shrimps
+Forelle | Fish, trout, mixed species, cooked, dry heat
+
+# --- Huelsenfruechte, Nuesse, Samen ---
+Linsen gekocht | Lentils, mature seeds, cooked, boiled, without salt | Linsen
+Kichererbsen gekocht | Chickpeas (garbanzo beans, bengal gram), mature seeds, cooked, boiled, without salt | Kichererbsen
+Tofu | Tofu, raw, firm, prepared with calcium sulfate
+Hummus | Hummus, commercial
+Mandeln | Nuts, almonds
+Walnüsse | Nuts, walnuts, english
+Cashews | Nuts, cashew nuts, raw | Cashewkerne
+Erdnüsse | Peanuts, all types, dry-roasted, without salt
+Erdnussbutter | Peanut butter, smooth style, without salt | Erdnussmus
+Sonnenblumenkerne | Seeds, sunflower seed kernels, dried
+Chiasamen | Seeds, chia seeds, dried | Chia
+Leinsamen | Seeds, flaxseed
+
+# --- Fette, Saucen, Aufstriche ---
+Olivenöl | Oil, olive, salad or cooking | Öl
+Rapsöl | Oil, canola
+Sonnenblumenöl | Oil, sunflower, linoleic (less than 60%)
+Mayonnaise | Salad dressing, mayonnaise, regular | Mayo
+Ketchup | Catsup
+Tomatensoße | Sauce, pasta, spaghetti/marinara, ready-to-serve | Tomatensauce, Nudelsoße
+Marmelade | Jams and preserves | Konfitüre
+Nuss-Nougat-Creme | Chocolate-flavored hazelnut spread | Nutella
+Honig | Honey
+Zucker | Sugars, granulated
+Ahornsirup | Syrups, maple
+
+# --- Suesses und Snacks ---
+Zartbitterschokolade | Chocolate, dark, 70-85% cacao solids | Bitterschokolade
+Milchschokolade | Candies, milk chocolate | Schokolade
+Vanilleeis | Ice creams, vanilla | Eis, Eiscreme
+Kekse | Cookies, chocolate chip, commercially prepared, regular, higher fat, enriched | Cookies
+Donut | Doughnuts, yeast-leavened, glazed, enriched
+Rührkuchen | Cake, pound, commercially prepared, butter | Kuchen
+Chips | Snacks, potato chips, plain, salted | Kartoffelchips
+Popcorn (ohne Fett) | Snacks, popcorn, air-popped | Popcorn
+
+# --- Fertiggerichte ---
+Pizza Margherita (TK) | Pizza, cheese topping, regular crust, frozen, cooked | Pizza
+Pizza Salami (TK) | Pizza, pepperoni topping, regular crust, frozen, cooked
+Hamburger | Fast foods, hamburger; single, regular patty; plain | Burger
+Cheeseburger | Fast foods, cheeseburger; single, regular patty, with condiments
+Burrito | Fast foods, burrito, with beans, cheese, and beef
+
+# --- Getraenke ---
+Kaffee schwarz | Beverages, coffee, brewed, prepared with tap water | Kaffee
+Tee | Beverages, tea, black, brewed, prepared with tap water | Schwarztee
+Cola | Beverages, carbonated, cola, regular
+Orangensaft | Orange juice, raw | O-Saft
+Apfelsaft | Apple juice, canned or bottled, unsweetened, without added ascorbic acid
+Bier | Alcoholic beverage, beer, regular, all
+Rotwein | Alcoholic beverage, wine, table, red | Wein
+Weißwein | Alcoholic beverage, wine, table, white
+Proteinpulver | Beverages, Protein powder whey based | Whey, Eiweißpulver
+Wasser | Beverages, water, tap, drinking
