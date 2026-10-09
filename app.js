@@ -5,11 +5,22 @@
 
 const SPEICHER_TAGE = "kalorien:tage";
 const SPEICHER_ZIEL = "kalorien:ziel";
+const SPEICHER_WASSER = "kalorien:wasser";        // { "2026-10-09": 750 } in ml
+const SPEICHER_WASSERZIEL = "kalorien:wasserziel"; // ml
+const SPEICHER_PROFIL = "kalorien:profil";
+
+const GLAS_ML = 250;
+const MAHLZEITEN = [
+  ["fruehstueck", "Frühstück"], ["mittag", "Mittagessen"],
+  ["abend", "Abendessen"], ["snack", "Snacks"],
+];
 
 const $ = (id) => document.getElementById(id);
 let tag = heute();
 let kiAn = false;
 let kandidaten = [];
+let vorgemerkteMahlzeit = null; // gesetzt ueber "+" an einer Mahlzeit
+let gewaehlteMahlzeit = null;
 
 // ---------- Speicher ----------
 
@@ -29,6 +40,25 @@ function setzeEintraege(liste) {
   schreib(SPEICHER_TAGE, tage);
 }
 const ziel = () => lies(SPEICHER_ZIEL, 2000);
+const wasserZiel = () => lies(SPEICHER_WASSERZIEL, 3000);
+const wasser = () => lies(SPEICHER_WASSER, {})[tag] ?? 0;
+function setzeWasser(ml) {
+  const alle = lies(SPEICHER_WASSER, {});
+  if (ml > 0) alle[tag] = ml; else delete alle[tag];
+  schreib(SPEICHER_WASSER, alle);
+}
+
+// Mahlzeit nach Uhrzeit raten - so stimmt sie meistens, ohne dass man tippt.
+// Eintraege von vor dieser Funktion haben kein Feld und werden ueber ihre
+// Uhrzeit einsortiert.
+function mahlzeitNachZeit(datum = new Date()) {
+  const h = datum.getHours() + datum.getMinutes() / 60;
+  if (h >= 4 && h < 10.5) return "fruehstueck";
+  if (h >= 10.5 && h < 15) return "mittag";
+  if (h >= 17 && h < 22) return "abend";
+  return "snack";
+}
+const mahlzeitVon = (e) => e.mahlzeit ?? mahlzeitNachZeit(new Date(e.zeit ?? Date.now()));
 
 // ---------- Rechnen ----------
 
@@ -89,22 +119,71 @@ function zeichne() {
   $("m-kh").textContent = rund(s.kh);
   $("m-fett").textContent = rund(s.fett);
 
-  const ul = $("liste");
-  ul.replaceChildren(...liste.map((e, i) => {
-    const li = document.createElement("li");
-    const w = werte(e);
-    li.innerHTML = `
-      <div class="was">
-        <div class="name"></div>
-        <div class="detail">${rund(e.gramm)} g · ${rund(w.protein)} P · ${rund(w.kh)} K · ${rund(w.fett)} F</div>
+  zeichneMahlzeiten(liste);
+  zeichneWasser();
+}
+
+function zeichneMahlzeiten(liste) {
+  $("mahlzeiten").replaceChildren(...MAHLZEITEN.map(([schluessel, titel]) => {
+    // Index mitnehmen: bearbeite() braucht die Stelle in der ganzen Tagesliste.
+    const teil = liste.map((e, i) => [e, i]).filter(([e]) => mahlzeitVon(e) === schluessel);
+    const kcal = teil.reduce((a, [e]) => a + werte(e).kcal, 0);
+
+    const block = document.createElement("div");
+    block.className = "mahlzeit";
+    block.innerHTML = `
+      <div class="mahlzeit-kopf">
+        <h2>${titel}</h2>
+        <span class="klein">${teil.length ? rund(kcal) + " kcal" : ""}</span>
+        <button class="plus" aria-label="${titel} hinzufügen">+</button>
       </div>
-      <div class="kcal">${rund(w.kcal)}</div>`;
-    li.querySelector(".name").textContent = e.name;
-    if (e.quelle === "KI-Schätzung") li.querySelector(".name").insertAdjacentHTML("beforeend", ' <span class="marke ki">geschätzt</span>');
-    li.addEventListener("click", () => bearbeite(i));
-    return li;
+      <ul class="liste"></ul>`;
+    block.querySelector(".plus").addEventListener("click", () => {
+      vorgemerkteMahlzeit = schluessel;
+      $("text").focus();
+      meldung(`Was gab es zum ${titel === "Snacks" ? "Snack" : titel}?`);
+    });
+    block.querySelector("ul").replaceChildren(...teil.map(([e, i]) => {
+      const li = document.createElement("li");
+      const w = werte(e);
+      li.innerHTML = `
+        <div class="was">
+          <div class="name"></div>
+          <div class="detail">${rund(e.gramm)} g · ${rund(w.protein)} P · ${rund(w.kh)} K · ${rund(w.fett)} F</div>
+        </div>
+        <div class="kcal">${rund(w.kcal)}</div>`;
+      li.querySelector(".name").textContent = e.name;
+      if (e.quelle === "KI-Schätzung") li.querySelector(".name").insertAdjacentHTML("beforeend", ' <span class="marke ki">geschätzt</span>');
+      li.addEventListener("click", () => bearbeite(i));
+      return li;
+    }));
+    return block;
   }));
-  $("leer").hidden = liste.length > 0;
+}
+
+// ---------- Wasser ----------
+
+function zeichneWasser() {
+  const ml = wasser();
+  const zielMl = wasserZiel();
+  const voll = Math.round(ml / GLAS_ML);
+  // Immer ein leeres Glas mehr zeigen als gefuellt - auch ueber dem Ziel
+  // will man noch eins antippen koennen.
+  const anzahl = Math.max(Math.ceil(zielMl / GLAS_ML), voll + 1);
+  $("wasser-stand").textContent = (ml / 1000).toLocaleString("de-DE");
+  $("wasser-ziel").textContent = (zielMl / 1000).toLocaleString("de-DE");
+  $("glaeser").classList.toggle("erreicht", ml >= zielMl);
+  $("glaeser").replaceChildren(...Array.from({ length: anzahl }, (_, i) => {
+    const b = document.createElement("button");
+    b.className = "glas" + (i < voll ? " voll" : "");
+    b.setAttribute("aria-label", i < voll ? `Glas ${i + 1} leeren` : `Glas ${i + 1} trinken`);
+    // Das letzte volle Glas antippen nimmt es zurueck, jedes andere fuellt bis dorthin.
+    b.addEventListener("click", () => {
+      setzeWasser((i + 1 === voll ? i : i + 1) * GLAS_ML);
+      zeichneWasser();
+    });
+    return b;
+  }));
 }
 
 function bearbeite(i) {
@@ -399,35 +478,140 @@ function oeffnePruefen(liste, rueckfrage, titel) {
     return li;
   }));
   summe();
+  waehleMahlzeit(vorgemerkteMahlzeit ?? mahlzeitNachZeit());
   $("pruefen").showModal();
 }
+
+function waehleMahlzeit(schluessel) {
+  gewaehlteMahlzeit = schluessel;
+  for (const b of $("mahlzeit-wahl").children) {
+    b.setAttribute("aria-checked", b.dataset.wert === schluessel);
+  }
+}
+$("mahlzeit-wahl").replaceChildren(...MAHLZEITEN.map(([schluessel, titel]) => {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.role = "radio";
+  b.dataset.wert = schluessel;
+  b.textContent = titel === "Mittagessen" ? "Mittag" : titel === "Abendessen" ? "Abend" : titel;
+  b.addEventListener("click", () => waehleMahlzeit(schluessel));
+  return b;
+}));
 
 function summe() {
   const s = kandidaten.filter((k) => k.an).reduce((a, k) => a + werte(k).kcal, 0);
   $("pruefen-summe").textContent = `Zusammen ${rund(s)} kcal`;
 }
 
-$("pruefen").addEventListener("close", () => {
-  if ($("pruefen").returnValue !== "ok") return;
+// Beim Antippen speichern, nicht erst im "close"-Ereignis: Das kommt nur
+// verzoegert, wenn die Seite gerade im Hintergrund ist - dann ging der
+// Eintrag verloren, wenn man die App direkt danach wegwischte.
+$("eintragen").addEventListener("click", () => {
+  vorgemerkteMahlzeit = null;
   const neu = kandidaten.filter((k) => k.an && k.gramm > 0).map((k) => ({
     name: k.name, gramm: k.gramm, pro100: k.pro100, quelle: k.quelle,
-    zeit: new Date().toISOString(),
+    mahlzeit: gewaehlteMahlzeit, zeit: new Date().toISOString(),
   }));
   setzeEintraege([...eintraege(), ...neu]);
   $("text").value = "";
   zeichne();
 });
 
+// ---------- Profil & Ziele ----------
+
+// Mifflin-St Jeor: die Formel, die die meisten Online-Rechner nutzen und die
+// in Studien am genauesten lag. Gibt den Grundumsatz in kcal/Tag zurueck.
+function grundumsatz(p) {
+  return 10 * p.gewicht + 6.25 * p.groesse - 5 * p.alter + (p.geschlecht === "w" ? -161 : 5);
+}
+
+function lieseProfil() {
+  return {
+    geschlecht: $("geschlecht").querySelector("[aria-checked=true]")?.dataset.wert ?? "m",
+    alter: parseFloat($("p-alter").value),
+    groesse: parseFloat($("p-groesse").value),
+    gewicht: parseFloat($("p-gewicht").value.replace(",", ".")),
+    aktivitaet: parseFloat($("p-aktivitaet").value),
+    ziel: parseInt($("p-ziel").value, 10),
+  };
+}
+
+let empfehlung = null;
+function berechne() {
+  const p = lieseProfil();
+  schreib(SPEICHER_PROFIL, p);
+  const vollstaendig = p.alter >= 10 && p.groesse >= 100 && p.gewicht >= 30;
+  $("uebernehmen").hidden = !vollstaendig;
+  if (!vollstaendig) {
+    empfehlung = null;
+    $("ergebnis").textContent = "Gib Alter, Größe und Gewicht ein.";
+    return;
+  }
+  const gu = grundumsatz(p);
+  const gesamt = gu * p.aktivitaet;
+  // Nie unter den Grundumsatz: Darunter fehlt dem Koerper Energie fuer die
+  // Grundfunktionen, und das Abnehmen kippt in Muskelabbau.
+  const roh = gesamt + p.ziel;
+  empfehlung = Math.round(Math.max(roh, gu) / 10) * 10;
+
+  const hinweise = [];
+  if (roh < gu) hinweise.push("Auf deinen Grundumsatz angehoben – weniger wäre ungesund.");
+  if (p.alter < 18) hinweise.push("Die Formel ist für Erwachsene gemacht. Unter 18 bitte nicht gezielt abnehmen, ohne das mit einem Arzt zu besprechen.");
+  $("ergebnis").innerHTML = `
+    <div class="ergebnis-zeile"><span>Grundumsatz</span><span>${rund(gu)} kcal</span></div>
+    <div class="ergebnis-zeile"><span>Mit Aktivität</span><span>${rund(gesamt)} kcal</span></div>
+    <div class="ergebnis-zeile gross"><span>Dein Tagesziel</span><span>${empfehlung} kcal</span></div>
+    ${hinweise.map((h) => `<p class="warn">${h}</p>`).join("")}`;
+}
+
+function setzeGeschlecht(wert) {
+  for (const b of $("geschlecht").children) b.setAttribute("aria-checked", b.dataset.wert === wert);
+}
+
+function oeffneEinstellungen() {
+  const p = lies(SPEICHER_PROFIL, {});
+  setzeGeschlecht(p.geschlecht ?? "m");
+  $("p-alter").value = p.alter || "";
+  $("p-groesse").value = p.groesse || "";
+  $("p-gewicht").value = p.gewicht ? p.gewicht.toLocaleString("de-DE") : "";
+  $("p-aktivitaet").value = String(p.aktivitaet ?? 1.375);
+  $("p-ziel").value = String(p.ziel ?? 0);
+  $("z-kcal").value = ziel();
+  $("z-wasser").value = (wasserZiel() / 1000).toLocaleString("de-DE");
+  berechne();
+  $("einstellungen").showModal();
+}
+
+for (const b of $("geschlecht").children) {
+  b.setAttribute("role", "radio");
+  b.addEventListener("click", () => { setzeGeschlecht(b.dataset.wert); berechne(); });
+}
+for (const id of ["p-alter", "p-groesse", "p-gewicht", "p-aktivitaet", "p-ziel"]) {
+  $(id).addEventListener("input", berechne);
+}
+$("uebernehmen").addEventListener("click", () => {
+  if (empfehlung) $("z-kcal").value = empfehlung;
+});
+
+// Bei "Fertig" sofort speichern (siehe "eintragen"), zusaetzlich beim
+// Schliessen per Escape/Zurueck - doppelt schadet nicht.
+function speichereZiele() {
+  const kcal = parseInt($("z-kcal").value, 10);
+  const liter = parseFloat($("z-wasser").value.replace(",", "."));
+  if (kcal >= 800 && kcal <= 6000) schreib(SPEICHER_ZIEL, kcal);
+  if (liter >= 0.5 && liter <= 8) schreib(SPEICHER_WASSERZIEL, Math.round(liter * 1000));
+  zeichne();
+}
+$("fertig").addEventListener("click", speichereZiele);
+$("einstellungen").addEventListener("close", speichereZiele);
+
 // ---------- Rest ----------
 
 $("tag-zurueck").addEventListener("click", () => verschiebe(-1));
 $("tag-vor").addEventListener("click", () => verschiebe(1));
 $("datum").addEventListener("click", () => { tag = heute(); zeichne(); });
-$("ziel-knopf").addEventListener("click", () => {
-  const a = prompt("Tagesziel in kcal:", ziel());
-  const z = parseInt(a, 10);
-  if (z > 0) { schreib(SPEICHER_ZIEL, z); zeichne(); }
-});
+$("ziel-knopf").addEventListener("click", oeffneEinstellungen);
+$("einstellungen-knopf").addEventListener("click", oeffneEinstellungen);
 
 // Auf GitHub Pages gibt es /api nicht - dann laeuft die App einfach ohne KI.
 fetch("api/status").then((r) => r.ok ? r.json() : { ki: false })

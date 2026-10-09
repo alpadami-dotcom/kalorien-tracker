@@ -20,6 +20,7 @@
   <button class="pfeil" id="tag-zurueck" aria-label="Vorheriger Tag">‹</button>
   <button class="datum" id="datum">Heute</button>
   <button class="pfeil" id="tag-vor" aria-label="Nächster Tag">›</button>
+  <button class="zahnrad" id="einstellungen-knopf" aria-label="Profil und Ziele">⚙︎</button>
 </header>
 
 <main>
@@ -40,6 +41,14 @@
       <div><span class="punkt k"></span><b id="m-kh">0</b> g Kohlenh.</div>
       <div><span class="punkt f"></span><b id="m-fett">0</b> g Fett</div>
     </div>
+  </section>
+
+  <section class="wasser">
+    <div class="wasser-kopf">
+      <span>Wasser</span>
+      <span class="klein"><b id="wasser-stand">0</b> / <span id="wasser-ziel">3</span> L</span>
+    </div>
+    <div class="glaeser" id="glaeser"></div>
   </section>
 
   <section class="eingabe">
@@ -64,11 +73,7 @@
     <ul class="vorschlaege" id="vorschlaege"></ul>
   </section>
 
-  <section>
-    <h2>Gegessen</h2>
-    <ul class="liste" id="liste"></ul>
-    <p class="leer" id="leer">Noch nichts eingetragen.</p>
-  </section>
+  <section id="mahlzeiten"></section>
 </main>
 
 <!-- Pruefen: was die KI / Suche / der Barcode gefunden hat, vor dem Eintragen -->
@@ -76,11 +81,61 @@
   <form method="dialog" class="blatt">
     <h2 id="pruefen-titel">Prüfen</h2>
     <p class="rueckfrage" id="rueckfrage" hidden></p>
+    <div class="segmente" id="mahlzeit-wahl" role="radiogroup" aria-label="Mahlzeit"></div>
     <ul id="kandidaten"></ul>
     <div class="summe" id="pruefen-summe"></div>
     <div class="aktionen">
       <button value="abbruch" class="zweit">Abbrechen</button>
       <button value="ok" id="eintragen" class="erst">Eintragen</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Profil und Ziele -->
+<dialog id="einstellungen">
+  <form method="dialog" class="blatt">
+    <h2>Profil &amp; Ziele</h2>
+
+    <h3>Kalorienbedarf berechnen</h3>
+    <div class="segmente" id="geschlecht" role="radiogroup" aria-label="Geschlecht">
+      <button type="button" data-wert="m">Männlich</button>
+      <button type="button" data-wert="w">Weiblich</button>
+    </div>
+    <div class="felder">
+      <label>Alter<input id="p-alter" type="number" inputmode="numeric" min="10" max="100" placeholder="Jahre"></label>
+      <label>Größe (cm)<input id="p-groesse" type="number" inputmode="numeric" min="100" max="230" placeholder="cm"></label>
+      <label>Gewicht (kg)<input id="p-gewicht" type="text" inputmode="decimal" placeholder="kg"></label>
+    </div>
+    <label class="zeile">Wie aktiv bist du?
+      <select id="p-aktivitaet">
+        <option value="1.2">Kaum – Schreibtisch, kein Sport</option>
+        <option value="1.375">Leicht – 1–3× Sport pro Woche</option>
+        <option value="1.55">Mittel – 3–5× Sport pro Woche</option>
+        <option value="1.725">Viel – 6–7× Sport pro Woche</option>
+        <option value="1.9">Sehr viel – körperliche Arbeit + Sport</option>
+      </select>
+    </label>
+    <label class="zeile">Dein Ziel
+      <select id="p-ziel">
+        <option value="-500">Abnehmen (ca. 0,5 kg pro Woche)</option>
+        <option value="-250">Langsam abnehmen (ca. 0,25 kg pro Woche)</option>
+        <option value="0">Gewicht halten</option>
+        <option value="250">Langsam zunehmen</option>
+        <option value="500">Zunehmen / Muskelaufbau</option>
+      </select>
+    </label>
+    <div class="ergebnis" id="ergebnis">Gib Alter, Größe und Gewicht ein.</div>
+    <button type="button" class="erst breit" id="uebernehmen" hidden>Als Kalorienziel übernehmen</button>
+
+    <h3>Tagesziele</h3>
+    <div class="felder zwei">
+      <label>Kalorien<input id="z-kcal" type="number" inputmode="numeric" min="800" max="6000" step="10"></label>
+      <!-- Kommazahlen als Text: type="number" verwirft "2,5" in manchen Browsern stillschweigend. -->
+      <label>Wasser (Liter)<input id="z-wasser" type="text" inputmode="decimal"></label>
+    </div>
+
+    <div class="aktionen eins">
+      <button value="ok" id="fertig" class="erst">Fertig</button>
     </div>
   </form>
 </dialog>
