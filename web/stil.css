@@ -10,6 +10,7 @@
   --protein: #2f8a5b;
   --kh: #d39a2c;
   --fett: #b5502f;
+  --wasser: #4aa3df;
   --schatten: 0 1px 2px rgb(0 0 0 / 6%), 0 4px 16px rgb(0 0 0 / 5%);
 }
 @media (prefers-color-scheme: dark) {
@@ -25,6 +26,7 @@
     --protein: #6cc79a;
     --kh: #e8b955;
     --fett: #e0866a;
+    --wasser: #5cb4ec;
     --schatten: none;
   }
 }
@@ -151,3 +153,61 @@ dialog::backdrop { background: rgb(0 0 0 / 40%); }
   max-width: 528px; margin: 0 auto; background: var(--tinte); color: var(--papier);
   padding: 12px 14px; border-radius: 12px; z-index: 11; font-size: 15px;
 }
+
+/* Einstellungen-Knopf oben rechts */
+.kopf { position: relative; }
+.zahnrad {
+  position: absolute; right: 12px; top: 50%; transform: translateY(-40%);
+  width: 44px; height: 44px; border: 0; background: none; font-size: 22px; color: var(--leise);
+}
+
+/* Wasser: ein Glas = 250 ml, antippen fuellt bis dorthin */
+.wasser { background: var(--karte); border-radius: 16px; padding: 14px 16px; box-shadow: var(--schatten); margin-top: 12px; }
+.wasser-kopf { display: flex; justify-content: space-between; align-items: baseline; font-weight: 600; }
+.wasser-kopf b { color: var(--tinte); font-variant-numeric: tabular-nums; }
+.glaeser { display: grid; grid-template-columns: repeat(auto-fill, 30px); justify-content: space-between; row-gap: 8px; margin-top: 10px; }
+.glas {
+  height: 44px; border: 2px solid var(--wasser); border-top-width: 1px; padding: 0;
+  border-radius: 3px 3px 9px 9px; background: transparent; position: relative; overflow: hidden;
+}
+.glas::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 0;
+  background: var(--wasser); transition: height .2s;
+}
+.glas.voll::after { height: 78%; }
+.glaeser.erreicht .glas.voll::after { background: var(--akzent); }
+
+/* Mahlzeiten */
+.mahlzeit { margin-top: 20px; }
+.mahlzeit-kopf { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.mahlzeit-kopf h2 { margin: 0; flex: 1; }
+.plus {
+  width: 32px; height: 32px; border-radius: 50%; border: 0; padding: 0;
+  background: var(--karte); box-shadow: var(--schatten); color: var(--akzent); font-size: 22px; line-height: 1;
+}
+.mahlzeit .liste:empty { display: none; }
+
+/* Segment-Auswahl (Mahlzeit, Geschlecht) */
+.segmente { display: flex; background: var(--papier); border-radius: 10px; padding: 3px; gap: 3px; margin: 0 0 12px; }
+.segmente button { flex: 1; border: 0; background: none; padding: 8px 4px; border-radius: 8px; font-size: 14px; color: var(--leise); }
+.segmente button[aria-checked=true] { background: var(--karte); color: var(--tinte); font-weight: 600; box-shadow: var(--schatten); }
+
+/* Einstellungen */
+.blatt h3 { font-size: 14px; color: var(--leise); font-weight: 600; margin: 18px 0 8px; }
+.blatt h3:first-of-type { margin-top: 4px; }
+.felder { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.felder.zwei { grid-template-columns: 1fr 1fr; }
+.felder label, .zeile { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--leise); }
+.zeile { margin-top: 10px; }
+.felder input, .zeile select {
+  font-size: 16px; padding: 10px; border-radius: 10px; border: 1px solid var(--linie);
+  background: var(--papier); color: var(--tinte); width: 100%; min-width: 0;
+}
+.ergebnis { background: var(--papier); border-radius: 12px; padding: 12px; margin-top: 12px; font-size: 14px; color: var(--leise); }
+.ergebnis-zeile { display: flex; justify-content: space-between; padding: 2px 0; }
+.ergebnis-zeile span:last-child { font-variant-numeric: tabular-nums; color: var(--tinte); }
+.ergebnis-zeile.gross { font-size: 17px; font-weight: 700; color: var(--tinte); border-top: 1px solid var(--linie); margin-top: 6px; padding-top: 8px; }
+.ergebnis .warn { color: var(--warn); margin: 8px 0 0; font-size: 13px; }
+.breit { width: 100%; margin-top: 8px; padding: 12px; border: 0; border-radius: 12px; font-weight: 600; }
+.aktionen.eins { grid-template-columns: 1fr; }
+dialog { overflow-y: auto; }

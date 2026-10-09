@@ -47,6 +47,17 @@ Fallen, die schon einmal zugeschnappt sind:
 - „Reis" traf „Reis roh" statt des Alias von „Reis gekocht" (fast 3× kcal).
   Exakte Alias-Treffer ranken deshalb vor allem anderen.
 
+## Profil, Wasser, Mahlzeiten
+
+- Kalorienbedarf nach Mifflin-St Jeor × Aktivitätsfaktor ± Ziel. Die
+  Empfehlung geht **nie unter den Grundumsatz**; unter 18 zeigt die App
+  einen Hinweis. Diese Untergrenze nicht entfernen.
+- Wasser: `kalorien:wasser` je Tag in ml, ein Glas = 250 ml.
+- Jeder Eintrag hat `mahlzeit` (fruehstueck/mittag/abend/snack); alte
+  Einträge ohne das Feld werden über ihre Uhrzeit einsortiert.
+- Speichern beim **Antippen** der Knöpfe, nicht im `close`-Ereignis des
+  Dialogs — das kommt im Hintergrund verzögert, Einträge gingen verloren.
+
 ## Konventionen
 
 Wie im Etsy-Projekt: deutsch benennen, Kommentare erklären das Warum,
