@@ -77,6 +77,7 @@
     <a href="#kalender" class="kachel breit-kachel" aria-label="Kalender">
       <div class="kachel-titel">Kalender <span class="weiter" aria-hidden="true">›</span></div>
       <div class="woche" id="kachel-woche"></div>
+      <div class="klein kachel-naechster" id="kachel-naechster" hidden></div>
     </a>
   </main>
 </div>
@@ -194,10 +195,22 @@
       <div class="legende kal-legende">
         <span><span class="key kal-key im-ziel"></span>Im Ziel</span>
         <span><span class="key kal-key drueber"></span>Über dem Ziel</span>
+        <span><span class="key kal-key notiz"></span>Eintrag</span>
       </div>
-      <p class="klein">Tag antippen, um ihn in der Übersicht zu öffnen.</p>
     </section>
-    <button type="button" id="kal-heute" class="erst breit">Heute</button>
+
+    <!-- Der angetippte Tag: Zusammenfassung und eigene Eintraege -->
+    <section class="kalender-karte tag-detail">
+      <div class="tag-detail-kopf">
+        <h2 id="kal-tag-titel"></h2>
+        <button type="button" class="plus" id="kal-eintrag-plus" aria-label="Eintrag hinzufügen">+</button>
+      </div>
+      <p class="klein" id="kal-tag-summe"></p>
+      <ul class="liste" id="kal-eintraege"></ul>
+      <p class="leer" id="kal-eintraege-leer">Noch keine Einträge – mit + z. B. Training oder Termine eintragen.</p>
+      <button type="button" class="link-knopf" id="kal-tag-oeffnen">Diesen Tag in der Übersicht öffnen ›</button>
+    </section>
+    <button type="button" id="kal-heute" class="zweit breit">Zu heute</button>
   </main>
 </div>
 
@@ -265,6 +278,27 @@
   </form>
 </dialog>
 
+
+<!-- Kalender-Eintrag: Training, Termin oder Notiz an einem Tag -->
+<dialog id="notiz-dialog">
+  <form method="dialog" class="blatt">
+    <h2 id="notiz-titel">Eintrag</h2>
+    <div class="segmente" id="notiz-art" role="radiogroup" aria-label="Art">
+      <button type="button" data-wert="training">🏋️ Training</button>
+      <button type="button" data-wert="termin">📅 Termin</button>
+      <button type="button" data-wert="notiz">📝 Notiz</button>
+    </div>
+    <label class="zeile">Was?<input id="notiz-text" type="text" autocomplete="off" enterkeyhint="done" placeholder="z. B. Beine, Zahnarzt, Cheat Day"></label>
+    <!-- Untereinander: Datums- und Zeitfelder sind am iPhone breiter als ihr Platz. -->
+    <label class="zeile">Tag<input id="notiz-datum" type="date"></label>
+    <label class="zeile">Uhrzeit (optional)<input id="notiz-zeit" type="time"></label>
+    <div class="aktionen">
+      <button type="button" id="notiz-abbrechen" class="zweit">Abbrechen</button>
+      <button value="ok" id="notiz-speichern" class="erst">Speichern</button>
+    </div>
+    <button type="button" id="notiz-loeschen" class="loeschen" hidden>Eintrag löschen</button>
+  </form>
+</dialog>
 
 <!-- Gewicht eintragen -->
 <dialog id="gewicht-dialog">

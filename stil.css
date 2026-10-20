@@ -340,3 +340,28 @@ body:has(.ansicht:not(#ansicht-start):not([hidden])) { padding-top: 0; }
 .kalender-karte { background: var(--karte); border-radius: 16px; padding: 14px 12px; box-shadow: var(--schatten); }
 #ansicht-gewicht .gewicht-karte { margin-top: 8px; }
 #ansicht-gewicht .breit, #ansicht-kalender .breit { margin-top: 14px; }
+
+/* Kalender: eigene Eintraege */
+.kal-tag.zukunft { color: var(--leise); }
+/* Kleines Zeichen oben rechts: an dem Tag steht ein Eintrag */
+.kal-tag.mit-notiz::before {
+  content: ""; position: absolute; top: 5px; right: 6px; width: 5px; height: 5px;
+  border-radius: 50%; background: var(--tinte);
+}
+.kal-tag.gewaehlt.mit-notiz::before { background: var(--akzent-text); }
+.kal-key.notiz { width: 5px; height: 5px; background: var(--tinte); }
+.tag-detail { margin-top: 12px; }
+.tag-detail-kopf { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.tag-detail-kopf h2 { margin: 0; color: var(--tinte); font-size: 17px; }
+.tag-detail .liste { box-shadow: none; border: 1px solid var(--linie); margin-top: 8px; }
+.tag-detail .leer { padding: 10px 0 0; text-align: left; font-size: 14px; }
+.notiz-zeichen { font-size: 20px; }
+.notiz-zeit { font-weight: 500; color: var(--leise); }
+.kachel-naechster { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--linie); color: var(--tinte); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.kachel-naechster[hidden] { display: none; }
+.zweit.breit { background: var(--linie); color: var(--tinte); }
+input[type=time] {
+  -webkit-appearance: none; appearance: none; display: block; min-height: 44px;
+  font-size: 16px; padding: 10px; border-radius: 10px; border: 1px solid var(--linie);
+  background: var(--papier); color: var(--tinte); width: 100%; min-width: 0; text-align: left;
+}
