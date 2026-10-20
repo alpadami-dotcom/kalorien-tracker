@@ -64,6 +64,20 @@ Fallen, die schon einmal zugeschnappt sind:
 - Speichern beim **Antippen** der Knöpfe, nicht im `close`-Ereignis des
   Dialogs — das kommt im Hintergrund verzögert, Einträge gingen verloren.
 
+## iPhone-Fallen
+
+- Die Zahlentastatur (`inputmode="decimal"`) hat **keinen Fertig-Knopf** und
+  legt sich über unten verankerte Blätter. `--tastatur` (aus visualViewport)
+  hebt die Blätter an; Tippen auf eine leere Stelle schließt die Tastatur.
+  Gewicht konnte deshalb nicht gespeichert werden.
+- Datumsfelder sind auf iOS breiter als ihr Platz → nie neben ein anderes
+  Feld setzen, `appearance: none`.
+- In `<form method="dialog">` ist der **erste** Submit-Knopf der Standard für
+  Enter — „Abbrechen" daher `type="button"`.
+- Zoom ist gesperrt (viewport-Meta + gesture-Ereignisse in app.js), weil
+  iOS `user-scalable=no` allein ignoriert. Eingabefelder brauchen ≥ 16 px
+  Schrift, sonst zoomt Safari beim Antippen trotzdem.
+
 ## Konventionen
 
 Wie im Etsy-Projekt: deutsch benennen, Kommentare erklären das Warum,

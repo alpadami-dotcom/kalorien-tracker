@@ -115,10 +115,12 @@ h2 { font-size: 15px; font-weight: 600; color: var(--leise); margin: 24px 0 8px;
 .marke.ki { background: color-mix(in srgb, var(--kh) 25%, transparent); color: var(--tinte); }
 
 /* Pruefen-Dialog: von unten wie ein iOS-Blatt */
+/* --tastatur setzt app.js auf die Hoehe der iPhone-Tastatur: Ohne das lag
+   die Tastatur ueber dem unteren Teil des Blatts samt "Speichern". */
 dialog {
-  border: 0; padding: 0; margin: auto auto 0; width: 100%; max-width: 560px;
+  border: 0; padding: 0; margin: auto auto var(--tastatur, 0px); width: 100%; max-width: 560px;
   background: var(--karte); color: var(--tinte); border-radius: 18px 18px 0 0;
-  max-height: 88vh;
+  max-height: calc(88vh - var(--tastatur, 0px));
 }
 dialog::backdrop { background: rgb(0 0 0 / 40%); }
 .blatt { padding: 18px 16px calc(env(safe-area-inset-bottom) + 16px); }
@@ -205,7 +207,7 @@ dialog::backdrop { background: rgb(0 0 0 / 40%); }
 .felder.zwei { grid-template-columns: 1fr 1fr; }
 .felder label, .zeile { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: var(--leise); }
 .zeile { margin-top: 10px; }
-.felder input, .zeile select {
+.felder input, .zeile select, .zeile input {
   font-size: 16px; padding: 10px; border-radius: 10px; border: 1px solid var(--linie);
   background: var(--papier); color: var(--tinte); width: 100%; min-width: 0;
 }
@@ -249,7 +251,18 @@ dialog { overflow-y: auto; }
 .gewicht-alle .liste { box-shadow: none; border: 1px solid var(--linie); margin-top: 8px; }
 .loeschen { width: 100%; margin-top: 10px; padding: 12px; border: 0; background: none; color: var(--warn); font-weight: 600; }
 .loeschen[hidden] { display: none; }
-input[type=date] { font-size: 16px; padding: 10px; border-radius: 10px; border: 1px solid var(--linie); background: var(--papier); color: var(--tinte); width: 100%; min-width: 0; }
+/* iOS gibt Datumsfeldern eine Mindestbreite und zentrierten Text -
+   appearance:none macht sie zu normalen, gleich breiten Feldern. */
+input[type=date] {
+  -webkit-appearance: none; appearance: none; display: block; min-height: 44px;
+  font-size: 16px; padding: 10px; border-radius: 10px; border: 1px solid var(--linie);
+  background: var(--papier); color: var(--tinte); width: 100%; min-width: 0; text-align: left;
+}
+input[type=date]::-webkit-date-and-time-value { text-align: left; }
+.gross-eingabe { font-size: 24px !important; font-weight: 600; }
+
+/* Doppeltippen zoomt nicht mehr (Teil der Zoom-Sperre, siehe app.js). */
+html { touch-action: manipulation; }
 
 /* Kalender */
 .kal-kopf { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
@@ -274,3 +287,4 @@ input[type=date] { font-size: 16px; padding: 10px; border-radius: 10px; border: 
 .kal-tag.gewaehlt::after { background: var(--akzent-text); }
 .kal-key { width: 8px; height: 8px; border-radius: 50%; }
 .kal-legende { margin: 10px 0 4px; }
+.blatt input:focus, .blatt select:focus { outline: 2px solid var(--akzent); outline-offset: -1px; }

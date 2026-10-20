@@ -212,6 +212,7 @@ $("g-loeschen").addEventListener("click", () => {
 });
 
 $("gewicht-plus").addEventListener("click", () => oeffneGewicht());
+$("g-abbrechen").addEventListener("click", () => $("gewicht-dialog").close());
 
 for (const b of $("gewicht-zeitraum").children) {
   b.setAttribute("role", "radio");
