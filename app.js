@@ -169,6 +169,7 @@ function zeichne() {
   zeichneWasser();
   if (typeof zeichneKalenderKachel === "function") zeichneKalenderKachel(); // kalender.js
   if (typeof zeichneWocheKachel === "function") zeichneWocheKachel(); // woche.js
+  if (typeof zeichneSchritte === "function") zeichneSchritte(); // schritte.js
   if (aktuelleMahlzeit && typeof zeichneMahlzeitSeite === "function") zeichneMahlzeitSeite();
 }
 

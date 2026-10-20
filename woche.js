@@ -43,6 +43,7 @@ function wochenDaten(montag) {
       d, s, zukunft: d > h, gegessen: liste.length > 0,
       makro: liste.length > 0 && makroGeschafft(s, mz),
       wasser: wasser[d] ?? 0, gewicht: gewicht[d] ?? null,
+      schritte: typeof schritteAlle === "function" ? (schritteAlle()[d] ?? 0) : 0,
     };
   });
 }
@@ -68,7 +69,7 @@ function zeichneWocheKachel() {
     const spalte = document.createElement("span");
     spalte.className = "mini-spalte" + (t.d === heute() ? " heute" : "") + (t.zukunft ? " zukunft" : "");
     const balken = document.createElement("span");
-    balken.className = "mini-balken" + (t.gegessen ? "" : " leer");
+    balken.className = "mini-balken" + (t.gegessen ? "" : " ohne-wert"); // nicht "leer": die Klasse hat schon Polster
     balken.style.height = t.gegessen ? Math.max(6, (t.s.kcal / oben) * 100) + "%" : "";
     const name = document.createElement("span");
     name.className = "mini-name";
@@ -190,6 +191,8 @@ function zeichneKennzahlen(woche) {
     ["Makroziel geschafft", `${mitEssen.filter((t) => t.makro).length} ${mitEssen.filter((t) => t.makro).length === 1 ? "Tag" : "Tage"}`, "✓ Protein, KH und Fett"],
     ["Ø Protein", mitEssen.length ? `${zahl(avg("protein"))} g` : "–", `Ziel ${makroZiele().protein} g`],
     ["Ø Wasser", mitWasser.length ? `${(schnitt(mitWasser.map((t) => t.wasser)) / 1000).toLocaleString("de-DE", { maximumFractionDigits: 1 })} L` : "–", `Ziel ${(wasserZiel() / 1000).toLocaleString("de-DE")} L`],
+    ["Ø Schritte", woche.some((t) => t.schritte) ? zahl(schnitt(woche.filter((t) => t.schritte).map((t) => t.schritte))) : "–",
+      typeof schrittZiel === "function" ? `Ziel ${zahl(schrittZiel())}` : ""],
     ["Gewicht", gewogen.length >= 2
       ? `${gewogen.at(-1).gewicht - gewogen[0].gewicht > 0 ? "+" : "−"}${Math.abs(gewogen.at(-1).gewicht - gewogen[0].gewicht).toLocaleString("de-DE", { maximumFractionDigits: 1 })} kg`
       : gewogen.length ? `${gewogen[0].gewicht.toLocaleString("de-DE")} kg` : "–",
