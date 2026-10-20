@@ -89,14 +89,18 @@ function datumText() {
   const gestern = new Date(h + "T12:00:00"); gestern.setDate(gestern.getDate() - 1);
   if (tag === h) return "Heute";
   if (tag === gestern.toISOString().slice(0, 10)) return "Gestern";
-  return new Date(tag + "T12:00:00").toLocaleDateString("de-DE",
-    { weekday: "short", day: "numeric", month: "short" });
+  return new Date(tag + "T12:00:00").toLocaleDateString("de-DE", { weekday: "long" });
 }
 
 // ---------- Zeichnen ----------
 
 function zeichne() {
-  $("datum").textContent = datumText();
+  $("datum-titel").textContent = datumText();
+  // Bei "Heute"/"Gestern" gehoert der Wochentag in die Zeile darunter,
+  // sonst steht er schon oben und wuerde doppelt erscheinen.
+  const relativ = tag >= heute() || datumText() === "Gestern";
+  $("datum-voll").textContent = new Date(tag + "T12:00:00").toLocaleDateString("de-DE",
+    relativ ? { weekday: "long", day: "numeric", month: "long" } : { day: "numeric", month: "long", year: "numeric" });
   $("tag-vor").style.visibility = tag >= heute() ? "hidden" : "visible";
 
   const liste = eintraege();
@@ -610,6 +614,31 @@ $("einstellungen").addEventListener("close", speichereZiele);
 $("tag-zurueck").addEventListener("click", () => verschiebe(-1));
 $("tag-vor").addEventListener("click", () => verschiebe(1));
 $("datum").addEventListener("click", () => { tag = heute(); zeichne(); });
+
+// Immer den Tag zeigen, der gerade ist. iOS laesst die App im Hintergrund
+// weiterlaufen, statt sie neu zu laden - "tag" blieb so ueber Nacht auf
+// gestern stehen, und das Fruehstueck landete beim Vortag.
+// Regeln: Um Mitternacht springt "Heute" mit. Wer die App nach mehr als
+// 10 Minuten wieder oeffnet, landet immer auf heute - auch wenn er vorher
+// in einem alten Tag geblaettert hat.
+let letztesHeute = heute();
+let verstecktSeit = null;
+function pruefeTag() {
+  const h = heute();
+  const lange = verstecktSeit && Date.now() - verstecktSeit > 10 * 60 * 1000;
+  if (h === letztesHeute && !lange) return;
+  if (tag === letztesHeute || lange) tag = h;
+  letztesHeute = h;
+  zeichne();
+  if (typeof zeichneGewicht === "function") zeichneGewicht(); // Zeitraum haengt an heute
+}
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) { verstecktSeit = Date.now(); return; }
+  pruefeTag();
+  verstecktSeit = null;
+});
+window.addEventListener("pageshow", pruefeTag);
+setInterval(pruefeTag, 60 * 1000);
 $("ziel-knopf").addEventListener("click", oeffneEinstellungen);
 $("einstellungen-knopf").addEventListener("click", oeffneEinstellungen);
 
