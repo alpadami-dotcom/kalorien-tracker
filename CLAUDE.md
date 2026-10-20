@@ -64,6 +64,10 @@ Fallen, die schon einmal zugeschnappt sind:
   einen Hinweis. Diese Untergrenze nicht entfernen.
 - Wasser: `kalorien:wasser` je Tag in ml, ein Glas = 250 ml.
 - Kalender-Einträge dürfen in der Zukunft liegen (planen), Essen nicht.
+  Wiederholungen (Woche/Monat/Jahr; Geburtstag = automatisch jährlich)
+  liegen **einmal** am Ursprungstag; `eintraegeAm()` rechnet die Termine aus.
+  Ändern/Löschen gilt für die ganze Reihe. 31. und 29.2. rutschen auf den
+  letzten Tag des Monats. Monat wischen: links = zurück, rechts = vor.
 - Makro-Ziele: automatisch 1,8 g Protein/kg, 30 % kcal aus Fett, Rest KH;
   gespeichert (`kalorien:makroziele`) wird nur, was davon abweicht.
   „Geschafft" = Protein ≥ 90 %, KH und Fett ≤ 110 % (`makroGeschafft()`),
