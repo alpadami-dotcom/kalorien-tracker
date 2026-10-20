@@ -15,7 +15,7 @@ ohne Server. Suche, Mengen und Barcode passieren im Browser.
 | `web/mahlzeit.js` | Mahlzeit-Seite (#mahlzeit-fruehstueck …): eintragen + Gedächtnis „Letztes Mal“ / „Oft gegessen“ aus `kalorien:tage` |
 | `web/gewicht.js` | Gewichtsverlauf: Kurve (SVG, ohne Bibliothek), Eintragen, Liste |
 | `web/kalender.js` | Kalender (#kalender): Monat, Tagesdetail, eigene Einträge (Training/Termin/Notiz, `kalorien:kalender`), Wochenstreifen + nächster Eintrag in der Kachel |
-| `web/schritte.js` | Aktivität (#schritte): Bewegen-Ring + Schritte per Kurzbefehl → Zwischenablage → „Einfügen“; auch von Hand; `kalorien:schritte`, `kalorien:aktiv` |
+| `web/schritte.js` | Schritte (#schritte): Ring bis zum Ziel, per Kurzbefehl → Zwischenablage → „Einfügen“ oder von Hand; `kalorien:schritte` |
 | `web/woche.js` | Wochenübersicht (#woche): Säulen je Tag + Ziel-Linie, Kennzahlen, Tagesliste; Woche-Kachel mit Mini-Balken |
 | `web/sicherung.js` | Datensicherung: alle `kalorien:*`-Werte als JSON (Teilen-Menü → iCloud), Wiederherstellen mit Vorschau + Rückgängig, Erinnerung nach 14 Tagen |
 | `web/sw.js` | Service Worker: offline nutzbar, „Netz zuerst" damit Updates ankommen |
@@ -83,17 +83,18 @@ Reihenfolge auf der Mahlzeit-Seite: ⭐ Favoriten (selbst per Stern,
 Zuletzt gegessen (alle Mahlzeiten) → Oft. Was weiter oben steht, wird
 weiter unten nicht wiederholt.
 
-## Aktivität (Schritte + Bewegen-Ring)
+## Schritte
 
-Der Nutzer hat **keine Apple Watch** — die Fitness-App füllt nur den
-Bewegen-Ring (= „Aktive Energie“ in Health). Trainieren/Stehen deshalb nicht.
 Web-Apps dürfen Health nicht lesen. Umweg (vom Nutzer so gewählt): Der
-iPhone-Kurzbefehl **„Schritte kopieren“** (Name muss exakt stimmen) summiert
-Schritte und aktive Energie von heute und kopiert „Schritte;kcal“
-(`leseAktivitaet()`; nur eine Zahl = alter Kurzbefehl, nur Schritte); „Schritte holen“ startet ihn über
-`shortcuts://run-shortcut`, zurück über „◀ Kalorien“, dann „Einfügen“ —
-die Zwischenablage darf iOS erst nach einem Tipp freigeben. Aktive kcal nur als Info, nicht aufs Ziel gerechnet; fehlen sie, Schätzung
-≈0,00055 × kg pro Schritt.
+iPhone-Kurzbefehl **„Schritte kopieren“** (Name muss exakt stimmen; bei ihm
+heißt die Aktion „Health-Messungen suchen“) summiert die Schritte von heute
+und kopiert sie. „Holen“ startet ihn über `shortcuts://run-shortcut`, zurück
+über „◀ Kalorien“, dann „Einfügen“ — die Zwischenablage gibt iOS erst nach
+einem Tipp frei. Der Nutzer will **nur Schritte**, keine kcal (Bewegen-Ring
+gab es kurz, wieder entfernt; er hat keine Apple Watch). Ring mit
+Lila-Pink-Verlauf, voll bei 10.000; geschafft = gleiche Farbe, aber Leuchten,
+🏆 und einmalige Feier beim Überschreiten — **nicht die Farbe wechseln**,
+so gewünscht.
 
 ## Profil, Wasser, Mahlzeiten
 
