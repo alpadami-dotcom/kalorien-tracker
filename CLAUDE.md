@@ -18,6 +18,7 @@ ohne Server. Suche, Mengen und Barcode passieren im Browser.
 | `web/daten/*.json` | Nährwerte, erzeugt von `daten/baue_daten.py` — nicht von Hand ändern |
 | `daten/deutsch.txt` | ~160 deutsche Namen → USDA-Eintrag, von Hand gepflegt |
 | `werkzeuge/baue_hintergrund.py` | rechnet den lila Marmor-Hintergrund (hell + dunkel) nach `web/` |
+| `werkzeuge/baue_symbol.py` | App-Symbol: Flamme auf Marmor; neues Symbol = neuer Dateiname (iOS cacht pro Adresse) |
 | `server.py`, `ki.py` | nur zu Hause: Foto/Freitext über Claude, braucht `.env` mit Schlüssel |
 
 Veröffentlichen: `veroeffentlichen.bat` schiebt `web/` auf den Zweig

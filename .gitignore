@@ -2,3 +2,4 @@
 daten/roh/
 __pycache__/
 .env.txt
+werkzeuge/symbol-vorschau.png
