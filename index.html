@@ -18,7 +18,10 @@
 
 <header class="kopf">
   <button class="pfeil" id="tag-zurueck" aria-label="Vorheriger Tag">‹</button>
-  <button class="datum" id="datum">Heute</button>
+  <button class="datum" id="datum" aria-label="Zu heute springen">
+    <span id="datum-titel">Heute</span>
+    <span class="datum-voll" id="datum-voll"></span>
+  </button>
   <button class="pfeil" id="tag-vor" aria-label="Nächster Tag">›</button>
   <button class="zahnrad" id="einstellungen-knopf" aria-label="Profil und Ziele">⚙︎</button>
 </header>
