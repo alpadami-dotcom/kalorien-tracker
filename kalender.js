@@ -293,8 +293,8 @@ function zeichneNaechsten() {
 
 // ---------- Knoepfe ----------
 
-// Wischen ueber dem Monat: nach links = voriger Monat, nach rechts = naechster -
-// dieselbe Richtung wie beim Tageswechsel in der Uebersicht.
+// Wischen ueber dem Monat: Finger nach rechts = voriger Monat, nach links =
+// naechster - dieselbe Richtung wie beim Tageswechsel in der Uebersicht.
 let kalWisch = null;
 const monatKarte = $("kal-raster").closest(".kalender-karte");
 monatKarte.addEventListener("touchstart", (ev) => {
@@ -308,12 +308,12 @@ monatKarte.addEventListener("touchend", (ev) => {
   const schnell = Date.now() - kalWisch.zeit < 700;
   kalWisch = null;
   if (!schnell || Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
-  if (dx > 0 && $("kal-vor").disabled) return;
-  blaettereMonat(dx < 0 ? -1 : 1);
+  if (dx < 0 && $("kal-vor").disabled) return;
+  blaettereMonat(dx > 0 ? -1 : 1);
   const r = $("kal-raster");
   r.classList.remove("rein-rechts", "rein-links");
   void r.offsetWidth; // Animation neu starten
-  r.classList.add(dx < 0 ? "rein-rechts" : "rein-links");
+  r.classList.add(dx > 0 ? "rein-links" : "rein-rechts");
 }, { passive: true });
 
 $("kal-zurueck").addEventListener("click", () => blaettereMonat(-1));

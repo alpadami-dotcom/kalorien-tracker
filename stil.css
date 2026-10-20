@@ -460,3 +460,8 @@ dialog { background: var(--blatt); }
 /* Monat wischen: dieselbe Gleit-Animation wie beim Tageswechsel */
 .kal-raster.rein-rechts { animation: rein-rechts .25s ease-out; }
 .kal-raster.rein-links { animation: rein-links .25s ease-out; }
+
+/* Datensicherung */
+.datei-knopf { display: flex; align-items: center; justify-content: center; text-align: center; font-weight: 600; font-size: 15px; cursor: pointer; }
+.import-liste { margin: 0 0 10px; padding-left: 20px; line-height: 1.7; }
+.warn-text { font-size: 14px; color: var(--warn); }
