@@ -25,11 +25,12 @@ const sortiert = (liste) => [...liste].sort((a, b) => (a.zeit || "99").localeCom
 const langesDatum = (d) => new Date(d + "T12:00:00").toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "long" });
 
 // 10 % Spielraum: Wer 2050 statt 2000 isst, hat sein Ziel nicht verfehlt.
-function tagStatus(tage, d, z) {
+// Makros gegen die heutigen Ziele - alte Ziele werden nicht gespeichert.
+function tagStatus(tage, d, z, mz = makroZiele()) {
   const liste = tage[d] ?? [];
   if (!liste.length) return null;
-  const kcal = liste.reduce((a, e) => a + werte(e).kcal, 0);
-  return { kcal, klasse: kcal > z * 1.1 ? "drueber" : "im-ziel" };
+  const s = summen(liste);
+  return { kcal: s.kcal, klasse: s.kcal > z * 1.1 ? "drueber" : "im-ziel", makro: makroGeschafft(s, mz) };
 }
 
 // ---------- Monat ----------
@@ -46,6 +47,7 @@ function zeichneKalender() {
   const tage = alleTage();
   const notizen = kalEintraege();
   const z = ziel();
+  const mz = makroZiele();
 
   // Wochen beginnen am Montag (deutsche Gewohnheit, nicht US-Sonntag).
   const versatz = (new Date(j, m - 1, 1).getDay() + 6) % 7;
@@ -63,12 +65,14 @@ function zeichneKalender() {
     if (d === kalAuswahl) b.classList.add("gewaehlt");
     if (d > h) b.classList.add("zukunft");
 
-    const status = tagStatus(tage, d, z);
+    const status = tagStatus(tage, d, z, mz);
     if (status) b.classList.add(status.klasse);
+    if (status?.makro) b.classList.add("makro");
     const n = notizen[d]?.length ?? 0;
     if (n) b.classList.add("mit-notiz");
     const teile = [];
     if (status) teile.push(`${Math.round(status.kcal)} kcal${status.klasse === "drueber" ? ", über dem Ziel" : ""}`);
+    if (status?.makro) teile.push("Makroziel geschafft");
     if (n) teile.push(n === 1 ? "1 Eintrag" : `${n} Einträge`);
     b.setAttribute("aria-label", `${t}. ${$("kal-titel").textContent}${teile.length ? ": " + teile.join(", ") : ""}`);
 
@@ -112,6 +116,7 @@ function zeichneTagDetail() {
     const ml = lies(SPEICHER_WASSER, {})[d];
     const kg = lies(SPEICHER_GEWICHT, {})[d];
     const teile = [liste.length ? `${Math.round(kcal)} kcal gegessen` : "Nichts gegessen eingetragen"];
+    if (liste.length && makroGeschafft(summen(liste))) teile.push("✓ Makroziel geschafft");
     if (ml) teile.push(`${(ml / 1000).toLocaleString("de-DE")} L Wasser`);
     if (kg != null) teile.push(`${kg.toLocaleString("de-DE")} kg`);
     $("kal-tag-summe").textContent = teile.join(" · ");
@@ -206,8 +211,8 @@ function zeichneWoche() {
     const datum = new Date(h.getTime() - (6 - i) * 86400000);
     const d = datum.toISOString().slice(0, 10);
     const zelle = document.createElement("span");
-    zelle.className = "woche-tag" + (d === tag ? " gewaehlt" : "");
     const status = tagStatus(tage, d, z);
+    zelle.className = "woche-tag" + (d === tag ? " gewaehlt" : "") + (status?.makro ? " makro" : "");
     zelle.innerHTML = `<span class="woche-name"></span><span class="woche-punkt ${status?.klasse ?? ""}"></span>`;
     zelle.querySelector(".woche-name").textContent = datum.toLocaleDateString("de-DE", { weekday: "short" }).replace(".", "");
     return zelle;

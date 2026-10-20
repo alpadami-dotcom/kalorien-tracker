@@ -17,6 +17,7 @@ ohne Server. Suche, Mengen und Barcode passieren im Browser.
 | `web/sw.js` | Service Worker: offline nutzbar, „Netz zuerst" damit Updates ankommen |
 | `web/daten/*.json` | Nährwerte, erzeugt von `daten/baue_daten.py` — nicht von Hand ändern |
 | `daten/deutsch.txt` | ~160 deutsche Namen → USDA-Eintrag, von Hand gepflegt |
+| `werkzeuge/baue_hintergrund.py` | rechnet den lila Marmor-Hintergrund (hell + dunkel) nach `web/` |
 | `server.py`, `ki.py` | nur zu Hause: Foto/Freitext über Claude, braucht `.env` mit Schlüssel |
 
 Veröffentlichen: `veroeffentlichen.bat` schiebt `web/` auf den Zweig
@@ -62,6 +63,12 @@ Fallen, die schon einmal zugeschnappt sind:
   einen Hinweis. Diese Untergrenze nicht entfernen.
 - Wasser: `kalorien:wasser` je Tag in ml, ein Glas = 250 ml.
 - Kalender-Einträge dürfen in der Zukunft liegen (planen), Essen nicht.
+- Makro-Ziele: automatisch 1,8 g Protein/kg, 30 % kcal aus Fett, Rest KH;
+  gespeichert (`kalorien:makroziele`) wird nur, was davon abweicht.
+  „Geschafft" = Protein ≥ 90 %, KH und Fett ≤ 110 % (`makroGeschafft()`),
+  im Kalender als grüne Fläche.
+- Übersicht: nach links wischen = Vortag, nach rechts = nächster Tag
+  (so vom Nutzer gewünscht, nicht wie bei Fotos).
 - Gewicht: `kalorien:gewicht` je Tag in kg. Linie = 7-Tage-Schnitt (nach
   Zeit, nicht Anzahl), Punkte = Messungen. Der neueste Wert wird ins Profil
   übernommen, damit der Kalorienrechner aktuell bleibt. Kurvenfarben sind
@@ -84,6 +91,14 @@ Fallen, die schon einmal zugeschnappt sind:
 - Zoom ist gesperrt (viewport-Meta + gesture-Ereignisse in app.js), weil
   iOS `user-scalable=no` allein ignoriert. Eingabefelder brauchen ≥ 16 px
   Schrift, sonst zoomt Safari beim Antippen trotzdem.
+
+## Design
+
+Lila Marmor (Vorbild: Foto von flüssigem Marmor). Hintergrund über
+`body::before` (iOS kann kein `background-attachment: fixed`), Karten als
+Milchglas (`--karte` halbtransparent + `backdrop-filter`), Dialoge deckend
+(`--blatt`). Auf Unterseiten liegt ein Schleier (`--schleier`) über dem
+Marmor, sonst wäre Text direkt auf dem Bild unlesbar.
 
 ## Konventionen
 

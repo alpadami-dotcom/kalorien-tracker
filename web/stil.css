@@ -1,38 +1,46 @@
 :root {
-  --papier: #f6f5f1;
-  --karte: #ffffff;
-  --tinte: #1d1f1b;
-  --leise: #6b6e66;
-  --linie: #e4e2dc;
-  --akzent: #2563b8;
+  /* Lila-Marmor-Design: Farben aus dem Vorbild-Foto abgegriffen.
+     --karte ist Milchglas ueber dem Marmor, --blatt deckend fuer Dialoge. */
+  --papier: #f3eef9;
+  --karte: rgb(255 255 255 / 88%);
+  --blatt: #fbf9fe;
+  --tinte: #22152f;
+  --leise: #6a5c78;
+  --linie: #e4dbee;
+  --akzent: #6b3fc4;
   --akzent-text: #ffffff;
-  --warn: #b5502f;
+  --warn: #c0472f;
   --protein: #2f8a5b;
   --kh: #d39a2c;
-  --fett: #b5502f;
+  --fett: #c0472f;
   --wasser: #4aa3df;
-  /* Kurvenfarben: mit dem dataviz-Validator geprueft (Farbschwaeche, Kontrast). */
+  /* Kurvenfarben: mit dem dataviz-Validator gegen die Kartenflaeche geprueft. */
   --kurve-gewogen: #c4702a;
-  --kurve-schnitt: #2563b8;
-  --schatten: 0 1px 2px rgb(0 0 0 / 6%), 0 4px 16px rgb(0 0 0 / 5%);
+  --kurve-schnitt: #6b3fc4;
+  --schleier: rgb(243 238 249 / 84%);
+  --marmor: url(marmor-hell.jpg);
+  --schatten: 0 2px 6px rgb(40 10 70 / 10%), 0 10px 30px rgb(40 10 70 / 16%);
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --papier: #161714;
-    --karte: #20221e;
-    --tinte: #ecebe6;
-    --leise: #9a9d94;
-    --linie: #33362f;
-    --akzent: #6aa6f2;
-    --akzent-text: #0b1626;
-    --warn: #e0866a;
+    --papier: #1d1529;
+    --karte: rgb(28 20 40 / 82%);
+    --blatt: #1f1730;
+    --tinte: #f1ebf8;
+    --leise: #b3a6c4;
+    --linie: #3a2e4c;
+    --akzent: #b69cff;
+    --akzent-text: #1d1036;
+    --warn: #f08a6c;
     --protein: #6cc79a;
     --kh: #e8b955;
-    --fett: #e0866a;
+    --fett: #f08a6c;
     --wasser: #5cb4ec;
     --kurve-gewogen: #c9782f;
-    --kurve-schnitt: #4f8fe0;
-    --schatten: none;
+    --kurve-schnitt: #8f70ec;
+    --schleier: rgb(20 14 30 / 82%);
+    --marmor: url(marmor-dunkel.jpg);
+    --schatten: 0 8px 30px rgb(0 0 0 / 35%);
   }
 }
 
@@ -40,7 +48,7 @@
 html { -webkit-text-size-adjust: 100%; }
 body {
   margin: 0;
-  background: var(--papier);
+  background: #4e2a78; /* falls das Bild noch laedt */
   color: var(--tinte);
   font: 16px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   padding: env(safe-area-inset-top) 0 calc(env(safe-area-inset-bottom) + 24px);
@@ -365,3 +373,83 @@ input[type=time] {
   font-size: 16px; padding: 10px; border-radius: 10px; border: 1px solid var(--linie);
   background: var(--papier); color: var(--tinte); width: 100%; min-width: 0; text-align: left;
 }
+
+
+/* ===== Lila-Marmor-Design ===== */
+/* Fester Hintergrund ueber ein Pseudo-Element: iOS kennt
+   background-attachment: fixed nicht, das Bild wuerde mitscrollen. */
+body::before {
+  content: ""; position: fixed; inset: 0; z-index: -2;
+  background: var(--marmor) center / cover no-repeat;
+}
+/* Auf den Unterseiten steht viel Text direkt auf dem Hintergrund - dort
+   liegt ein Schleier ueber dem Marmor, damit alles lesbar bleibt. */
+body::after {
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background: var(--schleier); opacity: 0; transition: opacity .2s;
+}
+body:has(.ansicht:not(#ansicht-start):not([hidden]))::after { opacity: 1; }
+
+/* Milchglas fuer alles, was auf dem Marmor liegt */
+.kachel, .kopf, .wasser, .gewicht-karte, .kalender-karte, .liste, .vorschlaege, .leiste {
+  -webkit-backdrop-filter: blur(18px) saturate(1.3); backdrop-filter: blur(18px) saturate(1.3);
+}
+.kopf { background: var(--karte); border-radius: 18px; margin: 8px 16px 0; max-width: 528px; box-shadow: var(--schatten); }
+@media (min-width: 592px) { .kopf { margin: 8px auto 0; } }
+.leiste { background: color-mix(in srgb, var(--papier) 70%, transparent); }
+dialog { background: var(--blatt); }
+.kachel-plus { background: var(--papier); }
+
+/* ===== Uebersicht fuellt den ganzen Bildschirm ===== */
+#ansicht-start:not([hidden]) {
+  display: flex; flex-direction: column;
+  min-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 24px);
+}
+#ansicht-start .kacheln {
+  flex: 1; width: 100%; max-width: 560px; margin: 12px auto 0; padding: 0 16px;
+  grid-template-rows: 1.5fr 1fr 1fr;
+}
+#ansicht-start .kachel { display: flex; flex-direction: column; justify-content: space-between; height: 100%; padding: 16px 18px; border-radius: 22px; }
+#ansicht-start .kachel-huelle { height: 100%; }
+#ansicht-start .kcal-zahl { font-size: 52px; }
+#ansicht-start .kcal-rest { font-size: 26px; }
+#ansicht-start .kachel-wert { font-size: 34px; }
+#ansicht-start .kachel-titel { font-size: 15px; margin-bottom: 0; }
+#ansicht-start .woche { margin-top: auto; }
+
+/* Makros mit eigenem Ziel und Fortschritt */
+.makros { gap: 12px; }
+.makro { flex: 1; min-width: 0; }
+.makro-name { font-size: 13px; color: var(--leise); white-space: nowrap; }
+.makro-wert { font-size: 13px; color: var(--leise); margin: 2px 0 5px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.makro-wert b { font-size: 16px; color: var(--tinte); }
+.makro-balken { height: 5px; border-radius: 3px; background: var(--linie); overflow: hidden; }
+.makro-balken div { height: 100%; width: 0; border-radius: 3px; transition: width .3s; }
+.makro-balken .p { background: var(--protein); }
+.makro-balken .k { background: var(--kh); }
+.makro-balken .f { background: var(--fett); }
+.makro-balken .drueber { background: var(--warn); }
+.makro-status {
+  align-self: flex-start; margin-top: 10px; padding: 4px 10px; border-radius: 999px; font-size: 13px; font-weight: 600;
+  background: color-mix(in srgb, var(--protein) 18%, transparent); color: var(--tinte);
+}
+.makro-status[hidden] { display: none; }
+
+/* Kalender: Tag mit geschafftem Makroziel bekommt eine gruene Flaeche.
+   Flaeche statt noch eines Punktes - drei Zeichen pro Tag waeren zu viel. */
+.kal-tag.makro { background: color-mix(in srgb, var(--protein) 22%, transparent); font-weight: 600; }
+.kal-tag.makro.gewaehlt { background: var(--akzent); }
+.kal-key.makro { width: 12px; height: 12px; border-radius: 4px; background: color-mix(in srgb, var(--protein) 35%, transparent); }
+.woche-tag.makro { background: color-mix(in srgb, var(--protein) 22%, transparent); color: var(--tinte); }
+
+.link-knopf.inline { padding: 0; font-size: 13px; }
+
+/* Wischen: der neue Tag gleitet aus der Richtung herein, in die man wischt */
+@keyframes rein-rechts { from { transform: translateX(28px); opacity: .3; } to { transform: none; opacity: 1; } }
+@keyframes rein-links { from { transform: translateX(-28px); opacity: .3; } to { transform: none; opacity: 1; } }
+.kacheln.rein-rechts { animation: rein-rechts .25s ease-out; }
+.kacheln.rein-links { animation: rein-links .25s ease-out; }
+.legende { flex-wrap: wrap; gap: 6px 14px; }
+.legende > span { white-space: nowrap; }
+/* Plus-Kreise leicht eingefaerbt: Auf Milchglas waere Papierfarbe im Dunkelmodus unsichtbar. */
+.kachel-plus, .mahlzeit-kopf .plus, .tag-detail-kopf .plus { background: color-mix(in srgb, var(--akzent) 16%, var(--papier)); }
