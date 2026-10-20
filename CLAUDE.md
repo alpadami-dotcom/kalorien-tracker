@@ -13,7 +13,7 @@ ohne Server. Suche, Mengen und Barcode passieren im Browser.
 | `web/naehrwerte.js` | Suche (deutsche Liste + USDA), Stückgewichte, Barcode lesen + Open Food Facts |
 | `web/app.js` | Oberfläche, Mengen-Parser `zerlege()`, Speichern im localStorage |
 | `web/gewicht.js` | Gewichtsverlauf: Kurve (SVG, ohne Bibliothek), Eintragen, Liste |
-| `web/kalender.js` | Monatskalender (#kalender) und Wochenstreifen der Kachel; Punkt = im Ziel / drüber |
+| `web/kalender.js` | Kalender (#kalender): Monat, Tagesdetail, eigene Einträge (Training/Termin/Notiz, `kalorien:kalender`), Wochenstreifen + nächster Eintrag in der Kachel |
 | `web/sw.js` | Service Worker: offline nutzbar, „Netz zuerst" damit Updates ankommen |
 | `web/daten/*.json` | Nährwerte, erzeugt von `daten/baue_daten.py` — nicht von Hand ändern |
 | `daten/deutsch.txt` | ~160 deutsche Namen → USDA-Eintrag, von Hand gepflegt |
@@ -61,6 +61,7 @@ Fallen, die schon einmal zugeschnappt sind:
   Empfehlung geht **nie unter den Grundumsatz**; unter 18 zeigt die App
   einen Hinweis. Diese Untergrenze nicht entfernen.
 - Wasser: `kalorien:wasser` je Tag in ml, ein Glas = 250 ml.
+- Kalender-Einträge dürfen in der Zukunft liegen (planen), Essen nicht.
 - Gewicht: `kalorien:gewicht` je Tag in kg. Linie = 7-Tage-Schnitt (nach
   Zeit, nicht Anzahl), Punkte = Messungen. Der neueste Wert wird ins Profil
   übernommen, damit der Kalorienrechner aktuell bleibt. Kurvenfarben sind
