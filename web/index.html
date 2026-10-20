@@ -150,17 +150,27 @@
 
     <ul class="liste mz-liste" id="mz-eintraege"></ul>
 
+    <!-- Favoriten: selbst mit dem Stern markiert, fuer alle Mahlzeiten gleich -->
+    <section class="gedaechtnis" id="mz-favoriten" hidden>
+      <h3>⭐ Favoriten</h3>
+      <ul class="liste" id="mz-favoriten-liste"></ul>
+    </section>
+
     <!-- Gedaechtnis: lernt aus dem, was schon eingetragen wurde - nichts von Hand anlegen -->
     <section class="gedaechtnis" id="mz-letztes" hidden>
       <h3 id="mz-letztes-titel">Letztes Mal</h3>
       <ul class="liste" id="mz-letztes-liste"></ul>
       <button type="button" class="zweit breit" id="mz-alles-nochmal">Alles nochmal eintragen</button>
     </section>
+    <section class="gedaechtnis" id="mz-zuletzt" hidden>
+      <h3>Zuletzt gegessen</h3>
+      <ul class="liste" id="mz-zuletzt-liste"></ul>
+    </section>
     <section class="gedaechtnis" id="mz-oft" hidden>
       <h3 id="mz-oft-titel">Oft gegessen</h3>
       <ul class="liste" id="mz-oft-liste"></ul>
     </section>
-    <p class="leer" id="mz-leer">Hier merkt sich die App, was du zu dieser Mahlzeit isst – nach ein paar Tagen stehen deine Lieblingssachen hier zum Antippen.</p>
+    <p class="leer" id="mz-leer">Hier merkt sich die App, was du isst – nach ein paar Tagen stehen deine Lieblingssachen hier zum Antippen. Mit ☆ machst du etwas zum Favoriten.</p>
   </main>
 </div>
 
@@ -283,6 +293,12 @@
       <p class="leer" id="kal-eintraege-leer">Noch keine Einträge – mit + z. B. Training oder Termine eintragen.</p>
       <button type="button" class="link-knopf" id="kal-tag-oeffnen">Diesen Tag in der Übersicht öffnen ›</button>
     </section>
+
+    <!-- Alle Eintraege auf einen Blick - findet auch einen, der beim falschen Tag gelandet ist -->
+    <details class="kalender-karte alle-eintraege">
+      <summary>Alle Einträge <span id="kal-alle-anzahl"></span></summary>
+      <ul class="liste" id="kal-alle-liste"></ul>
+    </details>
     <button type="button" id="kal-heute" class="zweit breit">Zu heute</button>
   </main>
 </div>

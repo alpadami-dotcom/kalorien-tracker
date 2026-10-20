@@ -77,6 +77,10 @@ Das Gedächtnis hat **keinen eigenen Speicher**: Es zählt in `kalorien:tage`,
 an wie vielen Tagen (nicht wie oft) etwas zu dieser Mahlzeit gegessen wurde
 (ab 2 Tagen = „oft“) und schlägt die zuletzt gegessene Menge vor. Eigene
 Lebensmittel anlegen wollte der Nutzer ausdrücklich noch nicht.
+Reihenfolge auf der Mahlzeit-Seite: ⭐ Favoriten (selbst per Stern,
+`kalorien:favoriten`, mit Menge) → Letztes Mal (diese Mahlzeit) →
+Zuletzt gegessen (alle Mahlzeiten) → Oft. Was weiter oben steht, wird
+weiter unten nicht wiederholt.
 
 ## Profil, Wasser, Mahlzeiten
 
@@ -126,6 +130,14 @@ Lila Marmor (Vorbild: Foto von flüssigem Marmor). Hintergrund über
 Milchglas (`--karte` halbtransparent + `backdrop-filter`), Dialoge deckend
 (`--blatt`). Auf Unterseiten liegt ein Schleier (`--schleier`) über dem
 Marmor, sonst wäre Text direkt auf dem Bild unlesbar.
+
+## Datenverlust – was wir wissen
+
+Am 2026-10-20 war ein Kalendereintrag weg, auch in Safari nicht zu finden.
+Wahrscheinlichste Ursache: Das App-Symbol wurde (fürs neue Icon) gelöscht
+und neu hinzugefügt — iOS löscht dabei vermutlich den Speicher der alten
+Home-Bildschirm-App. **Vor jedem Symbol-Wechsel den Nutzer erst sichern
+lassen** und nie wieder behaupten, die Daten blieben erhalten.
 
 ## Konventionen
 

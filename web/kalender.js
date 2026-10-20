@@ -119,6 +119,47 @@ function zeichneKalender() {
   }
   $("kal-raster").replaceChildren(...zellen);
   zeichneTagDetail();
+  zeichneAlleEintraege();
+}
+
+// Alle gespeicherten Eintraege, Kommendes zuerst (naechster oben), dann
+// Vergangenes (juengstes oben). Wiederholungen stehen einmal, mit ihrem Rhythmus.
+function zeichneAlleEintraege() {
+  const h = heute();
+  const alle = Object.entries(kalEintraege()).flatMap(([d, liste]) => liste.map((e) => ({ ...e, d })));
+  const naechstes = (e) => {
+    if (!e.wiederholung || e.d >= h) return e.d;
+    // Bei Wiederholungen zaehlt der naechste Termin, nicht der allererste.
+    for (let i = 0; i <= 366; i++) {
+      const d = new Date(new Date(h + "T12:00:00").getTime() + i * 86400000).toISOString().slice(0, 10);
+      if (trifft(e.wiederholung, e.d, d)) return d;
+    }
+    return e.d;
+  };
+  const mitDatum = alle.map((e) => ({ ...e, wann: naechstes(e) }));
+  const kommend = mitDatum.filter((e) => e.wann >= h).sort((a, b) => a.wann.localeCompare(b.wann));
+  const vorbei = mitDatum.filter((e) => e.wann < h).sort((a, b) => b.wann.localeCompare(a.wann));
+
+  $("kal-alle-anzahl").textContent = `(${alle.length})`;
+  $("kal-alle-liste").replaceChildren(...[...kommend, ...vorbei].map((e) => {
+    const li = document.createElement("li");
+    li.innerHTML = `<span class="notiz-zeichen" aria-hidden="true"></span>
+      <div class="was"><div class="name"></div><div class="detail"></div></div>`;
+    li.querySelector(".notiz-zeichen").textContent = ARTEN[e.art]?.zeichen ?? "📝";
+    li.querySelector(".name").textContent = e.text;
+    // Jahreszahl nur, wenn es nicht dieses Jahr ist - sonst wirkt der naechste
+    // Geburtstag im September, als laege er schon hinter einem.
+    const jahr = e.wann.slice(0, 4) !== h.slice(0, 4) ? ` ${e.wann.slice(0, 4)}` : "";
+    li.querySelector(".detail").textContent = langesDatum(e.wann) + jahr + (e.zeit ? `, ${e.zeit} Uhr` : "")
+      + (e.wiederholung ? ` · 🔁 ${WIEDERHOLUNG[e.wiederholung]}` : "") + (e.wann < h ? " · vorbei" : "");
+    li.addEventListener("click", () => {
+      kalAuswahl = e.wann;
+      kalenderMonat = e.wann.slice(0, 7);
+      zeichneKalender();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+    return li;
+  }));
 }
 
 function blaettereMonat(schritt) {
