@@ -652,6 +652,38 @@ fetch("api/status").then((r) => r.ok ? r.json() : { ki: false })
     $("foto-knopf").hidden = !kiAn;
   });
 
+// ---------- iPhone-Eigenheiten ----------
+
+// Tastatur: Die Blaetter haengen unten am Bildschirm, die iPhone-Tastatur
+// schiebt sich darueber. visualViewport kennt den noch sichtbaren Teil -
+// um dessen Abstand zum unteren Rand ruecken die Blaetter nach oben.
+if (window.visualViewport) {
+  const passeAn = () => {
+    const vv = window.visualViewport;
+    const verdeckt = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+    document.documentElement.style.setProperty("--tastatur", verdeckt + "px");
+  };
+  visualViewport.addEventListener("resize", passeAn);
+  visualViewport.addEventListener("scroll", passeAn);
+}
+
+// Die Zahlentastatur hat keinen "Fertig"-Knopf. Tippen auf eine leere
+// Stelle im Blatt schliesst sie deshalb.
+document.addEventListener("pointerdown", (ev) => {
+  const feld = document.activeElement;
+  if (feld?.matches?.("input, select") && !ev.target.closest("input, select, label, button")) feld.blur();
+});
+
+// Zoom sperren. iOS-Safari ignoriert "user-scalable=no" seit Jahren
+// absichtlich; das Zusammenziehen mit zwei Fingern laesst sich nur ueber
+// die Safari-eigenen gesture-Ereignisse abfangen.
+for (const art of ["gesturestart", "gesturechange", "gestureend"]) {
+  document.addEventListener(art, (ev) => ev.preventDefault(), { passive: false });
+}
+document.addEventListener("touchmove", (ev) => {
+  if (ev.touches.length > 1) ev.preventDefault();
+}, { passive: false });
+
 // Offline-Faehigkeit und "Zum Home-Bildschirm". Fehler hier sind egal:
 // Die App laeuft auch ohne Service Worker, nur nicht offline.
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});

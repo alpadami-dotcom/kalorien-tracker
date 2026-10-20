@@ -2,7 +2,9 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- Kein Zoomen: Die App soll sich wie eine App anfuehlen. Safari ignoriert
+     user-scalable teilweise, deshalb sperrt app.js das Zoomen zusaetzlich. -->
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Kalorien">
 <meta name="theme-color" content="#f6f5f1" media="(prefers-color-scheme: light)">
@@ -205,13 +207,15 @@
 <dialog id="gewicht-dialog">
   <form method="dialog" class="blatt">
     <h2>Gewicht eintragen</h2>
-    <div class="felder zwei">
-      <label>Tag<input id="g-datum" type="date"></label>
-      <label>Gewicht (kg)<input id="g-wert" type="text" inputmode="decimal" placeholder="z. B. 72,5"></label>
-    </div>
+    <!-- Untereinander statt nebeneinander: Das Datumsfeld ist am iPhone
+         breiter als sein Platz und rutschte ueber das Gewichtsfeld. -->
+    <label class="zeile">Gewicht (kg)<input id="g-wert" class="gross-eingabe" type="text" inputmode="decimal" autocomplete="off" placeholder="z. B. 72,5"></label>
+    <label class="zeile">Tag<input id="g-datum" type="date"></label>
     <p class="klein">Tipp: morgens nach dem Aufstehen wiegen – dann sind die Werte vergleichbar.</p>
     <div class="aktionen">
-      <button value="abbruch" class="zweit">Abbrechen</button>
+      <!-- type="button": sonst waere "Abbrechen" der Standardknopf, und
+           Enter im Gewichtsfeld wuerde abbrechen statt speichern. -->
+      <button type="button" id="g-abbrechen" class="zweit">Abbrechen</button>
       <button value="ok" id="g-speichern" class="erst">Speichern</button>
     </div>
     <button value="geloescht" id="g-loeschen" class="loeschen" hidden>Diesen Eintrag löschen</button>
