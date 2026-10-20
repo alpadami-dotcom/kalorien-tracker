@@ -296,6 +296,17 @@
       <button type="button" class="link-knopf inline" id="makro-auto">Auf automatisch zurücksetzen</button></p>
     <p class="klein">Geschafft heißt: Protein mindestens 90 % des Ziels, Kohlenhydrate und Fett höchstens 110 %.</p>
 
+    <h3>Datensicherung</h3>
+    <p class="klein">Deine Daten liegen nur auf diesem iPhone. Sichere sie ab und zu als Datei – am besten in iCloud Drive („In Dateien sichern“).</p>
+    <p class="klein" id="sicherung-stand"></p>
+    <div class="felder zwei">
+      <button type="button" class="erst breit" id="sichern">💾 Jetzt sichern</button>
+      <label class="zweit breit datei-knopf">📂 Wiederherstellen
+        <input type="file" id="sicherung-datei" accept=".json,application/json" hidden>
+      </label>
+    </div>
+    <button type="button" class="link-knopf" id="import-rueckgaengig" hidden>Letzte Wiederherstellung rückgängig machen</button>
+
     <div class="aktionen eins">
       <button value="ok" id="fertig" class="erst">Fertig</button>
     </div>
@@ -335,6 +346,19 @@
   </form>
 </dialog>
 
+<!-- Wiederherstellen: erst zeigen, was in der Datei steckt, dann fragen -->
+<dialog id="import-dialog">
+  <form method="dialog" class="blatt">
+    <h2>Sicherung wiederherstellen?</h2>
+    <ul class="import-liste" id="import-inhalt"></ul>
+    <p class="warn-text">Deine jetzigen Daten werden durch die Sicherung ersetzt. Falls das ein Versehen war, kannst du es danach im Menü rückgängig machen.</p>
+    <div class="aktionen">
+      <button type="button" id="import-abbrechen" class="zweit">Abbrechen</button>
+      <button value="ok" id="import-ok" class="erst">Wiederherstellen</button>
+    </div>
+  </form>
+</dialog>
+
 <!-- Gewicht eintragen -->
 <dialog id="gewicht-dialog">
   <form method="dialog" class="blatt">
@@ -361,5 +385,6 @@
 <script src="app.js"></script>
 <script src="gewicht.js"></script>
 <script src="kalender.js"></script>
+<script src="sicherung.js"></script>
 </body>
 </html>

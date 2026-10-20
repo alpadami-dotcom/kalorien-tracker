@@ -14,6 +14,7 @@ ohne Server. Suche, Mengen und Barcode passieren im Browser.
 | `web/app.js` | Oberfläche, Mengen-Parser `zerlege()`, Speichern im localStorage |
 | `web/gewicht.js` | Gewichtsverlauf: Kurve (SVG, ohne Bibliothek), Eintragen, Liste |
 | `web/kalender.js` | Kalender (#kalender): Monat, Tagesdetail, eigene Einträge (Training/Termin/Notiz, `kalorien:kalender`), Wochenstreifen + nächster Eintrag in der Kachel |
+| `web/sicherung.js` | Datensicherung: alle `kalorien:*`-Werte als JSON (Teilen-Menü → iCloud), Wiederherstellen mit Vorschau + Rückgängig, Erinnerung nach 14 Tagen |
 | `web/sw.js` | Service Worker: offline nutzbar, „Netz zuerst" damit Updates ankommen |
 | `web/daten/*.json` | Nährwerte, erzeugt von `daten/baue_daten.py` — nicht von Hand ändern |
 | `daten/deutsch.txt` | ~160 deutsche Namen → USDA-Eintrag, von Hand gepflegt |
@@ -67,13 +68,14 @@ Fallen, die schon einmal zugeschnappt sind:
   Wiederholungen (Woche/Monat/Jahr; Geburtstag = automatisch jährlich)
   liegen **einmal** am Ursprungstag; `eintraegeAm()` rechnet die Termine aus.
   Ändern/Löschen gilt für die ganze Reihe. 31. und 29.2. rutschen auf den
-  letzten Tag des Monats. Monat wischen: links = zurück, rechts = vor.
+  letzten Tag des Monats.
 - Makro-Ziele: automatisch 1,8 g Protein/kg, 30 % kcal aus Fett, Rest KH;
   gespeichert (`kalorien:makroziele`) wird nur, was davon abweicht.
   „Geschafft" = Protein ≥ 90 %, KH und Fett ≤ 110 % (`makroGeschafft()`),
   im Kalender als grüne Fläche.
-- Übersicht: nach links wischen = Vortag, nach rechts = nächster Tag
-  (so vom Nutzer gewünscht, nicht wie bei Fotos).
+- Wischen (Übersicht = Tag, Kalender = Monat): **Finger nach rechts =
+  zurück**, nach links = vor, wie bei Fotos. Erst andersherum gebaut, der
+  Nutzer wollte es so — nicht wieder umdrehen.
 - Gewicht: `kalorien:gewicht` je Tag in kg. Linie = 7-Tage-Schnitt (nach
   Zeit, nicht Anzahl), Punkte = Messungen. Der neueste Wert wird ins Profil
   übernommen, damit der Kalorienrechner aktuell bleibt. Kurvenfarben sind
@@ -114,6 +116,8 @@ Kommentare ohne Umlaute, Texte für den Nutzer mit Umlauten.
 
 - Daten liegen im localStorage des iPhones. Als Home-Bildschirm-App bleiben
   sie erhalten; im normalen Safari-Tab kann iOS sie nach 7 Tagen löschen.
+  Deshalb die Datensicherung — neue Speicher-Schlüssel immer mit Präfix
+  `kalorien:`, sonst fehlen sie in der Sicherung.
 - KI unterwegs bräuchte einen kleinen Server für den Schlüssel
   (z. B. Cloudflare Worker), GitHub Pages kann das nicht.
 - Für andere Nutzer: Konten + Datenbank, Gesundheitsdaten → Datenschutz.

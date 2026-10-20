@@ -734,8 +734,10 @@ $("z-kcal").addEventListener("input", () => {
 
 // ---------- Wischen: Tag wechseln ----------
 
-// Auf der Uebersicht: nach links wischen = Vortag, nach rechts = naechster Tag
-// (hoechstens bis heute). Nur klar waagrechte, zuegige Wischer zaehlen -
+// Auf der Uebersicht: Finger nach rechts ziehen = Vortag, nach links = naechster
+// Tag (hoechstens bis heute) - wie Fotos blaettern, das Aeltere liegt links.
+// Erst andersherum gebaut; der Nutzer empfand das als "nach rechts scrollen".
+// Nur klar waagrechte, zuegige Wischer zaehlen -
 // sonst wuerde schon leichtes Schraegscrollen den Tag wechseln.
 let wischStart = null;
 $("ansicht-start").addEventListener("touchstart", (ev) => {
@@ -750,12 +752,12 @@ $("ansicht-start").addEventListener("touchend", (ev) => {
   const schnell = Date.now() - wischStart.zeit < 700;
   wischStart = null;
   if (!schnell || Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
-  if (dx > 0 && tag >= heute()) return; // keine Zukunft
-  verschiebe(dx < 0 ? -1 : 1);
+  if (dx < 0 && tag >= heute()) return; // keine Zukunft
+  verschiebe(dx > 0 ? -1 : 1);
   const k = document.querySelector("#ansicht-start .kacheln");
   k.classList.remove("rein-rechts", "rein-links");
   void k.offsetWidth; // Animation neu starten
-  k.classList.add(dx < 0 ? "rein-rechts" : "rein-links");
+  k.classList.add(dx > 0 ? "rein-links" : "rein-rechts"); // Vortag kommt von links
 }, { passive: true });
 
 // ---------- Ansichten ----------
