@@ -20,7 +20,7 @@ const $ = (id) => document.getElementById(id);
 let tag = heute();
 let kiAn = false;
 let kandidaten = [];
-let vorgemerkteMahlzeit = null; // gesetzt ueber "+" an einer Mahlzeit
+let aktuelleMahlzeit = null; // offene Mahlzeit-Seite (#mahlzeit-...), sonst null
 let gewaehlteMahlzeit = null;
 
 // ---------- Speicher ----------
@@ -168,6 +168,7 @@ function zeichne() {
   zeichneMahlzeiten(liste);
   zeichneWasser();
   if (typeof zeichneWoche === "function") zeichneWoche(); // kalender.js
+  if (aktuelleMahlzeit && typeof zeichneMahlzeitSeite === "function") zeichneMahlzeitSeite();
 }
 
 function zeichneMahlzeiten(liste) {
@@ -178,18 +179,15 @@ function zeichneMahlzeiten(liste) {
 
     const block = document.createElement("div");
     block.className = "mahlzeit";
+    // Der ganze Kopf ist der Weg zum Eintragen - ein kleines Plus allein
+    // trifft man am Handy schlecht.
     block.innerHTML = `
-      <div class="mahlzeit-kopf">
+      <a class="mahlzeit-kopf" href="#mahlzeit-${schluessel}" aria-label="${titel}: eintragen">
         <h2>${titel}</h2>
         <span class="klein">${teil.length ? rund(kcal) + " kcal" : ""}</span>
-        <button class="plus" aria-label="${titel} hinzufügen">+</button>
-      </div>
+        <span class="plus" aria-hidden="true">+</span>
+      </a>
       <ul class="liste"></ul>`;
-    block.querySelector(".plus").addEventListener("click", () => {
-      vorgemerkteMahlzeit = schluessel;
-      $("text").focus();
-      meldung(`Was gab es zum ${titel === "Snacks" ? "Snack" : titel}?`);
-    });
     block.querySelector("ul").replaceChildren(...teil.map(([e, i]) => {
       const li = document.createElement("li");
       const w = werte(e);
@@ -528,7 +526,8 @@ function oeffnePruefen(liste, rueckfrage, titel) {
     return li;
   }));
   summe();
-  waehleMahlzeit(vorgemerkteMahlzeit ?? mahlzeitNachZeit());
+  // Auf einer Mahlzeit-Seite gehoert alles zu dieser Mahlzeit, sonst nach Uhrzeit raten.
+  waehleMahlzeit(aktuelleMahlzeit ?? mahlzeitNachZeit());
   $("pruefen").showModal();
 }
 
@@ -557,7 +556,6 @@ function summe() {
 // verzoegert, wenn die Seite gerade im Hintergrund ist - dann ging der
 // Eintrag verloren, wenn man die App direkt danach wegwischte.
 $("eintragen").addEventListener("click", () => {
-  vorgemerkteMahlzeit = null;
   const neu = kandidaten.filter((k) => k.an && k.gramm > 0).map((k) => ({
     name: k.name, gramm: k.gramm, pro100: k.pro100, quelle: k.quelle,
     mahlzeit: gewaehlteMahlzeit, zeit: new Date().toISOString(),
@@ -765,12 +763,20 @@ $("ansicht-start").addEventListener("touchend", (ev) => {
 // Die Adresse waehlt die Ansicht: "" = Uebersicht, sonst #essen usw.
 // Ueber die Adresse statt eigenem Zustand, damit "Zurueck" einfach geht.
 function zeigeAnsicht() {
-  const name = location.hash.slice(1) || "start";
-  const ansicht = document.getElementById("ansicht-" + name) ? name : "start";
+  let name = location.hash.slice(1) || "start";
+  // "#mahlzeit-fruehstueck": eine Ansicht fuer alle vier Mahlzeiten.
+  aktuelleMahlzeit = null;
+  if (name.startsWith("mahlzeit-")) {
+    const schluessel = name.slice("mahlzeit-".length);
+    if (MAHLZEITEN.some(([k]) => k === schluessel)) aktuelleMahlzeit = schluessel;
+    name = "mahlzeit";
+  }
+  const ansicht = document.getElementById("ansicht-" + name) && (name !== "mahlzeit" || aktuelleMahlzeit) ? name : "start";
   for (const a of document.querySelectorAll(".ansicht")) a.hidden = a.id !== "ansicht-" + ansicht;
   // Erst sichtbar gezeichnet kennen Kurve und Kalender ihre Breite.
   if (ansicht === "gewicht" && typeof zeichneGewicht === "function") zeichneGewicht();
   if (ansicht === "kalender" && typeof zeigeKalender === "function") zeigeKalender();
+  if (ansicht === "mahlzeit" && typeof zeichneMahlzeitSeite === "function") zeichneMahlzeitSeite();
   window.scrollTo(0, 0);
 }
 window.addEventListener("hashchange", zeigeAnsicht);

@@ -106,6 +106,23 @@
       <span><b id="essen-kcal">0</b> kcal gegessen</span>
       <span class="klein" id="essen-rest"></span>
     </div>
+    <p class="klein essen-tipp">Tippe auf eine Mahlzeit, um etwas einzutragen.</p>
+
+    <section id="mahlzeiten"></section>
+  </main>
+</div>
+
+<!-- ===== Eine Mahlzeit (#mahlzeit-fruehstueck usw.): eintragen + Gedaechtnis ===== -->
+<div class="ansicht" id="ansicht-mahlzeit" hidden>
+  <header class="leiste">
+    <a href="#essen" class="zurueck">‹ Essen</a>
+    <div class="leiste-titel"><span id="mz-titel">Frühstück</span><span class="datum-voll" id="mz-datum"></span></div>
+  </header>
+  <main>
+    <div class="essen-summe">
+      <span><b id="mz-kcal">0</b> kcal</span>
+      <span class="klein" id="mz-makros"></span>
+    </div>
   <section class="eingabe">
     <form id="text-form" autocomplete="off">
       <input id="text" type="text" enterkeyhint="send"
@@ -128,7 +145,19 @@
     <ul class="vorschlaege" id="vorschlaege"></ul>
   </section>
 
-    <section id="mahlzeiten"></section>
+    <ul class="liste mz-liste" id="mz-eintraege"></ul>
+
+    <!-- Gedaechtnis: lernt aus dem, was schon eingetragen wurde - nichts von Hand anlegen -->
+    <section class="gedaechtnis" id="mz-letztes" hidden>
+      <h3 id="mz-letztes-titel">Letztes Mal</h3>
+      <ul class="liste" id="mz-letztes-liste"></ul>
+      <button type="button" class="zweit breit" id="mz-alles-nochmal">Alles nochmal eintragen</button>
+    </section>
+    <section class="gedaechtnis" id="mz-oft" hidden>
+      <h3 id="mz-oft-titel">Oft gegessen</h3>
+      <ul class="liste" id="mz-oft-liste"></ul>
+    </section>
+    <p class="leer" id="mz-leer">Hier merkt sich die App, was du zu dieser Mahlzeit isst – nach ein paar Tagen stehen deine Lieblingssachen hier zum Antippen.</p>
   </main>
 </div>
 
@@ -383,6 +412,7 @@
 
 <script src="naehrwerte.js"></script>
 <script src="app.js"></script>
+<script src="mahlzeit.js"></script>
 <script src="gewicht.js"></script>
 <script src="kalender.js"></script>
 <script src="sicherung.js"></script>
