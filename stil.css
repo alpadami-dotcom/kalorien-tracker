@@ -283,8 +283,13 @@ html { touch-action: manipulation; }
   font-size: 15px; font-variant-numeric: tabular-nums; padding: 0 0 6px;
 }
 .kal-tag:disabled { color: var(--linie); }
-.kal-tag.heute { font-weight: 700; box-shadow: inset 0 0 0 1.5px var(--akzent); }
-.kal-tag.gewaehlt { background: var(--akzent); color: var(--akzent-text); }
+/* Heute: lila Zahl. Ausgewaehlt: Ring. Frueher war "ausgewaehlt" eine volle
+   lila Flaeche - die verdeckte Zahl, Punkte und die gruene Makro-Flaeche,
+   am iPhone im Dunkelmodus sah man den Tag kaum noch. */
+.kal-tag { -webkit-tap-highlight-color: transparent; }
+.kal-tag.heute { font-weight: 700; color: var(--akzent); }
+.kal-tag.gewaehlt { box-shadow: inset 0 0 0 2px var(--akzent); font-weight: 700; }
+.kal-tag.gewaehlt:not(.makro) { background: color-mix(in srgb, var(--akzent) 12%, transparent); }
 /* Punkt unter der Zahl: Tag mit Eintraegen, Farbe = Ziel gehalten oder nicht */
 .kal-tag.im-ziel::after, .kal-tag.drueber::after {
   content: ""; position: absolute; left: 50%; bottom: 7px; width: 6px; height: 6px;
@@ -292,7 +297,7 @@ html { touch-action: manipulation; }
 }
 .kal-tag.im-ziel::after, .kal-key.im-ziel { background: var(--akzent); }
 .kal-tag.drueber::after, .kal-key.drueber { background: var(--warn); }
-.kal-tag.gewaehlt::after { background: var(--akzent-text); }
+
 .kal-key { width: 8px; height: 8px; border-radius: 50%; }
 .kal-legende { margin: 10px 0 4px; }
 .blatt input:focus, .blatt select:focus { outline: 2px solid var(--akzent); outline-offset: -1px; }
@@ -356,7 +361,7 @@ body:has(.ansicht:not(#ansicht-start):not([hidden])) { padding-top: 0; }
   content: ""; position: absolute; top: 5px; right: 6px; width: 5px; height: 5px;
   border-radius: 50%; background: var(--tinte);
 }
-.kal-tag.gewaehlt.mit-notiz::before { background: var(--akzent-text); }
+
 .kal-key.notiz { width: 5px; height: 5px; background: var(--tinte); }
 .tag-detail { margin-top: 12px; }
 .tag-detail-kopf { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
@@ -438,7 +443,7 @@ dialog { background: var(--blatt); }
 /* Kalender: Tag mit geschafftem Makroziel bekommt eine gruene Flaeche.
    Flaeche statt noch eines Punktes - drei Zeichen pro Tag waeren zu viel. */
 .kal-tag.makro { background: color-mix(in srgb, var(--protein) 22%, transparent); font-weight: 600; }
-.kal-tag.makro.gewaehlt { background: var(--akzent); }
+
 .kal-key.makro { width: 12px; height: 12px; border-radius: 4px; background: color-mix(in srgb, var(--protein) 35%, transparent); }
 .woche-tag.makro { background: color-mix(in srgb, var(--protein) 22%, transparent); color: var(--tinte); }
 
@@ -524,3 +529,14 @@ a.mahlzeit-kopf .plus { display: inline-flex; align-items: center; justify-conte
 }
 .kennzahl-wert { font-size: 22px; font-weight: 700; margin: 2px 0; }
 .woche-unter { font-size: 15px; color: var(--leise); margin: 20px 2px 8px; font-weight: 600; }
+
+/* Favoriten-Stern in Listenzeilen */
+.stern {
+  flex: none; width: 34px; height: 34px; border: 0; background: none; padding: 0;
+  font-size: 20px; line-height: 1; color: var(--leise);
+}
+.stern.an { color: #e0a800; }
+
+.alle-eintraege { margin-top: 12px; }
+.alle-eintraege summary { font-weight: 600; cursor: pointer; padding: 4px 2px; }
+.alle-eintraege .liste { box-shadow: none; border: 1px solid var(--linie); margin-top: 10px; }
