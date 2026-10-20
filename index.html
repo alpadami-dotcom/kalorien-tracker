@@ -18,7 +18,7 @@
 
 <header class="kopf">
   <button class="pfeil" id="tag-zurueck" aria-label="Vorheriger Tag">‹</button>
-  <button class="datum" id="datum" aria-label="Zu heute springen">
+  <button class="datum" id="datum" aria-label="Kalender öffnen">
     <span id="datum-titel">Heute</span>
     <span class="datum-voll" id="datum-voll"></span>
   </button>
@@ -177,6 +177,30 @@
   </form>
 </dialog>
 
+<!-- Kalender -->
+<dialog id="kalender">
+  <form method="dialog" class="blatt">
+    <div class="kal-kopf">
+      <button type="button" class="pfeil" id="kal-zurueck" aria-label="Voriger Monat">‹</button>
+      <h2 id="kal-titel"></h2>
+      <button type="button" class="pfeil" id="kal-vor" aria-label="Nächster Monat">›</button>
+    </div>
+    <div class="kal-woche" aria-hidden="true">
+      <span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span>
+    </div>
+    <div class="kal-raster" id="kal-raster"></div>
+    <div class="legende kal-legende">
+      <span><span class="key kal-key im-ziel"></span>Im Ziel</span>
+      <span><span class="key kal-key drueber"></span>Über dem Ziel</span>
+    </div>
+    <p class="klein">Tag antippen, um dort einzutragen.</p>
+    <div class="aktionen">
+      <button value="zu" class="zweit">Schließen</button>
+      <button type="button" id="kal-heute" class="erst">Heute</button>
+    </div>
+  </form>
+</dialog>
+
 <!-- Gewicht eintragen -->
 <dialog id="gewicht-dialog">
   <form method="dialog" class="blatt">
@@ -200,5 +224,6 @@
 <script src="naehrwerte.js"></script>
 <script src="app.js"></script>
 <script src="gewicht.js"></script>
+<script src="kalender.js"></script>
 </body>
 </html>

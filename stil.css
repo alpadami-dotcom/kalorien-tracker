@@ -250,3 +250,27 @@ dialog { overflow-y: auto; }
 .loeschen { width: 100%; margin-top: 10px; padding: 12px; border: 0; background: none; color: var(--warn); font-weight: 600; }
 .loeschen[hidden] { display: none; }
 input[type=date] { font-size: 16px; padding: 10px; border-radius: 10px; border: 1px solid var(--linie); background: var(--papier); color: var(--tinte); width: 100%; min-width: 0; }
+
+/* Kalender */
+.kal-kopf { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.kal-kopf h2 { margin: 0; }
+.kal-kopf .pfeil:disabled { visibility: hidden; }
+.kal-woche, .kal-raster { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
+.kal-woche { font-size: 12px; color: var(--leise); margin-bottom: 4px; }
+.kal-tag {
+  position: relative; aspect-ratio: 1; border: 0; border-radius: 10px; background: none;
+  font-size: 15px; font-variant-numeric: tabular-nums; padding: 0 0 6px;
+}
+.kal-tag:disabled { color: var(--linie); }
+.kal-tag.heute { font-weight: 700; box-shadow: inset 0 0 0 1.5px var(--akzent); }
+.kal-tag.gewaehlt { background: var(--akzent); color: var(--akzent-text); }
+/* Punkt unter der Zahl: Tag mit Eintraegen, Farbe = Ziel gehalten oder nicht */
+.kal-tag.im-ziel::after, .kal-tag.drueber::after {
+  content: ""; position: absolute; left: 50%; bottom: 7px; width: 6px; height: 6px;
+  margin-left: -3px; border-radius: 50%;
+}
+.kal-tag.im-ziel::after, .kal-key.im-ziel { background: var(--akzent); }
+.kal-tag.drueber::after, .kal-key.drueber { background: var(--warn); }
+.kal-tag.gewaehlt::after { background: var(--akzent-text); }
+.kal-key { width: 8px; height: 8px; border-radius: 50%; }
+.kal-legende { margin: 10px 0 4px; }

@@ -613,7 +613,8 @@ $("einstellungen").addEventListener("close", speichereZiele);
 
 $("tag-zurueck").addEventListener("click", () => verschiebe(-1));
 $("tag-vor").addEventListener("click", () => verschiebe(1));
-$("datum").addEventListener("click", () => { tag = heute(); zeichne(); });
+// Datum antippen oeffnet den Kalender (kalender.js); "Heute" sitzt dort.
+$("datum").addEventListener("click", () => oeffneKalender());
 
 // Immer den Tag zeigen, der gerade ist. iOS laesst die App im Hintergrund
 // weiterlaufen, statt sie neu zu laden - "tag" blieb so ueber Nacht auf
