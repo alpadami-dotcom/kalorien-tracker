@@ -59,6 +59,47 @@ function ausTabelle(name) {
   return d ? ausUsda(d.fdc, d.name) : null;
 }
 
+// Abstand zweier Woerter in Tippfehlern: einfuegen, loeschen, ersetzen und
+// zwei Nachbarbuchstaben vertauschen kosten je 1 ("bnaane" -> "banane" = 1).
+// Bricht ab, sobald "grenze" sicher ueberschritten ist - die Suche laeuft
+// bei jedem Tastendruck ueber ~500 Woerter.
+function tippAbstand(a, b, grenze) {
+  if (Math.abs(a.length - b.length) > grenze) return grenze + 1;
+  let vorvorige = null;
+  let vorige = Array.from({ length: b.length + 1 }, (_, j) => j);
+  for (let i = 1; i <= a.length; i++) {
+    const zeile = [i];
+    let kleinste = i;
+    for (let j = 1; j <= b.length; j++) {
+      const kosten = a[i - 1] === b[j - 1] ? 0 : 1;
+      let v = Math.min(vorige[j] + 1, zeile[j - 1] + 1, vorige[j - 1] + kosten);
+      if (vorvorige && i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) {
+        v = Math.min(v, vorvorige[j - 2] + 1);
+      }
+      zeile.push(v);
+      kleinste = Math.min(kleinste, v);
+    }
+    if (kleinste > grenze) return grenze + 1;
+    vorvorige = vorige;
+    vorige = zeile;
+  }
+  return vorige[b.length];
+}
+
+// Wie viele Tippfehler bei dieser Laenge noch als "gemeint" gelten.
+// Kurze Woerter vertragen wenig: Bei "eier" waere sonst auch "Bier" ein Treffer.
+const erlaubteFehler = (laenge) => (laenge < 4 ? 0 : laenge < 6 ? 1 : 2);
+
+// Bester Tippabstand von q zu einem Wort - auch zu dessen Anfang, weil man
+// meist noch tippt: "banan" soll "Banane" finden, "hänchn" "Hähnchenbrust".
+function unscharf(q, w, grenze) {
+  let best = tippAbstand(q, w, grenze);
+  for (let laenge = q.length - 1; laenge <= q.length + 1; laenge++) {
+    if (laenge >= 3 && laenge < w.length) best = Math.min(best, tippAbstand(q, w.slice(0, laenge), grenze));
+  }
+  return best;
+}
+
 // Erst die deutsche Liste (kuratiert), dann die englische USDA-Datenbank
 // als Notnagel fuer alles, was dort fehlt.
 async function suche(anfrage, grenze = 20) {
@@ -84,6 +125,24 @@ async function suche(anfrage, grenze = 20) {
       rang = rang === null ? r : Math.min(rang, r);
     }
     if (rang !== null) treffer.push([rang, d.name.length, () => ausTabelle(d.name)]);
+  }
+
+  // Tippfehler: nur wenn die deutsche Liste sonst nichts findet. Sonst
+  // mischten sich bei richtig geschriebenen Woertern aehnliche darunter.
+  const grenzeFehler = erlaubteFehler(q.replace(/\s/g, "").length);
+  if (!treffer.length && grenzeFehler) {
+    const ohneLeer = q.replace(/\s/g, "");
+    for (const d of DEUTSCH) {
+      let best = grenzeFehler + 1;
+      for (const wort of [d.name, ...d.aliase]) {
+        const w = norm(wort);
+        best = Math.min(best, unscharf(q, w, grenzeFehler), unscharf(ohneLeer, w.replace(/\s/g, ""), grenzeFehler));
+        for (const teil of w.split(/[\s()-]+/)) if (teil.length >= 3) best = Math.min(best, unscharf(q, teil, grenzeFehler));
+      }
+      if (best <= grenzeFehler) {
+        treffer.push([2.5 + best / 10, d.name.length, () => ({ ...ausTabelle(d.name), aehnlich: true })]);
+      }
+    }
   }
 
   // USDA: jedes Suchwort muss vorkommen. Kurze Namen zuerst, weil

@@ -385,6 +385,9 @@ function zeigeVorschlaege(treffer) {
     const n = li.querySelector(".n");
     n.textContent = k.name;
     if (/^[A-Z][a-z]+,/.test(k.name)) n.classList.add("en"); // englischer USDA-Name
+    // Tippfehler-Treffer kenntlich machen - sonst wundert man sich, warum
+    // auf "Banne" eine Banane kommt.
+    if (k.aehnlich) n.insertAdjacentHTML("afterbegin", '<span class="meintest">Meintest du</span> ');
     li.addEventListener("click", () => {
       $("vorschlaege").replaceChildren();
       oeffnePruefen([k], "", "Menge wählen");
@@ -404,10 +407,11 @@ $("text-form").addEventListener("submit", async (ev) => {
     // letzteTreffer: wer schnell tippt, drueckt Enter vor dem Suchtakt.
     const z = zerlege(text);
     letzteTreffer = (await suche(z.suche)).slice(0, 8).map((k) => mitMenge(k, z));
-    if (!letzteTreffer.length) return meldung("Nichts gefunden – anders schreiben, z. B. „Hähnchen“ statt „Chicken“.");
+    if (!letzteTreffer.length) return meldung("Nichts gefunden – versuch ein anderes Wort.");
     $("text").blur();
     $("vorschlaege").replaceChildren();
-    return oeffnePruefen([letzteTreffer[0]], "", "Menge prüfen");
+    const k = letzteTreffer[0];
+    return oeffnePruefen([k], "", k.aehnlich ? `Meintest du „${k.name}“?` : "Menge prüfen");
   }
   $("text").blur();
   laden("Claude liest mit …");
@@ -787,7 +791,6 @@ fetch("api/status").then((r) => r.ok ? r.json() : { ki: false })
   .catch(() => ({ ki: false }))
   .then((s) => {
     kiAn = s.ki;
-    $("ki-hinweis").hidden = kiAn;
     $("foto-knopf").hidden = !kiAn;
   });
 
