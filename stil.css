@@ -453,3 +453,10 @@ dialog { background: var(--blatt); }
 .legende > span { white-space: nowrap; }
 /* Plus-Kreise leicht eingefaerbt: Auf Milchglas waere Papierfarbe im Dunkelmodus unsichtbar. */
 .kachel-plus, .mahlzeit-kopf .plus, .tag-detail-kopf .plus { background: color-mix(in srgb, var(--akzent) 16%, var(--papier)); }
+
+/* Vier Arten im Kalender-Eintrag: Zeichen ueber dem Wort, damit sie in eine Zeile passen */
+.segmente.arten button { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 2px; font-size: 12px; }
+.segmente.arten button span { font-size: 20px; line-height: 1; }
+/* Monat wischen: dieselbe Gleit-Animation wie beim Tageswechsel */
+.kal-raster.rein-rechts { animation: rein-rechts .25s ease-out; }
+.kal-raster.rein-links { animation: rein-links .25s ease-out; }

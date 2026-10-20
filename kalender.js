@@ -4,16 +4,24 @@
 // Nutzt Helfer aus app.js ($, tag, heute, lies, schreib, alleTage, werte,
 // ziel, zeichne, meldung) und SPEICHER_GEWICHT aus gewicht.js.
 //
-// Eintraege: { "2026-10-21": [{ id, art, text, zeit }] } - zeit ist "18:00"
-// oder "". Anders als Essen duerfen sie in der Zukunft liegen: geplant wird
-// vorher, gegessen erst am Tag.
+// Eintraege: { "2026-10-21": [{ id, art, text, zeit, wiederholung }] } -
+// zeit ist "18:00" oder "", wiederholung "", "woche", "monat" oder "jahr".
+// Anders als Essen duerfen sie in der Zukunft liegen: geplant wird vorher,
+// gegessen erst am Tag.
+//
+// Wiederholungen werden nicht vervielfaeltigt gespeichert, sondern einmal am
+// ersten Tag; eintraegeAm() rechnet aus, an welchen Tagen sie auftauchen. So
+// steht ein Geburtstag in jedem kuenftigen Jahr, ohne dass man ihn je neu
+// eintraegt, und eine Aenderung gilt fuer die ganze Reihe.
 
 const SPEICHER_KALENDER = "kalorien:kalender";
 const ARTEN = {
   training: { zeichen: "🏋️", name: "Training" },
   termin: { zeichen: "📅", name: "Termin" },
+  geburtstag: { zeichen: "🎂", name: "Geburtstag" },
   notiz: { zeichen: "📝", name: "Notiz" },
 };
+const WIEDERHOLUNG = { woche: "jede Woche", monat: "jeden Monat", jahr: "jedes Jahr" };
 
 let kalenderMonat = null; // "2026-10"
 let kalAuswahl = null;    // angetippter Tag im Kalender, "2026-10-21"
@@ -23,6 +31,33 @@ const zuDatum = (j, m, t) => `${j}-${String(m).padStart(2, "0")}-${String(t).pad
 const kalEintraege = () => lies(SPEICHER_KALENDER, {});
 const sortiert = (liste) => [...liste].sort((a, b) => (a.zeit || "99").localeCompare(b.zeit || "99"));
 const langesDatum = (d) => new Date(d + "T12:00:00").toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "long" });
+const tageImMonat = (j, m) => new Date(j, m, 0).getDate(); // m: 1-12
+
+// Faellt eine Wiederholung, die am Tag "start" begann, auf Tag "d"?
+// Monats- und Jahresdaten, die es nicht gibt (31. im April, 29. Februar im
+// Nicht-Schaltjahr), rutschen auf den letzten Tag des Monats - sonst fiele
+// ein Geburtstag am 29.2. drei von vier Jahren einfach aus.
+function trifft(wiederholung, start, d) {
+  if (!wiederholung || d <= start) return false;
+  const [sj, sm, st] = start.split("-").map(Number);
+  const [j, m, t] = d.split("-").map(Number);
+  if (wiederholung === "woche") {
+    return (Date.UTC(j, m - 1, t) - Date.UTC(sj, sm - 1, st)) % (7 * 86400000) === 0;
+  }
+  if (wiederholung === "jahr" && m !== sm) return false;
+  return t === Math.min(st, tageImMonat(j, m));
+}
+
+// Alle Eintraege eines Tages: die direkt dort gespeicherten plus jede
+// Wiederholung, die auf ihn faellt. "start" merkt sich den Ursprungstag.
+function eintraegeAm(d, alle = kalEintraege()) {
+  const liste = (alle[d] ?? []).map((e) => ({ ...e, start: d }));
+  for (const [start, eintraege] of Object.entries(alle)) {
+    if (start >= d) continue;
+    for (const e of eintraege) if (trifft(e.wiederholung, start, d)) liste.push({ ...e, start });
+  }
+  return sortiert(liste);
+}
 
 // 10 % Spielraum: Wer 2050 statt 2000 isst, hat sein Ziel nicht verfehlt.
 // Makros gegen die heutigen Ziele - alte Ziele werden nicht gespeichert.
@@ -68,7 +103,7 @@ function zeichneKalender() {
     const status = tagStatus(tage, d, z, mz);
     if (status) b.classList.add(status.klasse);
     if (status?.makro) b.classList.add("makro");
-    const n = notizen[d]?.length ?? 0;
+    const n = eintraegeAm(d, notizen).length;
     if (n) b.classList.add("mit-notiz");
     const teile = [];
     if (status) teile.push(`${Math.round(status.kcal)} kcal${status.klasse === "drueber" ? ", über dem Ziel" : ""}`);
@@ -124,7 +159,7 @@ function zeichneTagDetail() {
   // Essen fuer die Zukunft eintragen ergibt keinen Sinn - nur planen.
   $("kal-tag-oeffnen").hidden = zukunft;
 
-  const liste = sortiert(kalEintraege()[d] ?? []);
+  const liste = eintraegeAm(d);
   $("kal-eintraege-leer").hidden = liste.length > 0;
   $("kal-eintraege").replaceChildren(...liste.map((e) => {
     const li = document.createElement("li");
@@ -134,7 +169,8 @@ function zeichneTagDetail() {
       <div class="kcal notiz-zeit"></div>`;
     li.querySelector(".notiz-zeichen").textContent = ARTEN[e.art]?.zeichen ?? "📝";
     li.querySelector(".name").textContent = e.text;
-    li.querySelector(".detail").textContent = ARTEN[e.art]?.name ?? "Notiz";
+    li.querySelector(".detail").textContent = (ARTEN[e.art]?.name ?? "Notiz")
+      + (e.wiederholung ? ` · 🔁 ${WIEDERHOLUNG[e.wiederholung]}` : "");
     li.querySelector(".notiz-zeit").textContent = e.zeit ? `${e.zeit} Uhr` : "";
     li.addEventListener("click", () => oeffneNotiz(d, e));
     return li;
@@ -149,13 +185,18 @@ function setzeArt(art) {
 const gewaehlteArt = () => $("notiz-art").querySelector("[aria-checked=true]")?.dataset.wert ?? "notiz";
 
 function oeffneNotiz(datum, eintrag) {
-  notizBearbeitet = eintrag ? { datum, id: eintrag.id } : null;
+  // Bei Wiederholungen wird die Reihe bearbeitet - also am Ursprungstag.
+  const ursprung = eintrag?.start ?? datum;
+  notizBearbeitet = eintrag ? { datum: ursprung, id: eintrag.id } : null;
   $("notiz-titel").textContent = eintrag ? "Eintrag ändern" : "Neuer Eintrag";
   setzeArt(eintrag?.art ?? "training");
   $("notiz-text").value = eintrag?.text ?? "";
-  $("notiz-datum").value = datum;
+  $("notiz-datum").value = ursprung;
   $("notiz-zeit").value = eintrag?.zeit ?? "";
+  $("notiz-wiederholung").value = eintrag?.wiederholung ?? "";
+  $("notiz-serie-hinweis").hidden = !eintrag?.wiederholung;
   $("notiz-loeschen").hidden = !eintrag;
+  $("notiz-loeschen").textContent = eintrag?.wiederholung ? "Ganze Reihe löschen" : "Eintrag löschen";
   $("notiz-dialog").showModal();
 }
 
@@ -176,7 +217,8 @@ $("notiz-speichern").addEventListener("click", (ev) => {
   // Beim Aendern alten Eintrag entfernen - er kann auf einen anderen Tag gewandert sein.
   const id = notizBearbeitet?.id ?? `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
   if (notizBearbeitet) entferneNotiz(alle, notizBearbeitet.datum, id);
-  (alle[datum] ??= []).push({ id, art: gewaehlteArt(), text, zeit: $("notiz-zeit").value });
+  (alle[datum] ??= []).push({ id, art: gewaehlteArt(), text, zeit: $("notiz-zeit").value,
+    wiederholung: $("notiz-wiederholung").value });
   schreib(SPEICHER_KALENDER, alle);
 
   kalAuswahl = datum;
@@ -197,7 +239,11 @@ $("notiz-loeschen").addEventListener("click", () => {
 $("notiz-abbrechen").addEventListener("click", () => $("notiz-dialog").close());
 for (const b of $("notiz-art").children) {
   b.setAttribute("role", "radio");
-  b.addEventListener("click", () => setzeArt(b.dataset.wert));
+  b.addEventListener("click", () => {
+    setzeArt(b.dataset.wert);
+    // Geburtstage kommen jedes Jahr wieder - das soll man nicht extra waehlen muessen.
+    if (b.dataset.wert === "geburtstag" && !$("notiz-wiederholung").value) $("notiz-wiederholung").value = "jahr";
+  });
 }
 
 // ---------- Kachel in der Uebersicht ----------
@@ -227,9 +273,15 @@ function zeichneNaechsten() {
   const jetzt = new Date();
   const uhr = `${String(jetzt.getHours()).padStart(2, "0")}:${String(jetzt.getMinutes()).padStart(2, "0")}`;
   const alle = kalEintraege();
-  const kandidat = Object.keys(alle).filter((d) => d >= h).sort()
-    .flatMap((d) => sortiert(alle[d]).map((e) => ({ ...e, datum: d })))
-    .find((e) => e.datum > h || !e.zeit || e.zeit >= uhr);
+  // Tag fuer Tag ab heute suchen: Wiederholungen stehen ja nicht einzeln im
+  // Speicher. Ein Jahr reicht - danach kaeme jeder Jahrestermin ohnehin wieder.
+  let kandidat = null;
+  const d0 = new Date(h + "T12:00:00");
+  for (let i = 0; i <= 366 && !kandidat && Object.keys(alle).length; i++) {
+    const d = new Date(d0.getTime() + i * 86400000).toISOString().slice(0, 10);
+    const e = eintraegeAm(d, alle).find((x) => i > 0 || !x.zeit || x.zeit >= uhr);
+    if (e) kandidat = { ...e, datum: d };
+  }
 
   const feld = $("kachel-naechster");
   feld.hidden = !kandidat;
@@ -240,6 +292,29 @@ function zeichneNaechsten() {
 }
 
 // ---------- Knoepfe ----------
+
+// Wischen ueber dem Monat: nach links = voriger Monat, nach rechts = naechster -
+// dieselbe Richtung wie beim Tageswechsel in der Uebersicht.
+let kalWisch = null;
+const monatKarte = $("kal-raster").closest(".kalender-karte");
+monatKarte.addEventListener("touchstart", (ev) => {
+  const t = ev.touches[0];
+  kalWisch = ev.touches.length === 1 ? { x: t.clientX, y: t.clientY, zeit: Date.now() } : null;
+}, { passive: true });
+monatKarte.addEventListener("touchend", (ev) => {
+  if (!kalWisch) return;
+  const t = ev.changedTouches[0];
+  const dx = t.clientX - kalWisch.x, dy = t.clientY - kalWisch.y;
+  const schnell = Date.now() - kalWisch.zeit < 700;
+  kalWisch = null;
+  if (!schnell || Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+  if (dx > 0 && $("kal-vor").disabled) return;
+  blaettereMonat(dx < 0 ? -1 : 1);
+  const r = $("kal-raster");
+  r.classList.remove("rein-rechts", "rein-links");
+  void r.offsetWidth; // Animation neu starten
+  r.classList.add(dx < 0 ? "rein-rechts" : "rein-links");
+}, { passive: true });
 
 $("kal-zurueck").addEventListener("click", () => blaettereMonat(-1));
 $("kal-vor").addEventListener("click", () => blaettereMonat(1));

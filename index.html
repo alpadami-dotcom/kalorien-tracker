@@ -307,15 +307,26 @@
 <dialog id="notiz-dialog">
   <form method="dialog" class="blatt">
     <h2 id="notiz-titel">Eintrag</h2>
-    <div class="segmente" id="notiz-art" role="radiogroup" aria-label="Art">
-      <button type="button" data-wert="training">🏋️ Training</button>
-      <button type="button" data-wert="termin">📅 Termin</button>
-      <button type="button" data-wert="notiz">📝 Notiz</button>
+    <!-- Zeichen ueber dem Wort: vier Arten passen sonst nicht in eine Zeile. -->
+    <div class="segmente arten" id="notiz-art" role="radiogroup" aria-label="Art">
+      <button type="button" data-wert="training"><span>🏋️</span>Training</button>
+      <button type="button" data-wert="termin"><span>📅</span>Termin</button>
+      <button type="button" data-wert="geburtstag"><span>🎂</span>Geburtstag</button>
+      <button type="button" data-wert="notiz"><span>📝</span>Notiz</button>
     </div>
-    <label class="zeile">Was?<input id="notiz-text" type="text" autocomplete="off" enterkeyhint="done" placeholder="z. B. Beine, Zahnarzt, Cheat Day"></label>
+    <label class="zeile">Was?<input id="notiz-text" type="text" autocomplete="off" enterkeyhint="done" placeholder="z. B. Beine, Zahnarzt, Lisa"></label>
     <!-- Untereinander: Datums- und Zeitfelder sind am iPhone breiter als ihr Platz. -->
     <label class="zeile">Tag<input id="notiz-datum" type="date"></label>
     <label class="zeile">Uhrzeit (optional)<input id="notiz-zeit" type="time"></label>
+    <label class="zeile">Wiederholen
+      <select id="notiz-wiederholung">
+        <option value="">Nicht wiederholen</option>
+        <option value="woche">Jede Woche</option>
+        <option value="monat">Jeden Monat</option>
+        <option value="jahr">Jedes Jahr</option>
+      </select>
+    </label>
+    <p class="klein" id="notiz-serie-hinweis" hidden>Wiederholt sich – Ändern und Löschen gilt für alle Termine dieser Reihe.</p>
     <div class="aktionen">
       <button type="button" id="notiz-abbrechen" class="zweit">Abbrechen</button>
       <button value="ok" id="notiz-speichern" class="erst">Speichern</button>
