@@ -44,7 +44,6 @@ function wochenDaten(montag) {
       makro: liste.length > 0 && makroGeschafft(s, mz),
       wasser: wasser[d] ?? 0, gewicht: gewicht[d] ?? null,
       schritte: typeof schritteAlle === "function" ? (schritteAlle()[d] ?? 0) : 0,
-      aktiv: typeof aktivAlle === "function" ? (aktivAlle()[d] ?? 0) : 0,
     };
   });
 }
@@ -192,8 +191,8 @@ function zeichneKennzahlen(woche) {
     ["Makroziel geschafft", `${mitEssen.filter((t) => t.makro).length} ${mitEssen.filter((t) => t.makro).length === 1 ? "Tag" : "Tage"}`, "✓ Protein, KH und Fett"],
     ["Ø Protein", mitEssen.length ? `${zahl(avg("protein"))} g` : "–", `Ziel ${makroZiele().protein} g`],
     ["Ø Wasser", mitWasser.length ? `${(schnitt(mitWasser.map((t) => t.wasser)) / 1000).toLocaleString("de-DE", { maximumFractionDigits: 1 })} L` : "–", `Ziel ${(wasserZiel() / 1000).toLocaleString("de-DE")} L`],
-    ["Bewegen-Ring", woche.some((t) => t.aktiv) ? `${woche.filter((t) => t.aktiv >= bewegZiel()).length} / ${woche.filter((t) => t.aktiv).length}` : "–",
-      woche.some((t) => t.aktiv) ? `Tage geschlossen · Ø ${zahl(schnitt(woche.filter((t) => t.aktiv).map((t) => t.aktiv)))} kcal` : "nichts eingetragen"],
+    ["Schrittziel geknackt", woche.some((t) => t.schritte) ? `${woche.filter((t) => t.schritte >= schrittZiel()).length} / ${woche.filter((t) => t.schritte).length}` : "–",
+      woche.some((t) => t.schritte) ? `Tage 🏆 ≥ ${zahl(schrittZiel())}` : "nichts eingetragen"],
     ["Ø Schritte", woche.some((t) => t.schritte) ? zahl(schnitt(woche.filter((t) => t.schritte).map((t) => t.schritte))) : "–",
       typeof schrittZiel === "function" ? `Ziel ${zahl(schrittZiel())}` : ""],
     ["Gewicht", gewogen.length >= 2

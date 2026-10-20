@@ -590,3 +590,38 @@ a.mahlzeit-kopf .plus { display: inline-flex; align-items: center; justify-conte
 .schritte-form input + input { margin-left: 0; }
 .ziel-links { display: flex; gap: 18px; }
 .mini-ring { display: inline-flex; flex: none; }
+
+/* ===== Schritt-Ring ===== */
+/* Verlauf Lila -> Pink wie der Marmor. Beim Ziel bleibt die Farbe gleich
+   (so gewuenscht) - stattdessen leuchtet der Ring und der Pokal erscheint. */
+.schritt-ring { display: inline-flex; flex: none; position: relative; }
+.schritt-ring .ring-spur { stroke: color-mix(in srgb, var(--akzent) 16%, transparent); }
+.schritt-ring .ring-wert { stroke: url(#ring-verlauf); transition: stroke-dasharray .6s ease-out; }
+.geknackt .schritt-ring svg, .schritt-ring.geknackt svg { filter: drop-shadow(0 0 6px #d65cff) drop-shadow(0 0 12px rgb(214 92 255 / 55%)); }
+.ring-gross { position: relative; width: 190px; height: 190px; margin: 4px auto 0; }
+.ring-gross .schritt-ring { position: absolute; inset: 0; }
+.ring-mitte { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.ring-mitte b { font-size: 40px; line-height: 1.05; }
+.ring-pokal { font-size: 26px; height: 0; opacity: 0; transform: scale(.4); transition: all .4s; }
+.ring-gross.geknackt .ring-pokal { height: 32px; opacity: 1; transform: none; }
+/* Kachel: kleiner Pokal im Ring */
+.schritt-ring .mini-pokal { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+
+/* Einmalige Feier, wenn das Ziel gerade geknackt wurde */
+@keyframes ring-feier { 0% { transform: scale(1); } 30% { transform: scale(1.12); } 60% { transform: scale(.97); } 100% { transform: scale(1); } }
+@keyframes funken {
+  0% { opacity: 1; transform: translate(-50%, -50%) scale(.2); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.6); }
+}
+.feiert { animation: ring-feier .8s ease-out; }
+.ring-gross.feiert::after {
+  content: ""; position: absolute; left: 50%; top: 50%; width: 260px; height: 260px; pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 4%, #ff7ad9 0 4px, transparent 5px),
+    radial-gradient(circle at 92% 30%, #b388ff 0 4px, transparent 5px),
+    radial-gradient(circle at 85% 82%, #ffd166 0 4px, transparent 5px),
+    radial-gradient(circle at 15% 85%, #ff7ad9 0 4px, transparent 5px),
+    radial-gradient(circle at 6% 32%, #ffd166 0 4px, transparent 5px),
+    radial-gradient(circle at 50% 98%, #b388ff 0 4px, transparent 5px);
+  animation: funken 1s ease-out forwards;
+}
