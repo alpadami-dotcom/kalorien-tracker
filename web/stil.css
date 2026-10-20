@@ -495,3 +495,32 @@ a.mahlzeit-kopf .plus { display: inline-flex; align-items: center; justify-conte
 #ansicht-essen .mahlzeit .liste li { padding-left: 0; padding-right: 0; }
 /* Tippfehler-Treffer: "Meintest du" klein davor */
 .meintest { font-size: 12px; color: var(--leise); font-weight: 400; }
+
+/* ===== Woche ===== */
+/* Mini-Balken in der Kachel: Hoehe relativ zum Ziel, heute kraeftig */
+.mini-woche { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; height: 56px; align-items: end; }
+.mini-spalte { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 3px; height: 100%; }
+.mini-balken { width: 100%; max-width: 12px; border-radius: 3px 3px 0 0; background: var(--kurve-schnitt); opacity: .55; }
+.mini-balken.leer { height: 3px; background: var(--linie); opacity: 1; }
+.mini-spalte.heute .mini-balken { opacity: 1; }
+.mini-spalte.zukunft .mini-balken.leer { background: transparent; }
+.mini-name { font-size: 10px; color: var(--leise); line-height: 1; }
+.mini-spalte.heute .mini-name { color: var(--tinte); font-weight: 700; }
+#ansicht-start .kachel-naechster { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+
+/* Seite */
+.woche-kopf { text-align: center; }
+.woche-kopf h2 { margin: 0; color: var(--tinte); }
+.woche-karte .diagramm { margin-top: 8px; }
+.diagramm .saeule { fill: var(--kurve-schnitt); } /* validierte Datenfarbe; --akzent ist im Dunkelmodus zu hell */
+.diagramm .ziel-linie { stroke: var(--tinte); stroke-width: 1.5; opacity: .55; }
+.diagramm .ziel-text { fill: var(--tinte); font-weight: 600; }
+.diagramm .achse.heute { fill: var(--tinte); font-weight: 700; }
+.tip-makros { opacity: .75; font-size: 12px; }
+.kennzahlen { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+.kennzahl {
+  background: var(--karte); border-radius: 16px; padding: 12px 14px; box-shadow: var(--schatten);
+  -webkit-backdrop-filter: blur(18px) saturate(1.3); backdrop-filter: blur(18px) saturate(1.3);
+}
+.kennzahl-wert { font-size: 22px; font-weight: 700; margin: 2px 0; }
+.woche-unter { font-size: 15px; color: var(--leise); margin: 20px 2px 8px; font-weight: 600; }

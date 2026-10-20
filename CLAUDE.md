@@ -15,6 +15,7 @@ ohne Server. Suche, Mengen und Barcode passieren im Browser.
 | `web/mahlzeit.js` | Mahlzeit-Seite (#mahlzeit-fruehstueck …): eintragen + Gedächtnis „Letztes Mal“ / „Oft gegessen“ aus `kalorien:tage` |
 | `web/gewicht.js` | Gewichtsverlauf: Kurve (SVG, ohne Bibliothek), Eintragen, Liste |
 | `web/kalender.js` | Kalender (#kalender): Monat, Tagesdetail, eigene Einträge (Training/Termin/Notiz, `kalorien:kalender`), Wochenstreifen + nächster Eintrag in der Kachel |
+| `web/woche.js` | Wochenübersicht (#woche): Säulen je Tag + Ziel-Linie, Kennzahlen, Tagesliste; Woche-Kachel mit Mini-Balken |
 | `web/sicherung.js` | Datensicherung: alle `kalorien:*`-Werte als JSON (Teilen-Menü → iCloud), Wiederherstellen mit Vorschau + Rückgängig, Erinnerung nach 14 Tagen |
 | `web/sw.js` | Service Worker: offline nutzbar, „Netz zuerst" damit Updates ankommen |
 | `web/daten/*.json` | Nährwerte, erzeugt von `daten/baue_daten.py` — nicht von Hand ändern |
@@ -28,8 +29,8 @@ Veröffentlichen: `veroeffentlichen.bat` schiebt `web/` auf den Zweig
 gh-Login keine `workflow`-Berechtigung hat und das Hochladen sonst scheitert.
 
 **Ansichten:** Beim Öffnen die Übersicht mit Kacheln (Kalorien, Wasser,
-Gewicht, Kalender); jede Kachel öffnet eine Unterseite. Gewählt wird über
-die Adresse (`#essen`, `#mahlzeit-<schlüssel>`, `#wasser`, `#gewicht`, `#kalender`, leer = Übersicht)
+Gewicht, Kalender, Woche); jede Kachel öffnet eine Unterseite. Gewählt wird über
+die Adresse (`#essen`, `#mahlzeit-<schlüssel>`, `#wasser`, `#gewicht`, `#kalender`, `#woche`, leer = Übersicht)
 in `zeigeAnsicht()` — kein eigener Router. Plus-Knöpfe auf Kacheln liegen
 *neben* dem Link, nie darin. Nach >10 Min. im Hintergrund zurück zur Übersicht.
 
@@ -60,6 +61,8 @@ Nur als Rückfall — sonst mischen sich bei richtigen Wörtern ähnliche
 darunter („eier“ → „Bier“).
 
 Fallen, die schon einmal zugeschnappt sind:
+- Datumsrechnung über Millisekunden: Wegen der Zeitumstellung hat ein Tag
+  im Jahr 23 Stunden — Tagesdifferenzen immer runden (KW war um 1 falsch).
 - Fehlt eine Portionsangabe, darf nie stillschweigend 100 g herauskommen —
   „1 EL Öl" waren so 884 statt 124 kcal.
 - „Reis" traf „Reis roh" statt des Alias von „Reis gekocht" (fast 3× kcal).
