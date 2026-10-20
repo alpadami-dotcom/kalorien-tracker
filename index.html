@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Kalorien">
-<meta name="theme-color" content="#f6f5f1" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#161714" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f3eef9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1d1529" media="(prefers-color-scheme: dark)">
 <title>Kalorien</title>
 <link rel="stylesheet" href="stil.css">
 <link rel="manifest" href="manifest.webmanifest">
@@ -48,10 +48,23 @@
       </div>
       <div class="balken"><div id="kcal-balken"></div></div>
       <div class="makros">
-        <div><span class="punkt p"></span><b id="m-protein">0</b> g Protein</div>
-        <div><span class="punkt k"></span><b id="m-kh">0</b> g Kohlenh.</div>
-        <div><span class="punkt f"></span><b id="m-fett">0</b> g Fett</div>
+        <div class="makro">
+          <div class="makro-name"><span class="punkt p"></span>Protein</div>
+          <div class="makro-wert"><b id="m-protein">0</b> / <span id="m-protein-ziel">0</span> g</div>
+          <div class="makro-balken"><div class="p" id="m-protein-balken"></div></div>
+        </div>
+        <div class="makro">
+          <div class="makro-name"><span class="punkt k"></span>Kohlenh.</div>
+          <div class="makro-wert"><b id="m-kh">0</b> / <span id="m-kh-ziel">0</span> g</div>
+          <div class="makro-balken"><div class="k" id="m-kh-balken"></div></div>
+        </div>
+        <div class="makro">
+          <div class="makro-name"><span class="punkt f"></span>Fett</div>
+          <div class="makro-wert"><b id="m-fett">0</b> / <span id="m-fett-ziel">0</span> g</div>
+          <div class="makro-balken"><div class="f" id="m-fett-balken"></div></div>
+        </div>
       </div>
+      <div class="makro-status" id="makro-status" hidden>✓ Makroziel geschafft</div>
     </a>
 
     <!-- Plus-Knoepfe liegen neben dem Link, nicht darin: Ein Knopf in einem
@@ -196,6 +209,7 @@
         <span><span class="key kal-key im-ziel"></span>Im Ziel</span>
         <span><span class="key kal-key drueber"></span>Über dem Ziel</span>
         <span><span class="key kal-key notiz"></span>Eintrag</span>
+        <span><span class="key kal-key makro"></span>Makroziel geschafft</span>
       </div>
     </section>
 
@@ -271,6 +285,16 @@
       <!-- Kommazahlen als Text: type="number" verwirft "2,5" in manchen Browsern stillschweigend. -->
       <label>Wasser (Liter)<input id="z-wasser" type="text" inputmode="decimal"></label>
     </div>
+
+    <h3>Makro-Ziele (Gramm pro Tag)</h3>
+    <div class="felder">
+      <label>Protein<input id="z-protein" type="number" inputmode="numeric" min="0" max="500"></label>
+      <label>Kohlenh.<input id="z-kh" type="number" inputmode="numeric" min="0" max="1000"></label>
+      <label>Fett<input id="z-fett" type="number" inputmode="numeric" min="0" max="400"></label>
+    </div>
+    <p class="klein">Leer lassen = automatisch: 1,8 g Protein pro kg Körpergewicht, 30 % der Kalorien aus Fett, der Rest Kohlenhydrate.
+      <button type="button" class="link-knopf inline" id="makro-auto">Auf automatisch zurücksetzen</button></p>
+    <p class="klein">Geschafft heißt: Protein mindestens 90 % des Ziels, Kohlenhydrate und Fett höchstens 110 %.</p>
 
     <div class="aktionen eins">
       <button value="ok" id="fertig" class="erst">Fertig</button>

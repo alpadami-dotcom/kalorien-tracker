@@ -9,11 +9,11 @@
 // Browser bis zu 10 Minuten lang die alte Datei aus seinem HTTP-Cache, und
 // ein Update kommt nicht an. "no-cache" fragt jedes Mal nach - dank ETag
 // kostet das bei unveraenderten Dateien nur eine kurze "304"-Antwort.
-const SPEICHER = "kalorien-v8";
+const SPEICHER = "kalorien-v9";
 const KERN = [
   "./", "index.html", "stil.css", "app.js", "naehrwerte.js", "gewicht.js", "kalender.js",
   "daten/usda.json", "daten/lebensmittel.json",
-  "manifest.webmanifest", "icon-blau-180.png", "icon-blau-192.png",
+  "manifest.webmanifest", "icon-blau-180.png", "icon-blau-192.png", "marmor-hell.jpg", "marmor-dunkel.jpg",
 ];
 
 self.addEventListener("install", (ev) => {

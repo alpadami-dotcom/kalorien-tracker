@@ -8,6 +8,7 @@ const SPEICHER_ZIEL = "kalorien:ziel";
 const SPEICHER_WASSER = "kalorien:wasser";        // { "2026-10-09": 750 } in ml
 const SPEICHER_WASSERZIEL = "kalorien:wasserziel"; // ml
 const SPEICHER_PROFIL = "kalorien:profil";
+const SPEICHER_MAKRO = "kalorien:makroziele"; // { protein, kh, fett } in g; fehlt = automatisch
 
 const GLAS_ML = 250;
 const MAHLZEITEN = [
@@ -40,6 +41,35 @@ function setzeEintraege(liste) {
   schreib(SPEICHER_TAGE, tage);
 }
 const ziel = () => lies(SPEICHER_ZIEL, 2000);
+
+// Makro-Ziele automatisch aus Kalorienziel und Gewicht: 1,8 g Protein je kg
+// (gaengige Empfehlung, wer Muskeln halten will), 30 % der kcal aus Fett,
+// der Rest Kohlenhydrate. Ohne Gewicht: 25 % der kcal aus Protein.
+function autoMakros() {
+  const z = ziel();
+  const kg = lies(SPEICHER_PROFIL, {}).gewicht;
+  const protein = Math.round(kg ? 1.8 * kg : (z * 0.25) / 4);
+  const fett = Math.round((z * 0.3) / 9);
+  const kh = Math.max(0, Math.round((z - protein * 4 - fett * 9) / 4));
+  return { protein, kh, fett };
+}
+const makroZiele = () => ({ ...autoMakros(), ...lies(SPEICHER_MAKRO, {}) });
+
+function summen(liste) {
+  const s = { kcal: 0, protein: 0, fett: 0, kh: 0 };
+  for (const e of liste) {
+    const w = werte(e);
+    for (const k in s) s[k] += w[k];
+  }
+  return s;
+}
+
+// "Geschafft": genug Protein, bei Kohlenhydraten und Fett nicht drueber.
+// Unter dem KH- oder Fett-Ziel zu bleiben ist kein Fehlschlag - deshalb
+// nur eine Obergrenze dort, und 10 % Spielraum, weil niemand aufs Gramm isst.
+function makroGeschafft(s, mz = makroZiele()) {
+  return s.kcal > 0 && s.protein >= mz.protein * 0.9 && s.kh <= mz.kh * 1.1 && s.fett <= mz.fett * 1.1;
+}
 const wasserZiel = () => lies(SPEICHER_WASSERZIEL, 3000);
 const wasser = () => lies(SPEICHER_WASSER, {})[tag] ?? 0;
 function setzeWasser(ml) {
@@ -104,11 +134,7 @@ function zeichne() {
   $("tag-vor").style.visibility = tag >= heute() ? "hidden" : "visible";
 
   const liste = eintraege();
-  const s = { kcal: 0, protein: 0, fett: 0, kh: 0 };
-  for (const e of liste) {
-    const w = werte(e);
-    for (const k in s) s[k] += w[k];
-  }
+  const s = summen(liste);
 
   const z = ziel();
   const rest = z - s.kcal;
@@ -122,6 +148,14 @@ function zeichne() {
   $("m-protein").textContent = rund(s.protein);
   $("m-kh").textContent = rund(s.kh);
   $("m-fett").textContent = rund(s.fett);
+  const mz = makroZiele();
+  for (const k of ["protein", "kh", "fett"]) {
+    $(`m-${k}-ziel`).textContent = mz[k];
+    $(`m-${k}-balken`).style.width = Math.min(100, mz[k] ? (s[k] / mz[k]) * 100 : 0) + "%";
+    // Bei KH/Fett ist "ueber dem Ziel" das Problem, bei Protein nicht.
+    $(`m-${k}-balken`).classList.toggle("drueber", k !== "protein" && s[k] > mz[k] * 1.1);
+  }
+  $("makro-status").hidden = !makroGeschafft(s, mz);
 
   // Unterseiten zeigen den gewaehlten Tag mit Datum, damit klar ist,
   // wohin ein Eintrag geht, wenn man vorher in der Uebersicht geblaettert hat.
@@ -594,6 +628,7 @@ function oeffneEinstellungen() {
   $("p-ziel").value = String(p.ziel ?? 0);
   $("z-kcal").value = ziel();
   $("z-wasser").value = (wasserZiel() / 1000).toLocaleString("de-DE");
+  zeigeMakroFelder();
   berechne();
   $("einstellungen").showModal();
 }
@@ -606,7 +641,10 @@ for (const id of ["p-alter", "p-groesse", "p-gewicht", "p-aktivitaet", "p-ziel"]
   $(id).addEventListener("input", berechne);
 }
 $("uebernehmen").addEventListener("click", () => {
-  if (empfehlung) $("z-kcal").value = empfehlung;
+  if (empfehlung) {
+    $("z-kcal").value = empfehlung;
+    $("z-kcal").dispatchEvent(new Event("input")); // Makro-Platzhalter mitziehen
+  }
 });
 
 // Bei "Fertig" sofort speichern (siehe "eintragen"), zusaetzlich beim
@@ -616,6 +654,18 @@ function speichereZiele() {
   const liter = parseFloat($("z-wasser").value.replace(",", "."));
   if (kcal >= 800 && kcal <= 6000) schreib(SPEICHER_ZIEL, kcal);
   if (liter >= 0.5 && liter <= 8) schreib(SPEICHER_WASSERZIEL, Math.round(liter * 1000));
+
+  // Nur abweichende Werte speichern: Was dem Automatik-Wert entspricht oder
+  // leer ist, bleibt automatisch - und zieht mit, wenn sich Gewicht oder
+  // Kalorienziel aendern.
+  const auto = autoMakros();
+  const eigene = {};
+  for (const k of ["protein", "kh", "fett"]) {
+    const v = parseInt($(`z-${k}`).value, 10);
+    if (v >= 0 && v !== auto[k]) eigene[k] = v;
+  }
+  if (Object.keys(eigene).length) schreib(SPEICHER_MAKRO, eigene);
+  else localStorage.removeItem(SPEICHER_MAKRO);
   zeichne();
 }
 $("fertig").addEventListener("click", speichereZiele);
@@ -662,6 +712,51 @@ $("kachel-wasser-plus").addEventListener("click", () => {
   zeichneWasser();
   meldung(`+250 ml – ${(wasser() / 1000).toLocaleString("de-DE")} L heute`);
 });
+
+// Makro-Felder: eigene Werte zeigen, sonst leer mit dem Automatik-Wert als Platzhalter.
+function zeigeMakroFelder() {
+  const eigene = lies(SPEICHER_MAKRO, {});
+  const auto = autoMakros();
+  for (const k of ["protein", "kh", "fett"]) {
+    $(`z-${k}`).value = eigene[k] ?? "";
+    $(`z-${k}`).placeholder = auto[k];
+  }
+}
+$("makro-auto").addEventListener("click", () => {
+  localStorage.removeItem(SPEICHER_MAKRO);
+  zeigeMakroFelder();
+});
+// Neues Kalorienziel -> Platzhalter der Makros sofort mitrechnen lassen.
+$("z-kcal").addEventListener("input", () => {
+  const kcal = parseInt($("z-kcal").value, 10);
+  if (kcal >= 800 && kcal <= 6000) { schreib(SPEICHER_ZIEL, kcal); zeigeMakroFelder(); }
+});
+
+// ---------- Wischen: Tag wechseln ----------
+
+// Auf der Uebersicht: nach links wischen = Vortag, nach rechts = naechster Tag
+// (hoechstens bis heute). Nur klar waagrechte, zuegige Wischer zaehlen -
+// sonst wuerde schon leichtes Schraegscrollen den Tag wechseln.
+let wischStart = null;
+$("ansicht-start").addEventListener("touchstart", (ev) => {
+  if (ev.touches.length !== 1) return (wischStart = null);
+  const t = ev.touches[0];
+  wischStart = { x: t.clientX, y: t.clientY, zeit: Date.now() };
+}, { passive: true });
+$("ansicht-start").addEventListener("touchend", (ev) => {
+  if (!wischStart) return;
+  const t = ev.changedTouches[0];
+  const dx = t.clientX - wischStart.x, dy = t.clientY - wischStart.y;
+  const schnell = Date.now() - wischStart.zeit < 700;
+  wischStart = null;
+  if (!schnell || Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return;
+  if (dx > 0 && tag >= heute()) return; // keine Zukunft
+  verschiebe(dx < 0 ? -1 : 1);
+  const k = document.querySelector("#ansicht-start .kacheln");
+  k.classList.remove("rein-rechts", "rein-links");
+  void k.offsetWidth; // Animation neu starten
+  k.classList.add(dx < 0 ? "rein-rechts" : "rein-links");
+}, { passive: true });
 
 // ---------- Ansichten ----------
 
