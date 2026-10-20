@@ -18,45 +18,80 @@
 </head>
 <body>
 
-<header class="kopf">
-  <button class="pfeil" id="tag-zurueck" aria-label="Vorheriger Tag">‹</button>
-  <button class="datum" id="datum" aria-label="Kalender öffnen">
-    <span id="datum-titel">Heute</span>
-    <span class="datum-voll" id="datum-voll"></span>
-  </button>
-  <button class="pfeil" id="tag-vor" aria-label="Nächster Tag">›</button>
-  <button class="zahnrad" id="einstellungen-knopf" aria-label="Profil und Ziele">⚙︎</button>
-</header>
+<!-- Die App hat fuenf Ansichten; die Adresse (#essen, #wasser ...) waehlt
+     eine aus. So funktionieren Zurueck-Knopf und Links ohne eigenen Router. -->
 
-<main>
-  <section class="bilanz">
-    <div class="kcal-zeile">
-      <div>
-        <div class="kcal-zahl" id="kcal-gegessen">0</div>
-        <div class="klein">kcal gegessen</div>
+<!-- ===== Uebersicht: die Kommandozentrale beim Oeffnen ===== -->
+<div class="ansicht" id="ansicht-start">
+  <header class="kopf">
+    <button class="pfeil" id="tag-zurueck" aria-label="Vorheriger Tag">‹</button>
+    <button class="datum" id="datum" aria-label="Kalender öffnen">
+      <span id="datum-titel">Heute</span>
+      <span class="datum-voll" id="datum-voll"></span>
+    </button>
+    <button class="pfeil" id="tag-vor" aria-label="Nächster Tag">›</button>
+    <button class="zahnrad" id="einstellungen-knopf" aria-label="Profil und Ziele">⚙︎</button>
+  </header>
+
+  <main class="kacheln">
+    <a href="#essen" class="kachel bilanz" aria-label="Kalorien – Essen eintragen">
+      <div class="kachel-titel">Kalorien <span class="weiter" aria-hidden="true">›</span></div>
+      <div class="kcal-zeile">
+        <div>
+          <div class="kcal-zahl" id="kcal-gegessen">0</div>
+          <div class="klein">kcal gegessen</div>
+        </div>
+        <div class="rest" id="ziel-knopf">
+          <div class="kcal-rest" id="kcal-rest">2000</div>
+          <div class="klein" id="rest-text">übrig von 2000</div>
+        </div>
       </div>
-      <button class="rest" id="ziel-knopf">
-        <div class="kcal-rest" id="kcal-rest">2000</div>
-        <div class="klein" id="rest-text">übrig von 2000</div>
-      </button>
-    </div>
-    <div class="balken"><div id="kcal-balken"></div></div>
-    <div class="makros">
-      <div><span class="punkt p"></span><b id="m-protein">0</b> g Protein</div>
-      <div><span class="punkt k"></span><b id="m-kh">0</b> g Kohlenh.</div>
-      <div><span class="punkt f"></span><b id="m-fett">0</b> g Fett</div>
-    </div>
-  </section>
+      <div class="balken"><div id="kcal-balken"></div></div>
+      <div class="makros">
+        <div><span class="punkt p"></span><b id="m-protein">0</b> g Protein</div>
+        <div><span class="punkt k"></span><b id="m-kh">0</b> g Kohlenh.</div>
+        <div><span class="punkt f"></span><b id="m-fett">0</b> g Fett</div>
+      </div>
+    </a>
 
-  <section class="wasser">
-    <div class="wasser-kopf">
-      <span>Wasser</span>
-      <span class="klein"><b id="wasser-stand">0</b> / <span id="wasser-ziel">3</span> L</span>
+    <!-- Plus-Knoepfe liegen neben dem Link, nicht darin: Ein Knopf in einem
+         Link ist ungueltig, und der Tipp wuerde sonst auch die Seite wechseln. -->
+    <div class="kachel-huelle">
+      <a href="#wasser" class="kachel" aria-label="Wasser">
+        <div class="kachel-titel">Wasser <span class="weiter" aria-hidden="true">›</span></div>
+        <div class="kachel-wert"><span id="kachel-wasser">0</span> <span class="klein">/ <span id="kachel-wasser-ziel">3</span> L</span></div>
+        <div class="balken wasser-balken"><div id="kachel-wasser-balken"></div></div>
+      </a>
+      <button class="plus kachel-plus" id="kachel-wasser-plus" aria-label="Ein Glas Wasser (250 ml)">+</button>
     </div>
-    <div class="glaeser" id="glaeser"></div>
-  </section>
 
+    <div class="kachel-huelle">
+      <a href="#gewicht" class="kachel" aria-label="Gewicht">
+        <div class="kachel-titel">Gewicht <span class="weiter" aria-hidden="true">›</span></div>
+        <div class="kachel-wert"><span id="kachel-gewicht">–</span> <span class="klein">kg</span></div>
+        <div class="klein kachel-unten" id="kachel-gewicht-delta"></div>
+      </a>
+      <button class="plus kachel-plus" id="kachel-gewicht-plus" aria-label="Gewicht eintragen">+</button>
+    </div>
 
+    <a href="#kalender" class="kachel breit-kachel" aria-label="Kalender">
+      <div class="kachel-titel">Kalender <span class="weiter" aria-hidden="true">›</span></div>
+      <div class="woche" id="kachel-woche"></div>
+    </a>
+  </main>
+</div>
+
+<!-- ===== Essen ===== -->
+<div class="ansicht" id="ansicht-essen" hidden>
+  <header class="leiste">
+    <a href="#" class="zurueck">‹ Übersicht</a>
+    <div class="leiste-titel"><span>Essen</span><span class="datum-voll" id="essen-datum"></span></div>
+  </header>
+  <main>
+    <div class="essen-summe">
+      <span><b id="essen-kcal">0</b> kcal gegessen</span>
+      <span class="klein" id="essen-rest"></span>
+    </div>
   <section class="eingabe">
     <form id="text-form" autocomplete="off">
       <input id="text" type="text" enterkeyhint="send"
@@ -79,18 +114,40 @@
     <ul class="vorschlaege" id="vorschlaege"></ul>
   </section>
 
-  <section id="mahlzeiten"></section>
+    <section id="mahlzeiten"></section>
+  </main>
+</div>
 
-  <section class="gewicht-karte">
-    <!-- Ganz unten: gewogen wird einmal am Tag, gegessen mehrmals. -->
-    <div class="gewicht-kopf">
-      <div>
-        <div class="klein">Gewicht</div>
-        <div class="gewicht-zahl"><span id="gewicht-aktuell">–</span> <span class="klein">kg</span></div>
-        <div class="klein" id="gewicht-delta"></div>
+<!-- ===== Wasser ===== -->
+<div class="ansicht" id="ansicht-wasser" hidden>
+  <header class="leiste">
+    <a href="#" class="zurueck">‹ Übersicht</a>
+    <div class="leiste-titel"><span>Wasser</span><span class="datum-voll" id="wasser-datum"></span></div>
+  </header>
+  <main>
+    <section class="wasser">
+      <div class="wasser-gross"><b id="wasser-stand">0</b> <span class="klein">/ <span id="wasser-ziel">3</span> L</span></div>
+      <p class="klein">Ein Glas = 250 ml. Antippen füllt, das letzte volle Glas nochmal antippen nimmt es zurück.</p>
+      <div class="glaeser" id="glaeser"></div>
+      <button type="button" class="link-knopf" id="wasser-ziel-aendern">Ziel ändern</button>
+    </section>
+  </main>
+</div>
+
+<!-- ===== Gewicht ===== -->
+<div class="ansicht" id="ansicht-gewicht" hidden>
+  <header class="leiste">
+    <a href="#" class="zurueck">‹ Übersicht</a>
+    <div class="leiste-titel"><span>Gewicht</span></div>
+  </header>
+  <main>
+    <section class="gewicht-karte">
+      <div class="gewicht-kopf">
+        <div>
+          <div class="gewicht-zahl"><span id="gewicht-aktuell">–</span> <span class="klein">kg</span></div>
+          <div class="klein" id="gewicht-delta"></div>
+        </div>
       </div>
-      <button class="plus" id="gewicht-plus" aria-label="Gewicht eintragen">+</button>
-    </div>
     <div class="segmente" id="gewicht-zeitraum" role="radiogroup" aria-label="Zeitraum">
       <button type="button" data-wert="30" aria-checked="true">30 Tage</button>
       <button type="button" data-wert="90">90 Tage</button>
@@ -112,8 +169,37 @@
       <summary>Alle Einträge <span id="gewicht-anzahl"></span></summary>
       <ul class="liste" id="gewicht-liste"></ul>
     </details>
-  </section>
-</main>
+    </section>
+    <button type="button" class="erst breit" id="gewicht-plus">Gewicht eintragen</button>
+  </main>
+</div>
+
+<!-- ===== Kalender ===== -->
+<div class="ansicht" id="ansicht-kalender" hidden>
+  <header class="leiste">
+    <a href="#" class="zurueck">‹ Übersicht</a>
+    <div class="leiste-titel"><span>Kalender</span></div>
+  </header>
+  <main>
+    <section class="kalender-karte">
+      <div class="kal-kopf">
+        <button type="button" class="pfeil" id="kal-zurueck" aria-label="Voriger Monat">‹</button>
+        <h2 id="kal-titel"></h2>
+        <button type="button" class="pfeil" id="kal-vor" aria-label="Nächster Monat">›</button>
+      </div>
+      <div class="kal-woche" aria-hidden="true">
+        <span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span>
+      </div>
+      <div class="kal-raster" id="kal-raster"></div>
+      <div class="legende kal-legende">
+        <span><span class="key kal-key im-ziel"></span>Im Ziel</span>
+        <span><span class="key kal-key drueber"></span>Über dem Ziel</span>
+      </div>
+      <p class="klein">Tag antippen, um ihn in der Übersicht zu öffnen.</p>
+    </section>
+    <button type="button" id="kal-heute" class="erst breit">Heute</button>
+  </main>
+</div>
 
 <!-- Pruefen: was die KI / Suche / der Barcode gefunden hat, vor dem Eintragen -->
 <dialog id="pruefen">
@@ -179,29 +265,6 @@
   </form>
 </dialog>
 
-<!-- Kalender -->
-<dialog id="kalender">
-  <form method="dialog" class="blatt">
-    <div class="kal-kopf">
-      <button type="button" class="pfeil" id="kal-zurueck" aria-label="Voriger Monat">‹</button>
-      <h2 id="kal-titel"></h2>
-      <button type="button" class="pfeil" id="kal-vor" aria-label="Nächster Monat">›</button>
-    </div>
-    <div class="kal-woche" aria-hidden="true">
-      <span>Mo</span><span>Di</span><span>Mi</span><span>Do</span><span>Fr</span><span>Sa</span><span>So</span>
-    </div>
-    <div class="kal-raster" id="kal-raster"></div>
-    <div class="legende kal-legende">
-      <span><span class="key kal-key im-ziel"></span>Im Ziel</span>
-      <span><span class="key kal-key drueber"></span>Über dem Ziel</span>
-    </div>
-    <p class="klein">Tag antippen, um dort einzutragen.</p>
-    <div class="aktionen">
-      <button value="zu" class="zweit">Schließen</button>
-      <button type="button" id="kal-heute" class="erst">Heute</button>
-    </div>
-  </form>
-</dialog>
 
 <!-- Gewicht eintragen -->
 <dialog id="gewicht-dialog">
