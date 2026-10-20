@@ -123,8 +123,17 @@ function zeichne() {
   $("m-kh").textContent = rund(s.kh);
   $("m-fett").textContent = rund(s.fett);
 
+  // Unterseiten zeigen den gewaehlten Tag mit Datum, damit klar ist,
+  // wohin ein Eintrag geht, wenn man vorher in der Uebersicht geblaettert hat.
+  const tagText = datumText() + ", " + new Date(tag + "T12:00:00").toLocaleDateString("de-DE", { day: "numeric", month: "long" });
+  $("essen-datum").textContent = tagText;
+  $("wasser-datum").textContent = tagText;
+  $("essen-kcal").textContent = rund(s.kcal);
+  $("essen-rest").textContent = rest >= 0 ? `noch ${rund(rest)} übrig` : `${rund(-rest)} über dem Ziel`;
+
   zeichneMahlzeiten(liste);
   zeichneWasser();
+  if (typeof zeichneWoche === "function") zeichneWoche(); // kalender.js
 }
 
 function zeichneMahlzeiten(liste) {
@@ -176,6 +185,9 @@ function zeichneWasser() {
   const anzahl = Math.max(Math.ceil(zielMl / GLAS_ML), voll + 1);
   $("wasser-stand").textContent = (ml / 1000).toLocaleString("de-DE");
   $("wasser-ziel").textContent = (zielMl / 1000).toLocaleString("de-DE");
+  $("kachel-wasser").textContent = (ml / 1000).toLocaleString("de-DE");
+  $("kachel-wasser-ziel").textContent = (zielMl / 1000).toLocaleString("de-DE");
+  $("kachel-wasser-balken").style.width = Math.min(100, (ml / zielMl) * 100) + "%";
   $("glaeser").classList.toggle("erreicht", ml >= zielMl);
   $("glaeser").replaceChildren(...Array.from({ length: anzahl }, (_, i) => {
     const b = document.createElement("button");
@@ -614,7 +626,7 @@ $("einstellungen").addEventListener("close", speichereZiele);
 $("tag-zurueck").addEventListener("click", () => verschiebe(-1));
 $("tag-vor").addEventListener("click", () => verschiebe(1));
 // Datum antippen oeffnet den Kalender (kalender.js); "Heute" sitzt dort.
-$("datum").addEventListener("click", () => oeffneKalender());
+$("datum").addEventListener("click", () => { location.hash = "kalender"; });
 
 // Immer den Tag zeigen, der gerade ist. iOS laesst die App im Hintergrund
 // weiterlaufen, statt sie neu zu laden - "tag" blieb so ueber Nacht auf
@@ -629,6 +641,8 @@ function pruefeTag() {
   const lange = verstecktSeit && Date.now() - verstecktSeit > 10 * 60 * 1000;
   if (h === letztesHeute && !lange) return;
   if (tag === letztesHeute || lange) tag = h;
+  // Wer die App nach einer Weile wieder oeffnet, startet in der Uebersicht.
+  if (lange && location.hash) location.hash = "";
   letztesHeute = h;
   zeichne();
   if (typeof zeichneGewicht === "function") zeichneGewicht(); // Zeitraum haengt an heute
@@ -640,7 +654,29 @@ document.addEventListener("visibilitychange", () => {
 });
 window.addEventListener("pageshow", pruefeTag);
 setInterval(pruefeTag, 60 * 1000);
-$("ziel-knopf").addEventListener("click", oeffneEinstellungen);
+$("wasser-ziel-aendern").addEventListener("click", oeffneEinstellungen);
+
+// Ein Glas direkt aus der Uebersicht, ohne die Wasser-Seite zu oeffnen.
+$("kachel-wasser-plus").addEventListener("click", () => {
+  setzeWasser(wasser() + GLAS_ML);
+  zeichneWasser();
+  meldung(`+250 ml – ${(wasser() / 1000).toLocaleString("de-DE")} L heute`);
+});
+
+// ---------- Ansichten ----------
+
+// Die Adresse waehlt die Ansicht: "" = Uebersicht, sonst #essen usw.
+// Ueber die Adresse statt eigenem Zustand, damit "Zurueck" einfach geht.
+function zeigeAnsicht() {
+  const name = location.hash.slice(1) || "start";
+  const ansicht = document.getElementById("ansicht-" + name) ? name : "start";
+  for (const a of document.querySelectorAll(".ansicht")) a.hidden = a.id !== "ansicht-" + ansicht;
+  // Erst sichtbar gezeichnet kennen Kurve und Kalender ihre Breite.
+  if (ansicht === "gewicht" && typeof zeichneGewicht === "function") zeichneGewicht();
+  if (ansicht === "kalender" && typeof zeigeKalender === "function") zeigeKalender();
+  window.scrollTo(0, 0);
+}
+window.addEventListener("hashchange", zeigeAnsicht);
 $("einstellungen-knopf").addEventListener("click", oeffneEinstellungen);
 
 // Auf GitHub Pages gibt es /api nicht - dann laeuft die App einfach ohne KI.
@@ -689,3 +725,5 @@ document.addEventListener("touchmove", (ev) => {
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
 
 zeichne();
+// Erst wenn auch gewicht.js und kalender.js geladen sind.
+document.addEventListener("DOMContentLoaded", zeigeAnsicht);

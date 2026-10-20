@@ -1,5 +1,5 @@
-// Kalender: Monatsansicht zum Springen auf einen Tag.
-// Ein Tag im Kalender ist derselbe Tag wie in der Hauptansicht - wer ihn
+// Kalender: Monatsansicht (#kalender) und der Wochenstreifen in der Kachel.
+// Ein Tag im Kalender ist derselbe Tag wie in der Uebersicht - wer ihn
 // antippt, landet dort und kann wie gewohnt Essen, Wasser und Gewicht
 // eintragen. Nutzt Helfer aus app.js ($, tag, heute, alleTage, werte, ziel, zeichne).
 
@@ -36,14 +36,11 @@ function zeichneKalender() {
     if (d === tag) b.classList.add("gewaehlt");
     if (d > h) b.disabled = true;
 
-    const liste = tage[d] ?? [];
-    const kcal = liste.reduce((a, e) => a + werte(e).kcal, 0);
+    const status = tagStatus(tage, d, z);
     const teile = [];
-    if (liste.length) {
-      // 10 % Spielraum: Wer 2050 statt 2000 isst, hat sein Ziel nicht verfehlt.
-      const drueber = kcal > z * 1.1;
-      b.classList.add(drueber ? "drueber" : "im-ziel");
-      teile.push(`${Math.round(kcal)} kcal${drueber ? ", über dem Ziel" : ""}`);
+    if (status) {
+      b.classList.add(status.klasse);
+      teile.push(`${Math.round(status.kcal)} kcal${status.klasse === "drueber" ? ", über dem Ziel" : ""}`);
     }
     if (wasserTage[d]) teile.push(`${(wasserTage[d] / 1000).toLocaleString("de-DE")} L Wasser`);
     if (gewichtTage[d] != null) teile.push(`${gewichtTage[d].toLocaleString("de-DE")} kg`);
@@ -51,9 +48,8 @@ function zeichneKalender() {
 
     b.addEventListener("click", () => {
       tag = d;
-      $("kalender").close();
       zeichne();
-      scrollTo({ top: 0, behavior: "smooth" });
+      location.hash = "";
     });
     zellen.push(b);
   }
@@ -67,16 +63,43 @@ function blaettereMonat(schritt) {
   zeichneKalender();
 }
 
-function oeffneKalender() {
+// 10 % Spielraum: Wer 2050 statt 2000 isst, hat sein Ziel nicht verfehlt.
+function tagStatus(tage, d, z) {
+  const liste = tage[d] ?? [];
+  if (!liste.length) return null;
+  const kcal = liste.reduce((a, e) => a + werte(e).kcal, 0);
+  return { kcal, klasse: kcal > z * 1.1 ? "drueber" : "im-ziel" };
+}
+
+// Aufgerufen von zeigeAnsicht(), wenn #kalender geoeffnet wird.
+function zeigeKalender() {
   kalenderMonat = tag.slice(0, 7);
   zeichneKalender();
-  $("kalender").showModal();
+}
+
+// Kachel: die letzten sieben Tage bis heute, je Tag ein Punkt.
+function zeichneWoche() {
+  const tage = alleTage();
+  const z = ziel();
+  const h = new Date(heute() + "T12:00:00");
+  $("kachel-woche").replaceChildren(...Array.from({ length: 7 }, (_, i) => {
+    const datum = new Date(h.getTime() - (6 - i) * 86400000);
+    const d = datum.toISOString().slice(0, 10);
+    const zelle = document.createElement("span");
+    zelle.className = "woche-tag" + (d === tag ? " gewaehlt" : "");
+    const status = tagStatus(tage, d, z);
+    zelle.innerHTML = `<span class="woche-name"></span><span class="woche-punkt ${status?.klasse ?? ""}"></span>`;
+    zelle.querySelector(".woche-name").textContent = datum.toLocaleDateString("de-DE", { weekday: "short" }).replace(".", "");
+    return zelle;
+  }));
 }
 
 $("kal-zurueck").addEventListener("click", () => blaettereMonat(-1));
 $("kal-vor").addEventListener("click", () => blaettereMonat(1));
 $("kal-heute").addEventListener("click", () => {
   tag = heute();
-  $("kalender").close();
   zeichne();
+  location.hash = "";
 });
+
+zeichneWoche();

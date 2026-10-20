@@ -36,6 +36,7 @@ function zeichneGewicht() {
 
   const letzter = alle.at(-1);
   $("gewicht-aktuell").textContent = letzter ? kg(letzter.kg) : "–";
+  $("kachel-gewicht").textContent = letzter ? kg(letzter.kg) : "–";
   if (sichtbar.length >= 2) {
     const d = sichtbar.at(-1).kg - sichtbar[0].kg;
     const richtung = Math.abs(d) < 0.05 ? "gleich geblieben" : `${d > 0 ? "+" : "−"}${kg(Math.abs(d))} kg`;
@@ -43,6 +44,13 @@ function zeichneGewicht() {
   } else {
     $("gewicht-delta").textContent = letzter ? `zuletzt ${kurzDatum(letzter.t, true)}` : "";
   }
+
+  // Kachel in der Uebersicht: immer die letzten 30 Tage, unabhaengig vom
+  // Zeitraum, den man auf der Gewicht-Seite gewaehlt hat.
+  const monat = alle.filter((p) => p.t > jetzt - 30 * TAG_MS);
+  $("kachel-gewicht-delta").textContent = monat.length >= 2
+    ? `${monat.at(-1).kg - monat[0].kg > 0 ? "+" : "−"}${kg(Math.abs(monat.at(-1).kg - monat[0].kg))} kg in 30 Tagen`
+    : letzter ? `zuletzt ${kurzDatum(letzter.t)}` : "Noch nichts eingetragen";
 
   const genug = sichtbar.length >= 2;
   $("gewicht-diagramm").hidden = !genug;
@@ -212,6 +220,7 @@ $("g-loeschen").addEventListener("click", () => {
 });
 
 $("gewicht-plus").addEventListener("click", () => oeffneGewicht());
+$("kachel-gewicht-plus").addEventListener("click", () => oeffneGewicht(heute()));
 $("g-abbrechen").addEventListener("click", () => $("gewicht-dialog").close());
 
 for (const b of $("gewicht-zeitraum").children) {

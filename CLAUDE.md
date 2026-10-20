@@ -13,7 +13,7 @@ ohne Server. Suche, Mengen und Barcode passieren im Browser.
 | `web/naehrwerte.js` | Suche (deutsche Liste + USDA), Stückgewichte, Barcode lesen + Open Food Facts |
 | `web/app.js` | Oberfläche, Mengen-Parser `zerlege()`, Speichern im localStorage |
 | `web/gewicht.js` | Gewichtsverlauf: Kurve (SVG, ohne Bibliothek), Eintragen, Liste |
-| `web/kalender.js` | Monatskalender (Datum antippen): Tag wählen, Punkt = im Ziel / drüber |
+| `web/kalender.js` | Monatskalender (#kalender) und Wochenstreifen der Kachel; Punkt = im Ziel / drüber |
 | `web/sw.js` | Service Worker: offline nutzbar, „Netz zuerst" damit Updates ankommen |
 | `web/daten/*.json` | Nährwerte, erzeugt von `daten/baue_daten.py` — nicht von Hand ändern |
 | `daten/deutsch.txt` | ~160 deutsche Namen → USDA-Eintrag, von Hand gepflegt |
@@ -22,6 +22,12 @@ ohne Server. Suche, Mengen und Barcode passieren im Browser.
 Veröffentlichen: `veroeffentlichen.bat` schiebt `web/` auf den Zweig
 `gh-pages`, GitHub Pages liefert ihn aus. Kein Actions-Workflow, weil der
 gh-Login keine `workflow`-Berechtigung hat und das Hochladen sonst scheitert.
+
+**Ansichten:** Beim Öffnen die Übersicht mit Kacheln (Kalorien, Wasser,
+Gewicht, Kalender); jede Kachel öffnet eine Unterseite. Gewählt wird über
+die Adresse (`#essen`, `#wasser`, `#gewicht`, `#kalender`, leer = Übersicht)
+in `zeigeAnsicht()` — kein eigener Router. Plus-Knöpfe auf Kacheln liegen
+*neben* dem Link, nie darin. Nach >10 Min. im Hintergrund zurück zur Übersicht.
 
 Der API-Schlüssel darf nie nach `web/` — alles dort ist öffentlich.
 Ohne `/api/status` (also auf GitHub Pages) blendet die App den Foto-Knopf aus.
