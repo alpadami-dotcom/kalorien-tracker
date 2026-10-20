@@ -15,6 +15,7 @@ ohne Server. Suche, Mengen und Barcode passieren im Browser.
 | `web/mahlzeit.js` | Mahlzeit-Seite (#mahlzeit-fruehstueck …): eintragen + Gedächtnis „Letztes Mal“ / „Oft gegessen“ aus `kalorien:tage` |
 | `web/gewicht.js` | Gewichtsverlauf: Kurve (SVG, ohne Bibliothek), Eintragen, Liste |
 | `web/kalender.js` | Kalender (#kalender): Monat, Tagesdetail, eigene Einträge (Training/Termin/Notiz, `kalorien:kalender`), Wochenstreifen + nächster Eintrag in der Kachel |
+| `web/schritte.js` | Schritte (#schritte): Kurzbefehl „Schritte kopieren“ liest Health → Zwischenablage → „Einfügen“; auch von Hand; `kalorien:schritte` |
 | `web/woche.js` | Wochenübersicht (#woche): Säulen je Tag + Ziel-Linie, Kennzahlen, Tagesliste; Woche-Kachel mit Mini-Balken |
 | `web/sicherung.js` | Datensicherung: alle `kalorien:*`-Werte als JSON (Teilen-Menü → iCloud), Wiederherstellen mit Vorschau + Rückgängig, Erinnerung nach 14 Tagen |
 | `web/sw.js` | Service Worker: offline nutzbar, „Netz zuerst" damit Updates ankommen |
@@ -81,6 +82,15 @@ Reihenfolge auf der Mahlzeit-Seite: ⭐ Favoriten (selbst per Stern,
 `kalorien:favoriten`, mit Menge) → Letztes Mal (diese Mahlzeit) →
 Zuletzt gegessen (alle Mahlzeiten) → Oft. Was weiter oben steht, wird
 weiter unten nicht wiederholt.
+
+## Schritte
+
+Web-Apps dürfen Health nicht lesen. Umweg (vom Nutzer so gewählt): Der
+iPhone-Kurzbefehl **„Schritte kopieren“** (Name muss exakt stimmen) summiert
+die heutigen Schritte und kopiert sie; „Schritte holen“ startet ihn über
+`shortcuts://run-shortcut`, zurück über „◀ Kalorien“, dann „Einfügen“ —
+die Zwischenablage darf iOS erst nach einem Tipp freigeben. Verbrauchte
+kcal (≈0,00055 × kg pro Schritt) nur als Info, nicht aufs Ziel gerechnet.
 
 ## Profil, Wasser, Mahlzeiten
 

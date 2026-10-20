@@ -79,6 +79,15 @@
     </div>
 
     <div class="kachel-huelle">
+      <a href="#schritte" class="kachel" aria-label="Schritte">
+        <div class="kachel-titel">Schritte <span class="weiter" aria-hidden="true">›</span></div>
+        <div><div class="kachel-wert" id="kachel-schritte">–</div><div class="klein">von <span id="kachel-schritte-ziel">10.000</span></div></div>
+        <div class="balken wasser-balken schritte-balken"><div id="kachel-schritte-balken"></div></div>
+      </a>
+      <button class="plus kachel-plus" id="kachel-schritte-holen" aria-label="Schritte aus Health holen">↻</button>
+    </div>
+
+    <div class="kachel-huelle">
       <a href="#gewicht" class="kachel" aria-label="Gewicht">
         <div class="kachel-titel">Gewicht <span class="weiter" aria-hidden="true">›</span></div>
         <div class="kachel-wert"><span id="kachel-gewicht">–</span> <span class="klein">kg</span></div>
@@ -87,16 +96,19 @@
       <button class="plus kachel-plus" id="kachel-gewicht-plus" aria-label="Gewicht eintragen">+</button>
     </div>
 
-    <a href="#kalender" class="kachel" aria-label="Kalender">
-      <div class="kachel-titel">Kalender <span class="weiter" aria-hidden="true">›</span></div>
-      <div class="kachel-wert"><span id="kachel-kal-tag">–</span> <span class="klein" id="kachel-kal-monat"></span></div>
-      <div class="klein kachel-naechster" id="kachel-naechster">Keine Einträge</div>
-    </a>
-
     <a href="#woche" class="kachel" aria-label="Wochenübersicht">
       <div class="kachel-titel">Woche <span class="weiter" aria-hidden="true">›</span></div>
       <div><div class="kachel-wert" id="kachel-woche-schnitt">–</div><div class="klein">Ø kcal pro Tag</div></div>
       <div class="mini-woche" id="kachel-woche-balken" aria-hidden="true"></div>
+    </a>
+
+    <!-- Kalender unten ueber die ganze Breite: Datum links, naechster Eintrag rechts -->
+    <a href="#kalender" class="kachel breit-kachel kalender-kachel" aria-label="Kalender">
+      <div class="kachel-titel">Kalender <span class="weiter" aria-hidden="true">›</span></div>
+      <div class="kalender-kachel-zeile">
+        <div class="kachel-wert"><span id="kachel-kal-tag">–</span> <span class="klein" id="kachel-kal-monat"></span></div>
+        <div class="klein kachel-naechster" id="kachel-naechster">Keine Einträge</div>
+      </div>
     </a>
   </main>
 </div>
@@ -227,6 +239,50 @@
     </details>
     </section>
     <button type="button" class="erst breit" id="gewicht-plus">Gewicht eintragen</button>
+  </main>
+</div>
+
+<!-- ===== Schritte ===== -->
+<div class="ansicht" id="ansicht-schritte" hidden>
+  <header class="leiste">
+    <a href="#" class="zurueck">‹ Übersicht</a>
+    <div class="leiste-titel"><span>Schritte</span><span class="datum-voll" id="schritte-datum"></span></div>
+  </header>
+  <main>
+    <section class="wasser">
+      <div class="wasser-gross"><b id="schritte-zahl">0</b> <span class="klein">/ <span id="schritte-ziel">10.000</span></span></div>
+      <div class="balken schritte-balken"><div id="schritte-balken"></div></div>
+      <p class="klein" id="schritte-kcal"></p>
+      <div id="schritte-holen-bereich">
+        <div class="felder zwei">
+          <button type="button" class="erst breit" id="schritte-holen">▶ Schritte holen</button>
+          <button type="button" class="zweit breit" id="schritte-einfuegen">📋 Einfügen</button>
+        </div>
+        <p class="klein">„Schritte holen“ startet deinen Kurzbefehl. Danach oben links auf „◀ Kalorien“ und hier auf „Einfügen“.</p>
+      </div>
+      <form id="schritte-form" class="schritte-form" autocomplete="off">
+        <input id="schritte-eingabe" type="text" inputmode="numeric" placeholder="Oder selbst eintippen, z. B. 8432">
+        <button type="submit" class="erst">OK</button>
+      </form>
+      <button type="button" class="link-knopf" id="schritte-ziel-aendern">Ziel ändern</button>
+    </section>
+
+    <h3 class="woche-unter">Letzte 7 Tage</h3>
+    <ul class="liste" id="schritte-liste"></ul>
+
+    <details class="kalender-karte anleitung">
+      <summary>Kurzbefehl einrichten (einmalig)</summary>
+      <ol>
+        <li>App <b>Kurzbefehle</b> öffnen, oben rechts auf <b>+</b>.</li>
+        <li>Oben auf den Namen tippen → <b>Umbenennen</b> → genau <b>Schritte kopieren</b> eingeben.</li>
+        <li><b>Aktion hinzufügen</b> → „Health“ suchen → <b>Health-Samples suchen</b>.</li>
+        <li>Dort: Typ <b>Schritte</b>, Filter <b>Startdatum ist heute</b>, dann auf „Mehr anzeigen“ und <b>Gruppieren nach: Tag</b>.</li>
+        <li>Darunter Aktion <b>Statistik berechnen</b> hinzufügen und <b>Summe</b> wählen.</li>
+        <li>Darunter Aktion <b>In Zwischenablage kopieren</b>.</li>
+        <li>Oben auf <b>Fertig</b>. Beim ersten Mal fragt das iPhone, ob der Kurzbefehl Health lesen darf – <b>Erlauben</b>.</li>
+      </ol>
+      <p class="klein">Heißt eine Aktion bei dir etwas anders, sag Bescheid.</p>
+    </details>
   </main>
 </div>
 
@@ -466,6 +522,7 @@
 <script src="gewicht.js"></script>
 <script src="kalender.js"></script>
 <script src="woche.js"></script>
+<script src="schritte.js"></script>
 <script src="sicherung.js"></script>
 </body>
 </html>

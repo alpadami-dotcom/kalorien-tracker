@@ -506,9 +506,9 @@ a.mahlzeit-kopf .plus { display: inline-flex; align-items: center; justify-conte
 .mini-woche { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; height: 56px; align-items: end; }
 .mini-spalte { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 3px; height: 100%; }
 .mini-balken { width: 100%; max-width: 12px; border-radius: 3px 3px 0 0; background: var(--kurve-schnitt); opacity: .55; }
-.mini-balken.leer { height: 3px; background: var(--linie); opacity: 1; }
+.mini-balken.ohne-wert { height: 3px; background: var(--linie); opacity: 1; }
 .mini-spalte.heute .mini-balken { opacity: 1; }
-.mini-spalte.zukunft .mini-balken.leer { background: transparent; }
+.mini-spalte.zukunft .mini-balken.ohne-wert { background: transparent; }
 .mini-name { font-size: 10px; color: var(--leise); line-height: 1; }
 .mini-spalte.heute .mini-name { color: var(--tinte); font-weight: 700; }
 #ansicht-start .kachel-naechster { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
@@ -548,3 +548,27 @@ a.mahlzeit-kopf .plus { display: inline-flex; align-items: center; justify-conte
   content: ""; position: absolute; top: 4px; right: 6px; width: 5px; height: 5px;
   border-radius: 50%; background: var(--akzent);
 }
+
+/* ===== Schritte ===== */
+.schritte-balken div { background: var(--protein); }
+.schritte-balken div.erreicht { background: var(--protein); }
+#ansicht-schritte .balken { margin: 10px 0; height: 10px; }
+#ansicht-schritte .felder.zwei .breit { margin-top: 4px; }
+.schritte-form { display: flex; gap: 8px; margin-top: 14px; }
+.schritte-form input {
+  flex: 1; min-width: 0; font-size: 16px; padding: 10px 12px; border-radius: 12px;
+  border: 1px solid var(--linie); background: var(--papier); color: var(--tinte);
+}
+.schritte-form button { border: 0; border-radius: 12px; padding: 0 18px; font-weight: 600; }
+@keyframes pulsieren { 50% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--akzent) 35%, transparent); } }
+.pulsiert { animation: pulsieren 1s ease-in-out infinite; }
+.anleitung { margin-top: 16px; }
+.anleitung summary { font-weight: 600; cursor: pointer; padding: 4px 2px; }
+.anleitung ol { padding-left: 20px; line-height: 1.6; margin: 10px 0 6px; font-size: 15px; }
+
+/* Uebersicht: vier Reihen - Kalender unten flach ueber die ganze Breite */
+#ansicht-start .kacheln { grid-template-rows: 1.45fr 1fr 1fr .62fr; }
+.kalender-kachel-zeile { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.kalender-kachel-zeile .kachel-naechster { margin: 0; padding: 0; border: 0; text-align: right; max-width: 60%; }
+#ansicht-start .kalender-kachel .kachel-wert { font-size: 28px; }
+.kennzahl:last-child:nth-child(odd) { grid-column: 1 / -1; } /* ungerade Anzahl: letzte Karte ueber die ganze Breite */
