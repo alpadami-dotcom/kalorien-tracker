@@ -625,3 +625,5 @@ a.mahlzeit-kopf .plus { display: inline-flex; align-items: center; justify-conte
     radial-gradient(circle at 50% 98%, #b388ff 0 4px, transparent 5px);
   animation: funken 1s ease-out forwards;
 }
+
+.schritt-statistik .diagramm { margin-top: 6px; }

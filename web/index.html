@@ -276,8 +276,20 @@
       <button type="button" class="link-knopf" id="schritte-ziel-aendern">Ziel ändern</button>
     </section>
 
-    <h3 class="woche-unter">Letzte 7 Tage</h3>
-    <ul class="liste" id="schritte-liste"></ul>
+    <h3 class="woche-unter">Statistik</h3>
+    <section class="kalender-karte schritt-statistik">
+      <div class="segmente" id="schritt-zeitraum" role="radiogroup" aria-label="Zeitraum">
+        <button type="button" data-wert="7" aria-checked="true">7 Tage</button>
+        <button type="button" data-wert="30">30 Tage</button>
+      </div>
+      <div class="diagramm" id="schritt-diagramm">
+        <div class="tip" id="schritt-tip" hidden>
+          <div class="tip-datum"></div>
+          <div><b class="tip-wert"></b></div>
+        </div>
+      </div>
+    </section>
+    <div class="kennzahlen" id="schritt-kennzahlen"></div>
 
     <details class="kalender-karte anleitung">
       <summary>Kurzbefehl einrichten (einmalig)</summary>

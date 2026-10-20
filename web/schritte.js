@@ -97,22 +97,121 @@ function zeichneSchritte() {
   // Health kennt nur heute - fuer andere Tage nur von Hand.
   $("schritte-holen-bereich").hidden = tag !== heute();
 
-  // Letzte 7 Tage
+  zeichneSchrittStatistik();
+}
+
+// ---------- Statistik ----------
+
+let schrittTage = 7; // Zeitraum der Statistik
+
+// Saeulen je Tag bis heute, eine Ziel-Linie. Eine Reihe, eine Farbe - keine
+// Legende; die Ziel-Linie traegt ihr Etikett selbst. Tage ueber der Linie
+// sind die geknackten, dafuer braucht es keine zweite Farbe.
+function zeichneSchrittStatistik() {
+  const box = $("schritt-diagramm");
+  if (!box) return;
+  const z = schrittZiel();
   const h = new Date(heute() + "T12:00:00");
-  $("schritte-liste").replaceChildren(...Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(h.getTime() - i * 86400000).toISOString().slice(0, 10);
-    const w = schritteAm(d);
-    const li = document.createElement("li");
-    li.innerHTML = `<span class="schritt-ring"></span><div class="was"><div class="name"></div><div class="detail"></div></div><div class="kcal"></div>`;
-    const r = li.querySelector(".schritt-ring");
-    r.innerHTML = ring(w / z, 30, 5);
-    r.classList.toggle("geknackt", w >= z);
-    li.querySelector(".name").textContent = i === 0 ? "Heute" : i === 1 ? "Gestern"
-      : new Date(d + "T12:00:00").toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "short" });
-    li.querySelector(".detail").textContent = !w ? "nicht eingetragen" : w >= z ? `🏆 ${kurz(z)} geknackt` : `${Math.round((w / z) * 100)} % vom Ziel`;
-    li.querySelector(".kcal").textContent = w ? tausender(w) : "";
-    return li;
+  const tage = Array.from({ length: schrittTage }, (_, i) => {
+    const d = new Date(h.getTime() - (schrittTage - 1 - i) * 86400000).toISOString().slice(0, 10);
+    return { d, n: schritteAm(d) };
+  });
+
+  const B = box.clientWidth || 320, H = 190;
+  const rand = { l: 34, r: 8, o: 14, u: 24 };
+  const groesster = Math.max(z, ...tage.map((t) => t.n));
+  const schritt = groesster > 20000 ? 10000 : 5000;
+  const oben = Math.ceil((groesster * 1.08) / schritt) * schritt;
+  const y = (v) => rand.o + (1 - v / oben) * (H - rand.o - rand.u);
+  const breite = (B - rand.l - rand.r) / tage.length;
+  const mitte = (i) => rand.l + breite * (i + 0.5);
+  const saeule = Math.min(24, Math.max(3, breite * 0.6));
+
+  const ns = "http://www.w3.org/2000/svg";
+  const el = (n, attr) => { const e = document.createElementNS(ns, n); for (const k in attr) e.setAttribute(k, attr[k]); return e; };
+  const svg = el("svg", { width: B, height: H, viewBox: `0 0 ${B} ${H}`, role: "img",
+    "aria-label": `Schritte der letzten ${schrittTage} Tage` });
+
+  for (let v = 0; v <= oben; v += schritt) {
+    svg.append(el("line", { x1: rand.l, x2: B - rand.r, y1: y(v), y2: y(v), class: "raster" }));
+    const t = el("text", { x: rand.l - 6, y: y(v) + 4, class: "achse", "text-anchor": "end" });
+    t.textContent = v ? `${v / 1000}k` : "0";
+    svg.append(t);
+  }
+
+  tage.forEach((t, i) => {
+    if (t.n) {
+      // Oben gerundet, unten gerade auf der Grundlinie.
+      const x = mitte(i) - saeule / 2, y0 = y(0), y1 = Math.min(y(t.n), y0 - 2), r = Math.min(4, saeule / 2, y0 - y1);
+      svg.append(el("path", { class: "saeule",
+        d: `M${x},${y0}V${y1 + r}Q${x},${y1} ${x + r},${y1}H${x + saeule - r}Q${x + saeule},${y1} ${x + saeule},${y1 + r}V${y0}Z` }));
+    }
+    // Bei 30 Tagen nur jeder 7. Tag beschriftet - sonst ueberlappen die Daten.
+    const zeigen = schrittTage <= 7 || (tage.length - 1 - i) % 7 === 0;
+    if (zeigen) {
+      const datum = new Date(t.d + "T12:00:00");
+      const text = el("text", { x: mitte(i), y: H - 7, class: "achse" + (t.d === heute() ? " heute" : ""), "text-anchor": "middle" });
+      text.textContent = schrittTage <= 7 ? datum.toLocaleDateString("de-DE", { weekday: "short" }).replace(".", "") : `${datum.getDate()}.${datum.getMonth() + 1}.`;
+      svg.append(text);
+    }
+  });
+
+  svg.append(el("line", { x1: rand.l, x2: B - rand.r, y1: y(z), y2: y(z), class: "ziel-linie" }));
+  const zt = el("text", { x: B - rand.r, y: y(z) - 5, class: "achse ziel-text", "text-anchor": "end" });
+  zt.textContent = `Ziel ${kurz(z)}`;
+  svg.append(zt);
+
+  // Antippen: die ganze Tagesspalte ist die Trefferflaeche.
+  const tip = $("schritt-tip");
+  tage.forEach((t, i) => {
+    const flaeche = el("rect", { x: mitte(i) - breite / 2, y: 0, width: breite, height: H, fill: "transparent", tabindex: 0 });
+    const zeige = () => {
+      tip.querySelector(".tip-datum").textContent = new Date(t.d + "T12:00:00").toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "short" });
+      tip.querySelector(".tip-wert").textContent = t.n ? `${tausender(t.n)} Schritte${t.n >= z ? " 🏆" : ""}` : "nicht eingetragen";
+      tip.hidden = false;
+      tip.style.left = Math.min(Math.max(mitte(i) - tip.offsetWidth / 2, 0), B - tip.offsetWidth) + "px";
+    };
+    flaeche.addEventListener("pointerdown", zeige);
+    flaeche.addEventListener("pointerenter", zeige);
+    flaeche.addEventListener("focus", zeige);
+    flaeche.addEventListener("pointerleave", () => { tip.hidden = true; });
+    flaeche.addEventListener("blur", () => { tip.hidden = true; });
+    svg.append(flaeche);
+  });
+  box.querySelector("svg")?.remove();
+  box.prepend(svg);
+  tip.hidden = true;
+
+  // Kennzahlen - Durchschnitt nur ueber Tage mit Eintrag, ein vergessener
+  // Tag ist kein Tag mit null Schritten.
+  const mit = tage.filter((t) => t.n);
+  const summe = mit.reduce((a, t) => a + t.n, 0);
+  const bester = mit.reduce((a, t) => (t.n > (a?.n ?? -1) ? t : a), null);
+  const kennzahlen = [
+    ["Ø Schritte", mit.length ? tausender(summe / mit.length) : "–", mit.length ? `an ${mit.length} ${mit.length === 1 ? "Tag" : "Tagen"}` : "noch nichts"],
+    ["Bester Tag", bester ? tausender(bester.n) : "–", bester ? new Date(bester.d + "T12:00:00").toLocaleDateString("de-DE", { weekday: "short", day: "numeric", month: "short" }) : ""],
+    ["Ziel geknackt", mit.length ? `${mit.filter((t) => t.n >= z).length} / ${mit.length}` : "–", `Tage 🏆 ≥ ${kurz(z)}`],
+    // 0,7 m pro Schritt ist ein ueblicher Mittelwert fuer Erwachsene.
+    ["Zusammen", summe ? tausender(summe) : "–", summe ? `≈ ${(summe * 0.0007).toLocaleString("de-DE", { maximumFractionDigits: 1 })} km` : ""],
+  ];
+  $("schritt-kennzahlen").replaceChildren(...kennzahlen.map(([titel, wert, unten]) => {
+    const div = document.createElement("div");
+    div.className = "kennzahl";
+    div.innerHTML = `<div class="klein"></div><div class="kennzahl-wert"></div><div class="klein"></div>`;
+    div.children[0].textContent = titel;
+    div.children[1].textContent = wert;
+    div.children[2].textContent = unten;
+    return div;
   }));
+}
+
+for (const b of $("schritt-zeitraum").children) {
+  b.setAttribute("role", "radio");
+  b.addEventListener("click", () => {
+    schrittTage = Number(b.dataset.wert);
+    for (const c of $("schritt-zeitraum").children) c.setAttribute("aria-checked", c === b);
+    zeichneSchrittStatistik();
+  });
 }
 
 // ---------- Holen und Einfuegen ----------

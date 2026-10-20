@@ -783,6 +783,7 @@ function zeigeAnsicht() {
   if (ansicht === "gewicht" && typeof zeichneGewicht === "function") zeichneGewicht();
   if (ansicht === "kalender" && typeof zeigeKalender === "function") zeigeKalender();
   if (ansicht === "woche" && typeof zeigeWoche === "function") zeigeWoche();
+  if (ansicht === "schritte" && typeof zeichneSchrittStatistik === "function") zeichneSchrittStatistik();
   if (ansicht === "mahlzeit" && typeof zeichneMahlzeitSeite === "function") zeichneMahlzeitSeite();
   window.scrollTo(0, 0);
 }
