@@ -12,6 +12,7 @@ ohne Server. Suche, Mengen und Barcode passieren im Browser.
 |---|---|
 | `web/naehrwerte.js` | Suche (deutsche Liste + USDA), Stückgewichte, Barcode lesen + Open Food Facts |
 | `web/app.js` | Oberfläche, Mengen-Parser `zerlege()`, Speichern im localStorage |
+| `web/mahlzeit.js` | Mahlzeit-Seite (#mahlzeit-fruehstueck …): eintragen + Gedächtnis „Letztes Mal“ / „Oft gegessen“ aus `kalorien:tage` |
 | `web/gewicht.js` | Gewichtsverlauf: Kurve (SVG, ohne Bibliothek), Eintragen, Liste |
 | `web/kalender.js` | Kalender (#kalender): Monat, Tagesdetail, eigene Einträge (Training/Termin/Notiz, `kalorien:kalender`), Wochenstreifen + nächster Eintrag in der Kachel |
 | `web/sicherung.js` | Datensicherung: alle `kalorien:*`-Werte als JSON (Teilen-Menü → iCloud), Wiederherstellen mit Vorschau + Rückgängig, Erinnerung nach 14 Tagen |
@@ -28,7 +29,7 @@ gh-Login keine `workflow`-Berechtigung hat und das Hochladen sonst scheitert.
 
 **Ansichten:** Beim Öffnen die Übersicht mit Kacheln (Kalorien, Wasser,
 Gewicht, Kalender); jede Kachel öffnet eine Unterseite. Gewählt wird über
-die Adresse (`#essen`, `#wasser`, `#gewicht`, `#kalender`, leer = Übersicht)
+die Adresse (`#essen`, `#mahlzeit-<schlüssel>`, `#wasser`, `#gewicht`, `#kalender`, leer = Übersicht)
 in `zeigeAnsicht()` — kein eigener Router. Plus-Knöpfe auf Kacheln liegen
 *neben* dem Link, nie darin. Nach >10 Min. im Hintergrund zurück zur Übersicht.
 
@@ -57,6 +58,16 @@ Fallen, die schon einmal zugeschnappt sind:
   „1 EL Öl" waren so 884 statt 124 kcal.
 - „Reis" traf „Reis roh" statt des Alias von „Reis gekocht" (fast 3× kcal).
   Exakte Alias-Treffer ranken deshalb vor allem anderen.
+
+## Eintragen und Gedächtnis
+
+Eingetragen wird nur auf der Seite einer Mahlzeit — die Essen-Seite zeigt
+den Tag, ein Tipp auf die Mahlzeit-Karte öffnet sie. Dort ist die Mahlzeit
+im Prüfen-Dialog vorausgewählt (`aktuelleMahlzeit`), egal welche Uhrzeit.
+Das Gedächtnis hat **keinen eigenen Speicher**: Es zählt in `kalorien:tage`,
+an wie vielen Tagen (nicht wie oft) etwas zu dieser Mahlzeit gegessen wurde
+(ab 2 Tagen = „oft“) und schlägt die zuletzt gegessene Menge vor. Eigene
+Lebensmittel anlegen wollte der Nutzer ausdrücklich noch nicht.
 
 ## Profil, Wasser, Mahlzeiten
 
