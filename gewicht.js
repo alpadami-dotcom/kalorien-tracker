@@ -172,26 +172,60 @@ function zeichneGewichtsliste(alle) {
 
 // ---------- Eintragen ----------
 
-function oeffneGewicht(datum) {
-  const g = gewichte();
-  const d = datum ?? tag;
-  $("g-datum").value = d;
-  $("g-datum").max = heute();
-  $("g-wert").value = g[d] != null ? g[d].toLocaleString("de-DE") : "";
-  $("g-loeschen").hidden = g[d] == null;
-  $("gewicht-dialog").showModal();
+let gewichtTag = null; // im Dialog gewaehlter Tag, "2026-10-20"
+
+// Die waehlbaren Tage: heute und die drei davor. Wird ein aelterer Wert
+// bearbeitet, kommt sein Tag vorne dazu - sonst liesse er sich nicht aendern.
+function gewichtTage(extra) {
+  const h = new Date(heute() + "T12:00:00");
+  const tage = Array.from({ length: 4 }, (_, i) => new Date(h.getTime() - i * TAG_MS).toISOString().slice(0, 10)).reverse();
+  if (extra && !tage.includes(extra) && extra < tage[0]) tage.unshift(extra);
+  return tage;
 }
 
-$("g-datum").addEventListener("change", () => {
-  const w = gewichte()[$("g-datum").value];
+function tagEtikett(d) {
+  const abstand = Math.round((alsZeit(heute()) - alsZeit(d)) / TAG_MS);
+  if (abstand === 0) return "Heute";
+  if (abstand === 1) return "Gestern";
+  const datum = new Date(d + "T12:00:00");
+  return abstand <= 6
+    ? `${datum.toLocaleDateString("de-DE", { weekday: "short" }).replace(".", "")} ${datum.getDate()}.`
+    : `${datum.getDate()}.${datum.getMonth() + 1}.`;
+}
+
+function waehleGewichtTag(d) {
+  gewichtTag = d;
+  for (const b of $("g-tage").children) b.setAttribute("aria-checked", b.dataset.wert === d);
+  const w = gewichte()[d];
   $("g-wert").value = w != null ? w.toLocaleString("de-DE") : "";
   $("g-loeschen").hidden = w == null;
-});
+}
+
+function oeffneGewicht(datum) {
+  // Ohne Angabe: der angezeigte Tag, falls er in den letzten 4 Tagen liegt, sonst heute.
+  const vorschlag = datum ?? tag;
+  const tage = gewichtTage(datum);
+  const d = tage.includes(vorschlag) ? vorschlag : heute();
+  const g = gewichte();
+  $("g-tage").replaceChildren(...tage.map((t) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.role = "radio";
+    b.dataset.wert = t;
+    b.textContent = tagEtikett(t);
+    // Kleiner Punkt: an diesem Tag ist schon ein Gewicht eingetragen.
+    if (g[t] != null) b.classList.add("hat-wert");
+    b.addEventListener("click", () => waehleGewichtTag(t));
+    return b;
+  }));
+  waehleGewichtTag(d);
+  $("gewicht-dialog").showModal();
+}
 
 // Speichern beim Antippen - siehe "eintragen" in app.js.
 $("g-speichern").addEventListener("click", (ev) => {
   const wert = parseFloat($("g-wert").value.replace(",", "."));
-  const datum = $("g-datum").value;
+  const datum = gewichtTag;
   if (!(wert >= 20 && wert <= 400) || !datum) {
     ev.preventDefault();
     return meldung("Bitte ein Gewicht in kg eingeben, z. B. 72,5.");
@@ -213,7 +247,7 @@ function uebernimmNeuestes(g) {
 
 $("g-loeschen").addEventListener("click", () => {
   const g = gewichte();
-  delete g[$("g-datum").value];
+  delete g[gewichtTag];
   schreib(SPEICHER_GEWICHT, g);
   uebernimmNeuestes(g);
   zeichneGewicht();

@@ -540,3 +540,11 @@ a.mahlzeit-kopf .plus { display: inline-flex; align-items: center; justify-conte
 .alle-eintraege { margin-top: 12px; }
 .alle-eintraege summary { font-weight: 600; cursor: pointer; padding: 4px 2px; }
 .alle-eintraege .liste { box-shadow: none; border: 1px solid var(--linie); margin-top: 10px; }
+
+/* Gewicht: Tag-Knoepfe statt Datumsfeld */
+.tage-wahl { margin-top: 4px; }
+.tage-wahl button { position: relative; font-size: 13px; padding: 9px 2px; }
+.tage-wahl button.hat-wert::after {
+  content: ""; position: absolute; top: 4px; right: 6px; width: 5px; height: 5px;
+  border-radius: 50%; background: var(--akzent);
+}
