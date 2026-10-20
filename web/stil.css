@@ -572,3 +572,21 @@ a.mahlzeit-kopf .plus { display: inline-flex; align-items: center; justify-conte
 .kalender-kachel-zeile .kachel-naechster { margin: 0; padding: 0; border: 0; text-align: right; max-width: 60%; }
 #ansicht-start .kalender-kachel .kachel-wert { font-size: 28px; }
 .kennzahl:last-child:nth-child(odd) { grid-column: 1 / -1; } /* ungerade Anzahl: letzte Karte ueber die ganze Breite */
+
+/* ===== Aktivitaet: Bewegen-Ring ===== */
+:root { --bewegen: #e3335f; }
+@media (prefers-color-scheme: dark) { :root { --bewegen: #ff5c86; } }
+.ring-spur { stroke: color-mix(in srgb, var(--bewegen) 18%, transparent); }
+.ring-wert { stroke: var(--bewegen); transition: stroke-dasharray .4s; }
+.aktiv-zeile { display: flex; align-items: center; gap: 10px; }
+.kachel-ring { display: inline-flex; flex: none; }
+#ansicht-start .aktiv-wert { font-size: 26px; }
+.aktiv-gross { position: relative; width: 168px; height: 168px; margin: 4px auto 0; }
+.aktiv-ring { position: absolute; inset: 0; }
+.aktiv-mitte { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.aktiv-mitte b { font-size: 38px; line-height: 1.1; }
+.aktiv-status { text-align: center; font-weight: 600; margin: 8px 0 14px; min-height: 1.4em; }
+.schritte-zeile { font-size: 18px; }
+.schritte-form input + input { margin-left: 0; }
+.ziel-links { display: flex; gap: 18px; }
+.mini-ring { display: inline-flex; flex: none; }

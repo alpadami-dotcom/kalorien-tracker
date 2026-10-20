@@ -79,12 +79,15 @@
     </div>
 
     <div class="kachel-huelle">
-      <a href="#schritte" class="kachel" aria-label="Schritte">
-        <div class="kachel-titel">Schritte <span class="weiter" aria-hidden="true">›</span></div>
-        <div><div class="kachel-wert" id="kachel-schritte">–</div><div class="klein">von <span id="kachel-schritte-ziel">10.000</span></div></div>
-        <div class="balken wasser-balken schritte-balken"><div id="kachel-schritte-balken"></div></div>
+      <a href="#schritte" class="kachel" aria-label="Aktivität">
+        <div class="kachel-titel">Aktivität <span class="weiter" aria-hidden="true">›</span></div>
+        <div class="aktiv-zeile">
+          <span id="kachel-ring" class="kachel-ring"></span>
+          <div><div class="kachel-wert aktiv-wert" id="kachel-aktiv">–</div><div class="klein">/ <span id="kachel-bewegziel">300</span> kcal</div></div>
+        </div>
+        <div class="klein kachel-unten" id="kachel-schritte">Noch keine Schritte</div>
       </a>
-      <button class="plus kachel-plus" id="kachel-schritte-holen" aria-label="Schritte aus Health holen">↻</button>
+      <button class="plus kachel-plus" id="kachel-schritte-holen" aria-label="Aktivität aus Health holen">↻</button>
     </div>
 
     <div class="kachel-huelle">
@@ -246,25 +249,35 @@
 <div class="ansicht" id="ansicht-schritte" hidden>
   <header class="leiste">
     <a href="#" class="zurueck">‹ Übersicht</a>
-    <div class="leiste-titel"><span>Schritte</span><span class="datum-voll" id="schritte-datum"></span></div>
+    <div class="leiste-titel"><span>Aktivität</span><span class="datum-voll" id="schritte-datum"></span></div>
   </header>
   <main>
     <section class="wasser">
-      <div class="wasser-gross"><b id="schritte-zahl">0</b> <span class="klein">/ <span id="schritte-ziel">10.000</span></span></div>
+      <!-- Bewegen-Ring: aktive kcal aus Health, wie in der Fitness-App -->
+      <div class="aktiv-gross">
+        <span id="aktiv-ring" class="aktiv-ring"></span>
+        <div class="aktiv-mitte"><b id="aktiv-zahl">0</b><span class="klein">von <span id="aktiv-ziel">300</span> kcal</span></div>
+      </div>
+      <p class="aktiv-status" id="aktiv-status"></p>
+      <div class="schritte-zeile"><span>👟 <b id="schritte-zahl">0</b> <span class="klein">/ <span id="schritte-ziel">10.000</span> Schritte</span></span></div>
       <div class="balken schritte-balken"><div id="schritte-balken"></div></div>
       <p class="klein" id="schritte-kcal"></p>
       <div id="schritte-holen-bereich">
         <div class="felder zwei">
-          <button type="button" class="erst breit" id="schritte-holen">▶ Schritte holen</button>
+          <button type="button" class="erst breit" id="schritte-holen">▶ Holen</button>
           <button type="button" class="zweit breit" id="schritte-einfuegen">📋 Einfügen</button>
         </div>
-        <p class="klein">„Schritte holen“ startet deinen Kurzbefehl. Danach oben links auf „◀ Kalorien“ und hier auf „Einfügen“.</p>
+        <p class="klein">„Holen“ startet deinen Kurzbefehl. Danach oben links auf „◀ Kalorien“ und hier auf „Einfügen“.</p>
       </div>
       <form id="schritte-form" class="schritte-form" autocomplete="off">
-        <input id="schritte-eingabe" type="text" inputmode="numeric" placeholder="Oder selbst eintippen, z. B. 8432">
+        <input id="schritte-eingabe" type="text" inputmode="numeric" placeholder="Schritte">
+        <input id="aktiv-eingabe" type="text" inputmode="numeric" placeholder="Aktive kcal">
         <button type="submit" class="erst">OK</button>
       </form>
-      <button type="button" class="link-knopf" id="schritte-ziel-aendern">Ziel ändern</button>
+      <div class="ziel-links">
+        <button type="button" class="link-knopf" id="bewegziel-aendern">Bewegen-Ziel ändern</button>
+        <button type="button" class="link-knopf" id="schritte-ziel-aendern">Schritt-Ziel ändern</button>
+      </div>
     </section>
 
     <h3 class="woche-unter">Letzte 7 Tage</h3>
@@ -275,13 +288,15 @@
       <ol>
         <li>App <b>Kurzbefehle</b> öffnen, oben rechts auf <b>+</b>.</li>
         <li>Oben auf den Namen tippen → <b>Umbenennen</b> → genau <b>Schritte kopieren</b> eingeben.</li>
-        <li><b>Aktion hinzufügen</b> → „Health“ suchen → <b>Health-Samples suchen</b>.</li>
-        <li>Dort: Typ <b>Schritte</b>, Filter <b>Startdatum ist heute</b>, dann auf „Mehr anzeigen“ und <b>Gruppieren nach: Tag</b>.</li>
-        <li>Darunter Aktion <b>Statistik berechnen</b> hinzufügen und <b>Summe</b> wählen.</li>
-        <li>Darunter Aktion <b>In Zwischenablage kopieren</b>.</li>
+        <li><b>Aktion hinzufügen</b> → „Health“ suchen → <b>Health-Samples suchen</b>. Typ <b>Schritte</b>, Filter <b>Startdatum ist heute</b>, unter „Mehr anzeigen“ <b>Gruppieren nach: Tag</b>.</li>
+        <li>Darunter <b>Statistik berechnen</b> → <b>Summe</b>.</li>
+        <li>Nochmal <b>Health-Samples suchen</b>, diesmal Typ <b>Aktive Energie</b> (das ist dein Bewegen-Ring), gleiche Einstellungen.</li>
+        <li>Darunter wieder <b>Statistik berechnen</b> → <b>Summe</b>.</li>
+        <li>Aktion <b>Text</b> hinzufügen. Ins Textfeld tippen, über der Tastatur die erste <b>Statistik</b> antippen, ein <b>;</b> tippen, dann die zweite <b>Statistik</b> antippen. Es steht dann da: Statistik ; Statistik.</li>
+        <li>Darunter <b>In Zwischenablage kopieren</b>.</li>
         <li>Oben auf <b>Fertig</b>. Beim ersten Mal fragt das iPhone, ob der Kurzbefehl Health lesen darf – <b>Erlauben</b>.</li>
       </ol>
-      <p class="klein">Heißt eine Aktion bei dir etwas anders, sag Bescheid.</p>
+      <p class="klein">Hast du schon den einfachen Kurzbefehl nur mit Schritten? Der geht weiter – dann fehlen nur die kcal. Heißt eine Aktion bei dir anders, sag Bescheid.</p>
     </details>
   </main>
 </div>
