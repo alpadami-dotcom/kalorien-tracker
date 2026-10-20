@@ -80,7 +80,7 @@ function zeichneMahlzeitSeite() {
   const titel = mahlzeitTitel(k);
   $("mz-titel").textContent = titel;
   $("mz-datum").textContent = $("essen-datum").textContent;
-  $("text").placeholder = k === "snack" ? "Welcher Snack? z. B. 1 Apfel" : `Was gab es zum ${titel}?`;
+  $("text").placeholder = k === "snack" ? "Welcher Snack?" : `Was gab es zum ${titel}?`;
 
   // Was heute schon in dieser Mahlzeit steht - Index fuer bearbeite() mitnehmen.
   const heuteHier = eintraege().map((e, i) => [e, i]).filter(([e]) => mahlzeitVon(e) === k);

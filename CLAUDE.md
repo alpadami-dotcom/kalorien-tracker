@@ -53,6 +53,12 @@ Laugenbrezel fehlen bewusst, weil die USDA kein echtes Gegenstück hat.
 „2 EL Olivenöl", „ein Glas Milch". Das Gewicht eines Stücks kommt aus
 `stueckGewicht()` (bevorzugt Etiketten, die mit „1 mittel" *anfangen*).
 
+Tippfehler: Findet die deutsche Liste nichts, sucht `suche()` unscharf
+(Damerau-Levenshtein, auch gegen Wortanfänge, 1 Fehler ab 4, 2 ab 6
+Buchstaben). Solche Treffer tragen `aehnlich` und zeigen „Meintest du …“.
+Nur als Rückfall — sonst mischen sich bei richtigen Wörtern ähnliche
+darunter („eier“ → „Bier“).
+
 Fallen, die schon einmal zugeschnappt sind:
 - Fehlt eine Portionsangabe, darf nie stillschweigend 100 g herauskommen —
   „1 EL Öl" waren so 884 statt 124 kcal.
