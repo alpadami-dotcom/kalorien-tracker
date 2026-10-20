@@ -120,7 +120,8 @@ function ersetzeDaten(daten) {
 function zeichneAlles() {
   zeichne();
   if (typeof zeichneGewicht === "function") zeichneGewicht();
-  if (typeof zeichneWoche === "function") zeichneWoche();
+  if (typeof zeichneKalenderKachel === "function") zeichneKalenderKachel();
+  if (typeof zeichneWocheKachel === "function") zeichneWocheKachel();
   zeigeSicherungsStand();
 }
 

@@ -87,10 +87,16 @@
       <button class="plus kachel-plus" id="kachel-gewicht-plus" aria-label="Gewicht eintragen">+</button>
     </div>
 
-    <a href="#kalender" class="kachel breit-kachel" aria-label="Kalender">
+    <a href="#kalender" class="kachel" aria-label="Kalender">
       <div class="kachel-titel">Kalender <span class="weiter" aria-hidden="true">›</span></div>
-      <div class="woche" id="kachel-woche"></div>
-      <div class="klein kachel-naechster" id="kachel-naechster" hidden></div>
+      <div class="kachel-wert"><span id="kachel-kal-tag">–</span> <span class="klein" id="kachel-kal-monat"></span></div>
+      <div class="klein kachel-naechster" id="kachel-naechster">Keine Einträge</div>
+    </a>
+
+    <a href="#woche" class="kachel" aria-label="Wochenübersicht">
+      <div class="kachel-titel">Woche <span class="weiter" aria-hidden="true">›</span></div>
+      <div><div class="kachel-wert" id="kachel-woche-schnitt">–</div><div class="klein">Ø kcal pro Tag</div></div>
+      <div class="mini-woche" id="kachel-woche-balken" aria-hidden="true"></div>
     </a>
   </main>
 </div>
@@ -211,6 +217,33 @@
     </details>
     </section>
     <button type="button" class="erst breit" id="gewicht-plus">Gewicht eintragen</button>
+  </main>
+</div>
+
+<!-- ===== Woche ===== -->
+<div class="ansicht" id="ansicht-woche" hidden>
+  <header class="leiste">
+    <a href="#" class="zurueck">‹ Übersicht</a>
+    <div class="leiste-titel"><span>Woche</span></div>
+  </header>
+  <main>
+    <section class="kalender-karte woche-karte">
+      <div class="kal-kopf">
+        <button type="button" class="pfeil" id="woche-zurueck" aria-label="Vorige Woche">‹</button>
+        <div class="woche-kopf"><h2 id="woche-titel"></h2><div class="klein" id="woche-zeitraum"></div></div>
+        <button type="button" class="pfeil" id="woche-vor" aria-label="Nächste Woche">›</button>
+      </div>
+      <div class="diagramm" id="woche-diagramm">
+        <div class="tip" id="woche-tip" hidden>
+          <div class="tip-datum"></div>
+          <div><b class="tip-wert"></b></div>
+          <div class="tip-makros"></div>
+        </div>
+      </div>
+    </section>
+    <div class="kennzahlen" id="woche-kennzahlen"></div>
+    <h3 class="woche-unter">Tage – antippen zum Öffnen</h3>
+    <ul class="liste" id="woche-liste"></ul>
   </main>
 </div>
 
@@ -412,6 +445,7 @@
 <script src="mahlzeit.js"></script>
 <script src="gewicht.js"></script>
 <script src="kalender.js"></script>
+<script src="woche.js"></script>
 <script src="sicherung.js"></script>
 </body>
 </html>

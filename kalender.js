@@ -248,21 +248,12 @@ for (const b of $("notiz-art").children) {
 
 // ---------- Kachel in der Uebersicht ----------
 
-// Die letzten sieben Tage bis heute, je Tag ein Punkt.
-function zeichneWoche() {
-  const tage = alleTage();
-  const z = ziel();
+// Kachel: heutiges Datum gross, darunter der naechste Eintrag. Den
+// Wochenverlauf zeigt seit der Wochenuebersicht deren eigene Kachel.
+function zeichneKalenderKachel() {
   const h = new Date(heute() + "T12:00:00");
-  $("kachel-woche").replaceChildren(...Array.from({ length: 7 }, (_, i) => {
-    const datum = new Date(h.getTime() - (6 - i) * 86400000);
-    const d = datum.toISOString().slice(0, 10);
-    const zelle = document.createElement("span");
-    const status = tagStatus(tage, d, z);
-    zelle.className = "woche-tag" + (d === tag ? " gewaehlt" : "") + (status?.makro ? " makro" : "");
-    zelle.innerHTML = `<span class="woche-name"></span><span class="woche-punkt ${status?.klasse ?? ""}"></span>`;
-    zelle.querySelector(".woche-name").textContent = datum.toLocaleDateString("de-DE", { weekday: "short" }).replace(".", "");
-    return zelle;
-  }));
+  $("kachel-kal-tag").textContent = h.getDate();
+  $("kachel-kal-monat").textContent = h.toLocaleDateString("de-DE", { month: "long" });
   zeichneNaechsten();
 }
 
@@ -284,8 +275,7 @@ function zeichneNaechsten() {
   }
 
   const feld = $("kachel-naechster");
-  feld.hidden = !kandidat;
-  if (!kandidat) return;
+  if (!kandidat) { feld.textContent = "Keine Einträge"; return; }
   const wann = kandidat.datum === h ? "Heute"
     : new Date(kandidat.datum + "T12:00:00").toLocaleDateString("de-DE", { weekday: "short", day: "numeric", month: "short" });
   feld.textContent = `${ARTEN[kandidat.art]?.zeichen ?? "📝"} ${wann}${kandidat.zeit ? " " + kandidat.zeit : ""} · ${kandidat.text}`;
@@ -330,7 +320,7 @@ $("kal-heute").addEventListener("click", () => {
   zeichneKalender();
 });
 
-zeichneWoche();
+zeichneKalenderKachel();
 
 // Der "naechste Eintrag" haengt an der Uhrzeit - jede Minute nachziehen,
 // sonst stuende um 19 Uhr noch das Training von 18 Uhr in der Kachel.

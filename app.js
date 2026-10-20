@@ -167,7 +167,8 @@ function zeichne() {
 
   zeichneMahlzeiten(liste);
   zeichneWasser();
-  if (typeof zeichneWoche === "function") zeichneWoche(); // kalender.js
+  if (typeof zeichneKalenderKachel === "function") zeichneKalenderKachel(); // kalender.js
+  if (typeof zeichneWocheKachel === "function") zeichneWocheKachel(); // woche.js
   if (aktuelleMahlzeit && typeof zeichneMahlzeitSeite === "function") zeichneMahlzeitSeite();
 }
 
@@ -780,6 +781,7 @@ function zeigeAnsicht() {
   // Erst sichtbar gezeichnet kennen Kurve und Kalender ihre Breite.
   if (ansicht === "gewicht" && typeof zeichneGewicht === "function") zeichneGewicht();
   if (ansicht === "kalender" && typeof zeigeKalender === "function") zeigeKalender();
+  if (ansicht === "woche" && typeof zeigeWoche === "function") zeigeWoche();
   if (ansicht === "mahlzeit" && typeof zeichneMahlzeitSeite === "function") zeichneMahlzeitSeite();
   window.scrollTo(0, 0);
 }
