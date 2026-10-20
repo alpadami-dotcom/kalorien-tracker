@@ -51,6 +51,7 @@
     <div class="glaeser" id="glaeser"></div>
   </section>
 
+
   <section class="eingabe">
     <form id="text-form" autocomplete="off">
       <input id="text" type="text" enterkeyhint="send"
@@ -74,6 +75,39 @@
   </section>
 
   <section id="mahlzeiten"></section>
+
+  <section class="gewicht-karte">
+    <!-- Ganz unten: gewogen wird einmal am Tag, gegessen mehrmals. -->
+    <div class="gewicht-kopf">
+      <div>
+        <div class="klein">Gewicht</div>
+        <div class="gewicht-zahl"><span id="gewicht-aktuell">–</span> <span class="klein">kg</span></div>
+        <div class="klein" id="gewicht-delta"></div>
+      </div>
+      <button class="plus" id="gewicht-plus" aria-label="Gewicht eintragen">+</button>
+    </div>
+    <div class="segmente" id="gewicht-zeitraum" role="radiogroup" aria-label="Zeitraum">
+      <button type="button" data-wert="30" aria-checked="true">30 Tage</button>
+      <button type="button" data-wert="90">90 Tage</button>
+      <button type="button" data-wert="0">Alles</button>
+    </div>
+    <div class="diagramm" id="gewicht-diagramm" hidden>
+      <div class="tip" id="gewicht-tip" hidden>
+        <div class="tip-datum"></div>
+        <div class="tip-zeile"><span class="key punkt-key"></span><b class="tip-gewogen"></b> gewogen</div>
+        <div class="tip-zeile"><span class="key linie-key"></span><b class="tip-schnitt"></b> 7-Tage-Schnitt</div>
+      </div>
+    </div>
+    <div class="legende" id="gewicht-legende" hidden>
+      <span><span class="key punkt-key"></span>Gewogen</span>
+      <span><span class="key linie-key"></span>7-Tage-Schnitt</span>
+    </div>
+    <p class="leer" id="gewicht-leer"></p>
+    <details class="gewicht-alle">
+      <summary>Alle Einträge <span id="gewicht-anzahl"></span></summary>
+      <ul class="liste" id="gewicht-liste"></ul>
+    </details>
+  </section>
 </main>
 
 <!-- Pruefen: was die KI / Suche / der Barcode gefunden hat, vor dem Eintragen -->
@@ -140,10 +174,28 @@
   </form>
 </dialog>
 
+<!-- Gewicht eintragen -->
+<dialog id="gewicht-dialog">
+  <form method="dialog" class="blatt">
+    <h2>Gewicht eintragen</h2>
+    <div class="felder zwei">
+      <label>Tag<input id="g-datum" type="date"></label>
+      <label>Gewicht (kg)<input id="g-wert" type="text" inputmode="decimal" placeholder="z. B. 72,5"></label>
+    </div>
+    <p class="klein">Tipp: morgens nach dem Aufstehen wiegen – dann sind die Werte vergleichbar.</p>
+    <div class="aktionen">
+      <button value="abbruch" class="zweit">Abbrechen</button>
+      <button value="ok" id="g-speichern" class="erst">Speichern</button>
+    </div>
+    <button value="geloescht" id="g-loeschen" class="loeschen" hidden>Diesen Eintrag löschen</button>
+  </form>
+</dialog>
+
 <div class="laden" id="laden" hidden><div class="kreisel"></div><span id="laden-text">Einen Moment …</span></div>
 <div class="meldung" id="meldung" hidden></div>
 
 <script src="naehrwerte.js"></script>
 <script src="app.js"></script>
+<script src="gewicht.js"></script>
 </body>
 </html>

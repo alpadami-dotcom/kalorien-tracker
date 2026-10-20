@@ -12,6 +12,7 @@ ohne Server. Suche, Mengen und Barcode passieren im Browser.
 |---|---|
 | `web/naehrwerte.js` | Suche (deutsche Liste + USDA), Stückgewichte, Barcode lesen + Open Food Facts |
 | `web/app.js` | Oberfläche, Mengen-Parser `zerlege()`, Speichern im localStorage |
+| `web/gewicht.js` | Gewichtsverlauf: Kurve (SVG, ohne Bibliothek), Eintragen, Liste |
 | `web/sw.js` | Service Worker: offline nutzbar, „Netz zuerst" damit Updates ankommen |
 | `web/daten/*.json` | Nährwerte, erzeugt von `daten/baue_daten.py` — nicht von Hand ändern |
 | `daten/deutsch.txt` | ~160 deutsche Namen → USDA-Eintrag, von Hand gepflegt |
@@ -53,6 +54,10 @@ Fallen, die schon einmal zugeschnappt sind:
   Empfehlung geht **nie unter den Grundumsatz**; unter 18 zeigt die App
   einen Hinweis. Diese Untergrenze nicht entfernen.
 - Wasser: `kalorien:wasser` je Tag in ml, ein Glas = 250 ml.
+- Gewicht: `kalorien:gewicht` je Tag in kg. Linie = 7-Tage-Schnitt (nach
+  Zeit, nicht Anzahl), Punkte = Messungen. Der neueste Wert wird ins Profil
+  übernommen, damit der Kalorienrechner aktuell bleibt. Kurvenfarben sind
+  mit dem dataviz-Validator geprüft — beim Ändern neu prüfen.
 - Jeder Eintrag hat `mahlzeit` (fruehstueck/mittag/abend/snack); alte
   Einträge ohne das Feld werden über ihre Uhrzeit einsortiert.
 - Speichern beim **Antippen** der Knöpfe, nicht im `close`-Ereignis des

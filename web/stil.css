@@ -11,6 +11,9 @@
   --kh: #d39a2c;
   --fett: #b5502f;
   --wasser: #4aa3df;
+  /* Kurvenfarben: mit dem dataviz-Validator geprueft (Farbschwaeche, Kontrast). */
+  --kurve-gewogen: #c4702a;
+  --kurve-schnitt: #2563b8;
   --schatten: 0 1px 2px rgb(0 0 0 / 6%), 0 4px 16px rgb(0 0 0 / 5%);
 }
 @media (prefers-color-scheme: dark) {
@@ -27,6 +30,8 @@
     --kh: #e8b955;
     --fett: #e0866a;
     --wasser: #5cb4ec;
+    --kurve-gewogen: #c9782f;
+    --kurve-schnitt: #4f8fe0;
     --schatten: none;
   }
 }
@@ -211,3 +216,36 @@ dialog::backdrop { background: rgb(0 0 0 / 40%); }
 .breit { width: 100%; margin-top: 8px; padding: 12px; border: 0; border-radius: 12px; font-weight: 600; }
 .aktionen.eins { grid-template-columns: 1fr; }
 dialog { overflow-y: auto; }
+
+/* Gewicht */
+.gewicht-karte { background: var(--karte); border-radius: 16px; padding: 14px 16px; box-shadow: var(--schatten); margin-top: 24px; }
+.gewicht-kopf { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+.gewicht-zahl { font-size: 28px; font-weight: 700; line-height: 1.15; }
+.gewicht-karte .segmente { margin-bottom: 8px; }
+.diagramm { position: relative; }
+.diagramm svg { display: block; touch-action: pan-y; } /* senkrecht scrollen bleibt moeglich */
+.diagramm .raster { stroke: var(--linie); stroke-width: 1; }
+.diagramm .achse { fill: var(--leise); font-size: 11px; font-variant-numeric: tabular-nums; }
+.diagramm .schnitt { fill: none; stroke: var(--kurve-schnitt); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.diagramm .gewogen { fill: var(--kurve-gewogen); stroke: var(--karte); stroke-width: 2; }
+.diagramm .kreuz { stroke: var(--leise); stroke-width: 1; }
+.diagramm .fokus { fill: none; stroke: var(--kurve-gewogen); stroke-width: 2; }
+.tip {
+  position: absolute; top: -6px; transform: translateY(-100%); pointer-events: none; z-index: 2;
+  background: var(--tinte); color: var(--papier); border-radius: 10px; padding: 8px 10px;
+  font-size: 13px; white-space: nowrap; box-shadow: var(--schatten);
+}
+.tip-datum { opacity: .75; margin-bottom: 2px; }
+.tip-zeile { display: flex; align-items: center; gap: 6px; }
+.key { display: inline-block; flex: none; }
+.punkt-key { width: 8px; height: 8px; border-radius: 50%; background: var(--kurve-gewogen); }
+.linie-key { width: 14px; height: 2px; border-radius: 1px; background: var(--kurve-schnitt); }
+.legende { display: flex; gap: 16px; font-size: 13px; color: var(--leise); margin-top: 6px; }
+.legende > span { display: inline-flex; align-items: center; gap: 6px; }
+.gewicht-karte .leer { padding: 8px 0; margin: 0; }
+.gewicht-alle { margin-top: 10px; }
+.gewicht-alle summary { font-size: 14px; color: var(--leise); cursor: pointer; padding: 4px 0; }
+.gewicht-alle .liste { box-shadow: none; border: 1px solid var(--linie); margin-top: 8px; }
+.loeschen { width: 100%; margin-top: 10px; padding: 12px; border: 0; background: none; color: var(--warn); font-weight: 600; }
+.loeschen[hidden] { display: none; }
+input[type=date] { font-size: 16px; padding: 10px; border-radius: 10px; border: 1px solid var(--linie); background: var(--papier); color: var(--tinte); width: 100%; min-width: 0; }
