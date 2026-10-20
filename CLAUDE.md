@@ -100,7 +100,9 @@ weiter unten nicht wiederholt.
 - Wischen (Übersicht = Tag, Kalender = Monat): **Finger nach rechts =
   zurück**, nach links = vor, wie bei Fotos. Erst andersherum gebaut, der
   Nutzer wollte es so — nicht wieder umdrehen.
-- Gewicht: `kalorien:gewicht` je Tag in kg. Linie = 7-Tage-Schnitt (nach
+- Gewicht: `kalorien:gewicht` je Tag in kg. Eintragen nur für heute und
+  die 3 Tage davor (Knöpfe statt Datumsfeld, so gewünscht); ältere Werte
+  nur über „Alle Einträge“, dann kommt ihr Tag als Knopf dazu. Linie = 7-Tage-Schnitt (nach
   Zeit, nicht Anzahl), Punkte = Messungen. Der neueste Wert wird ins Profil
   übernommen, damit der Kalorienrechner aktuell bleibt. Kurvenfarben sind
   mit dem dataviz-Validator geprüft — beim Ändern neu prüfen.

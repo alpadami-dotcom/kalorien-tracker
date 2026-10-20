@@ -441,7 +441,11 @@
     <!-- Untereinander statt nebeneinander: Das Datumsfeld ist am iPhone
          breiter als sein Platz und rutschte ueber das Gewichtsfeld. -->
     <label class="zeile">Gewicht (kg)<input id="g-wert" class="gross-eingabe" type="text" inputmode="decimal" autocomplete="off" placeholder="z. B. 72,5"></label>
-    <label class="zeile">Tag<input id="g-datum" type="date"></label>
+    <!-- Statt Kalender-Rad: nur heute und die drei Tage davor. Wiegen kann man
+         sich nicht im Voraus, und wer eine Woche vergessen hat, traegt sie
+         ohnehin nicht nach. Aeltere Werte aendert man ueber "Alle Eintraege". -->
+    <div class="zeile">Tag</div>
+    <div class="segmente tage-wahl" id="g-tage" role="radiogroup" aria-label="Tag"></div>
     <p class="klein">Tipp: morgens nach dem Aufstehen wiegen – dann sind die Werte vergleichbar.</p>
     <div class="aktionen">
       <!-- type="button": sonst waere "Abbrechen" der Standardknopf, und
