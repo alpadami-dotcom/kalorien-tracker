@@ -155,15 +155,15 @@
         <input type="file" accept="image/*" capture="environment" id="foto" hidden>
         📷 Foto vom Essen
       </label>
-      <label class="knopf">
-        <input type="file" accept="image/*" capture="environment" id="barcode-foto" hidden>
-        ▥ Barcode
-      </label>
+      <button type="button" class="knopf" id="barcode-knopf">▥ Barcode scannen</button>
     </div>
     <ul class="vorschlaege" id="vorschlaege"></ul>
   </section>
 
-    <ul class="liste mz-liste" id="mz-eintraege"></ul>
+    <!-- Heute schon Eingetragenes zugeklappt: Die Vorschlaege darunter sollen
+         ohne Scrollen erreichbar bleiben. -->
+    <button type="button" class="aufklappen mz-aufklappen" id="mz-aufklappen" aria-expanded="false" hidden></button>
+    <ul class="liste mz-liste" id="mz-eintraege" hidden></ul>
 
     <!-- Favoriten: selbst mit dem Stern markiert, fuer alle Mahlzeiten gleich -->
     <section class="gedaechtnis" id="mz-favoriten" hidden>
@@ -379,6 +379,22 @@
   </main>
 </div>
 
+<!-- Barcode-Scanner: Live-Kamera, Code wird von selbst erkannt -->
+<dialog id="scanner" class="scanner">
+  <div class="scanner-bild">
+    <video id="scanner-video" playsinline muted autoplay></video>
+    <div class="scanner-rahmen" aria-hidden="true"></div>
+  </div>
+  <p class="scanner-hinweis" id="scanner-hinweis">Halte den Barcode in den Rahmen.</p>
+  <div class="scanner-knoepfe">
+    <label class="zweit breit datei-knopf">📷 Foto
+      <input type="file" accept="image/*" capture="environment" id="barcode-foto" hidden>
+    </label>
+    <button type="button" class="zweit breit" id="scanner-nummer">🔢 Nummer</button>
+    <button type="button" class="erst breit" id="scanner-abbrechen">Fertig</button>
+  </div>
+</dialog>
+
 <!-- Pruefen: was die KI / Suche / der Barcode gefunden hat, vor dem Eintragen -->
 <dialog id="pruefen">
   <form method="dialog" class="blatt">
@@ -539,6 +555,7 @@
 <script src="naehrwerte.js"></script>
 <script src="app.js"></script>
 <script src="mahlzeit.js"></script>
+<script src="scanner.js"></script>
 <script src="gewicht.js"></script>
 <script src="kalender.js"></script>
 <script src="woche.js"></script>

@@ -21,6 +21,9 @@ let tag = heute();
 let kiAn = false;
 let kandidaten = [];
 let aktuelleMahlzeit = null; // offene Mahlzeit-Seite (#mahlzeit-...), sonst null
+// Aufgeklappte Listen auf der Essen-Seite. Standard: zu - sonst musste man
+// fuer jede weitere Mahlzeit an allen Eintraegen vorbei nach unten scrollen.
+const offeneMahlzeiten = new Set();
 let gewaehlteMahlzeit = null;
 
 // ---------- Speicher ----------
@@ -189,7 +192,8 @@ function zeichneMahlzeiten(liste) {
         <span class="klein">${teil.length ? rund(kcal) + " kcal" : ""}</span>
         <span class="plus" aria-hidden="true">+</span>
       </a>
-      <ul class="liste"></ul>`;
+      <button type="button" class="aufklappen" aria-expanded="false" hidden></button>
+      <ul class="liste" hidden></ul>`;
     block.querySelector("ul").replaceChildren(...teil.map(([e, i]) => {
       const li = document.createElement("li");
       const w = werte(e);
@@ -204,6 +208,22 @@ function zeichneMahlzeiten(liste) {
       li.addEventListener("click", () => bearbeite(i));
       return li;
     }));
+    // Zugeklappt: eine Zeile mit Anzahl und den ersten Namen. Aufklappen zeigt die Liste.
+    const knopf = block.querySelector(".aufklappen");
+    const ul = block.querySelector("ul");
+    if (teil.length) {
+      const offen = offeneMahlzeiten.has(schluessel);
+      const namen = teil.map(([e]) => e.name.replace(/\s*\(.*\)$/, "")).join(", ");
+      knopf.hidden = false;
+      knopf.setAttribute("aria-expanded", offen);
+      knopf.innerHTML = `<span class="aufklappen-text"></span><span class="pfeilchen" aria-hidden="true">${offen ? "▴" : "▾"}</span>`;
+      knopf.querySelector(".aufklappen-text").textContent = offen ? `${teil.length} ${teil.length === 1 ? "Eintrag" : "Einträge"} – zuklappen` : `${teil.length} · ${namen}`;
+      ul.hidden = !offen;
+      knopf.addEventListener("click", () => {
+        if (offeneMahlzeiten.has(schluessel)) offeneMahlzeiten.delete(schluessel); else offeneMahlzeiten.add(schluessel);
+        zeichneMahlzeiten(eintraege());
+      });
+    }
     return block;
   }));
 }
@@ -383,7 +403,10 @@ $("text").addEventListener("input", () => {
 function zeigeVorschlaege(treffer) {
   $("vorschlaege").replaceChildren(...treffer.map((k) => {
     const li = document.createElement("li");
-    li.innerHTML = `<span class="n"></span><span class="wert">${rund(k.pro100.kcal)} kcal/100 g</span>`;
+    // Gerichte isst man portionsweise - "860 kcal · 1 Döner" sagt mehr als "215 kcal/100 g".
+    const portion = k.quelle?.startsWith("Ø") && k.portionen?.[0];
+    const wert = portion ? `${rund((k.pro100.kcal * portion[1]) / 100)} kcal · ${portion[0]}` : `${rund(k.pro100.kcal)} kcal/100 g`;
+    li.innerHTML = `<span class="n"></span><span class="wert">${wert}</span>`;
     const n = li.querySelector(".n");
     n.textContent = k.name;
     if (/^[A-Z][a-z]+,/.test(k.name)) n.classList.add("en"); // englischer USDA-Name
@@ -439,23 +462,7 @@ $("foto").addEventListener("change", async (ev) => {
   finally { laden(); }
 });
 
-$("barcode-foto").addEventListener("change", async (ev) => {
-  const datei = ev.target.files[0];
-  ev.target.value = "";
-  if (!datei) return;
-  laden("Lese Barcode …");
-  try {
-    // Strichcodes brauchen mehr Aufloesung als Essensfotos.
-    const c = await aufLeinwand(datei, 2400);
-    const code = await liesBarcode(c.getContext("2d").getImageData(0, 0, c.width, c.height));
-    if (!code) throw new Error("Kein Barcode erkannt – näher ran, scharf, gut beleuchtet.");
-    laden("Suche Produkt …");
-    const k = await barcodeNachschlagen(code);
-    if (!k) throw new Error(`Barcode ${code} ist bei Open Food Facts unbekannt.`);
-    oeffnePruefen([k], "", "Produkt gefunden");
-  } catch (e) { meldung(e.message); }
-  finally { laden(); }
-});
+// Barcode: siehe scanner.js (Live-Kamera, Foto und Nummer als Notloesung).
 
 // Claude liefert nur Name, Gramm und den Namen aus der deutschen Liste.
 // Die Naehrwerte kommen von hier - nur was nicht in der Liste steht,
@@ -499,7 +506,10 @@ function oeffnePruefen(liste, rueckfrage, titel) {
 
     const info = [];
     if (k.menge) info.push(k.menge);
-    info.push(k.quelle === "KI-Schätzung" ? '<span class="warn">Nährwerte geschätzt</span>' : k.quelle);
+    // "Ø-Wert": Durchschnitt fuer Zubereitetes (Doener ...) - ehrlich sagen,
+    // dass das je nach Imbiss abweicht.
+    info.push(k.quelle === "KI-Schätzung" ? '<span class="warn">Nährwerte geschätzt</span>'
+      : k.quelle === "Ø-Wert" ? "Ø-Wert – je nach Zubereitung ± 20 %" : k.quelle);
     if (k.sicherheit === "niedrig") info.push('<span class="warn">Menge unsicher</span>');
     li.querySelector(".k-info").innerHTML = info.join(" · ");
     if (k.hinweis) li.querySelector(".k-info").append(" · " + k.hinweis);
