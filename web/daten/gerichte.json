@@ -1,0 +1,1521 @@
+[
+ {
+  "name": "Döner Kebab",
+  "aliase": [
+   "Döner",
+   "Doener",
+   "Kebab"
+  ],
+  "kcal": 215,
+  "protein": 11,
+  "kh": 20,
+  "fett": 10,
+  "portionen": [
+   [
+    "1 Döner",
+    400
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Dürüm Döner",
+  "aliase": [
+   "Dürüm",
+   "Yufka",
+   "Durum"
+  ],
+  "kcal": 210,
+  "protein": 11,
+  "kh": 21,
+  "fett": 9,
+  "portionen": [
+   [
+    "1 Dürüm",
+    400
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Döner-Box mit Pommes",
+  "aliase": [
+   "Dönerbox",
+   "Döner Box"
+  ],
+  "kcal": 230,
+  "protein": 9,
+  "kh": 20,
+  "fett": 12,
+  "portionen": [
+   [
+    "1 Box",
+    450
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Dönerfleisch",
+  "aliase": [
+   "Kebabfleisch",
+   "Gyrosfleisch"
+  ],
+  "kcal": 240,
+  "protein": 12,
+  "kh": 4,
+  "fett": 13,
+  "portionen": [
+   [
+    "1 Portion",
+    150
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Lahmacun",
+  "aliase": [
+   "türkische Pizza"
+  ],
+  "kcal": 220,
+  "protein": 9,
+  "kh": 30,
+  "fett": 7,
+  "portionen": [
+   [
+    "1 Stück",
+    200
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Falafel (frittiert)",
+  "aliase": [
+   "Falafel",
+   "Falafelbällchen"
+  ],
+  "kcal": 333,
+  "protein": 13,
+  "kh": 32,
+  "fett": 18,
+  "portionen": [
+   [
+    "1 Bällchen",
+    17
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Falafel im Brot",
+  "aliase": [
+   "Falafel Dürüm",
+   "Falafel Wrap"
+  ],
+  "kcal": 200,
+  "protein": 6,
+  "kh": 26,
+  "fett": 8,
+  "portionen": [
+   [
+    "1 Stück",
+    350
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Currywurst",
+  "aliase": [
+   "Curry Wurst"
+  ],
+  "kcal": 250,
+  "protein": 10,
+  "kh": 8,
+  "fett": 20,
+  "portionen": [
+   [
+    "1 Portion",
+    200
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Currywurst mit Pommes",
+  "aliase": [
+   "Currywurst Pommes"
+  ],
+  "kcal": 240,
+  "protein": 7,
+  "kh": 22,
+  "fett": 14,
+  "portionen": [
+   [
+    "1 Portion",
+    400
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Bratwurst im Brötchen",
+  "aliase": [
+   "Rostbratwurst Brötchen",
+   "Bratwurstbrötchen"
+  ],
+  "kcal": 280,
+  "protein": 11,
+  "kh": 22,
+  "fett": 16,
+  "portionen": [
+   [
+    "1 Stück",
+    150
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Pommes rot-weiß",
+  "aliase": [
+   "Pommes mit Ketchup und Mayo",
+   "Pommes Schranke"
+  ],
+  "kcal": 260,
+  "protein": 3,
+  "kh": 30,
+  "fett": 14,
+  "portionen": [
+   [
+    "1 Portion",
+    250
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Schnitzel paniert",
+  "aliase": [
+   "Wiener Schnitzel",
+   "Schweineschnitzel",
+   "Schnitzel"
+  ],
+  "kcal": 230,
+  "protein": 22,
+  "kh": 9,
+  "fett": 12,
+  "portionen": [
+   [
+    "1 Schnitzel",
+    180
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Leberkäse",
+  "aliase": [
+   "Leberkäs",
+   "Fleischkäse"
+  ],
+  "kcal": 256.0,
+  "protein": 12.4,
+  "kh": 1.0,
+  "fett": 21.6,
+  "portionen": [
+   [
+    "1 Scheibe",
+    100
+   ]
+  ],
+  "quelle": "Ø aus 26 Produkten"
+ },
+ {
+  "name": "Leberkässemmel",
+  "aliase": [
+   "Leberkäsebrötchen",
+   "Fleischkäsebrötchen"
+  ],
+  "kcal": 280,
+  "protein": 11,
+  "kh": 20,
+  "fett": 17,
+  "portionen": [
+   [
+    "1 Stück",
+    180
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Frikadelle",
+  "aliase": [
+   "Bulette",
+   "Fleischpflanzerl",
+   "Hackbällchen"
+  ],
+  "kcal": 234,
+  "protein": 13.5,
+  "kh": 8,
+  "fett": 15,
+  "portionen": [
+   [
+    "1 Stück",
+    80
+   ]
+  ],
+  "quelle": "Ø aus 47 Produkten"
+ },
+ {
+  "name": "Gyros",
+  "aliase": [
+   "Gyros Fleisch"
+  ],
+  "kcal": 210,
+  "protein": 20,
+  "kh": 2,
+  "fett": 14,
+  "portionen": [
+   [
+    "1 Portion",
+    200
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Gyros mit Pommes",
+  "aliase": [
+   "Gyrosteller",
+   "Gyros Teller"
+  ],
+  "kcal": 200,
+  "protein": 10,
+  "kh": 15,
+  "fett": 11,
+  "portionen": [
+   [
+    "1 Teller",
+    500
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Pizza Margherita (Restaurant)",
+  "aliase": [
+   "Pizza Restaurant",
+   "Pizzeria"
+  ],
+  "kcal": 250,
+  "protein": 10,
+  "kh": 31,
+  "fett": 9,
+  "portionen": [
+   [
+    "1 Pizza",
+    400
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Pizza Salami (Restaurant)",
+  "aliase": [
+   "Salamipizza Restaurant"
+  ],
+  "kcal": 270,
+  "protein": 11,
+  "kh": 29,
+  "fett": 12,
+  "portionen": [
+   [
+    "1 Pizza",
+    420
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Big Mac",
+  "aliase": [
+   "McDonalds Burger"
+  ],
+  "kcal": 251,
+  "protein": 12,
+  "kh": 20,
+  "fett": 13,
+  "portionen": [
+   [
+    "1 Burger",
+    219
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Chicken Nuggets",
+  "aliase": [
+   "Nuggets",
+   "Hähnchen Nuggets"
+  ],
+  "kcal": 220,
+  "protein": 13.4,
+  "kh": 15,
+  "fett": 11,
+  "portionen": [
+   [
+    "6 Stück",
+    100
+   ]
+  ],
+  "quelle": "Ø aus 47 Produkten"
+ },
+ {
+  "name": "Burger (Restaurant)",
+  "aliase": [
+   "Rindfleischburger",
+   "Smash Burger"
+  ],
+  "kcal": 250,
+  "protein": 13,
+  "kh": 20,
+  "fett": 13,
+  "portionen": [
+   [
+    "1 Burger",
+    250
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Hotdog",
+  "aliase": [
+   "Hot Dog"
+  ],
+  "kcal": 260,
+  "protein": 10,
+  "kh": 24,
+  "fett": 14,
+  "portionen": [
+   [
+    "1 Stück",
+    120
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Sushi",
+  "aliase": [
+   "Maki",
+   "Nigiri",
+   "Sushi gemischt"
+  ],
+  "kcal": 150,
+  "protein": 6,
+  "kh": 28,
+  "fett": 2,
+  "portionen": [
+   [
+    "1 Stück",
+    30
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Wrap mit Hähnchen",
+  "aliase": [
+   "Chicken Wrap",
+   "Hähnchenwrap"
+  ],
+  "kcal": 190,
+  "protein": 12,
+  "kh": 20,
+  "fett": 7,
+  "portionen": [
+   [
+    "1 Wrap",
+    250
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Frühlingsrolle",
+  "aliase": [
+   "Frühlingsrollen"
+  ],
+  "kcal": 171.5,
+  "protein": 3.9,
+  "kh": 22.5,
+  "fett": 6.2,
+  "portionen": [
+   [
+    "1 Stück",
+    60
+   ]
+  ],
+  "quelle": "Ø aus 54 Produkten"
+ },
+ {
+  "name": "Gebratene Nudeln",
+  "aliase": [
+   "Asia Nudeln",
+   "Mie Nudeln gebraten"
+  ],
+  "kcal": 160,
+  "protein": 5,
+  "kh": 22,
+  "fett": 6,
+  "portionen": [
+   [
+    "1 Portion",
+    350
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Gebratener Reis",
+  "aliase": [
+   "Asia Reis",
+   "Nasi Goreng"
+  ],
+  "kcal": 165,
+  "protein": 5,
+  "kh": 25,
+  "fett": 5,
+  "portionen": [
+   [
+    "1 Portion",
+    350
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Spaghetti Bolognese",
+  "aliase": [
+   "Bolognese",
+   "Nudeln mit Hackfleischsoße"
+  ],
+  "kcal": 140,
+  "protein": 6,
+  "kh": 18,
+  "fett": 5,
+  "portionen": [
+   [
+    "1 Teller",
+    400
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Lasagne",
+  "aliase": [
+   "Lasagna"
+  ],
+  "kcal": 134,
+  "protein": 5.1,
+  "kh": 13.1,
+  "fett": 5.4,
+  "portionen": [
+   [
+    "1 Portion",
+    350
+   ]
+  ],
+  "quelle": "Ø aus 53 Produkten"
+ },
+ {
+  "name": "Käsespätzle",
+  "aliase": [
+   "Kässpätzle",
+   "Spätzle mit Käse"
+  ],
+  "kcal": 210,
+  "protein": 9,
+  "kh": 22,
+  "fett": 10,
+  "portionen": [
+   [
+    "1 Portion",
+    350
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Spätzle gekocht",
+  "aliase": [
+   "Spätzle"
+  ],
+  "kcal": 150,
+  "protein": 5.5,
+  "kh": 27,
+  "fett": 2.5,
+  "portionen": [
+   [
+    "1 Portion",
+    200
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Kartoffelsalat (Mayo)",
+  "aliase": [
+   "Kartoffelsalat"
+  ],
+  "kcal": 142.0,
+  "protein": 1.5,
+  "kh": 14.0,
+  "fett": 8.1,
+  "portionen": [
+   [
+    "1 Portion",
+    200
+   ]
+  ],
+  "quelle": "Ø aus 50 Produkten"
+ },
+ {
+  "name": "Kartoffelsalat (Essig & Öl)",
+  "aliase": [
+   "Kartoffelsalat schwäbisch"
+  ],
+  "kcal": 100,
+  "protein": 2,
+  "kh": 14,
+  "fett": 4,
+  "portionen": [
+   [
+    "1 Portion",
+    200
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Bratkartoffeln",
+  "aliase": [
+   "Röstkartoffeln"
+  ],
+  "kcal": 150,
+  "protein": 3,
+  "kh": 20,
+  "fett": 7,
+  "portionen": [
+   [
+    "1 Portion",
+    250
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Kartoffelpüree",
+  "aliase": [
+   "Kartoffelbrei",
+   "Stampf"
+  ],
+  "kcal": 90,
+  "protein": 2,
+  "kh": 13,
+  "fett": 3,
+  "portionen": [
+   [
+    "1 Portion",
+    200
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Gulasch",
+  "aliase": [
+   "Rindergulasch"
+  ],
+  "kcal": 120,
+  "protein": 14,
+  "kh": 4,
+  "fett": 5,
+  "portionen": [
+   [
+    "1 Portion",
+    300
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Chili con Carne",
+  "aliase": [
+   "Chili"
+  ],
+  "kcal": 110,
+  "protein": 8,
+  "kh": 9,
+  "fett": 4.5,
+  "portionen": [
+   [
+    "1 Teller",
+    400
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Schweinebraten",
+  "aliase": [
+   "Krustenbraten"
+  ],
+  "kcal": 200,
+  "protein": 26,
+  "kh": 0,
+  "fett": 11,
+  "portionen": [
+   [
+    "1 Portion",
+    200
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Kaiserschmarrn",
+  "aliase": [
+   "Kaiserschmarren"
+  ],
+  "kcal": 230,
+  "protein": 7,
+  "kh": 30,
+  "fett": 9,
+  "portionen": [
+   [
+    "1 Portion",
+    300
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Milchreis",
+  "aliase": [
+   "Milchreis mit Zimt"
+  ],
+  "kcal": 117,
+  "protein": 3.3,
+  "kh": 20.7,
+  "fett": 2.4,
+  "portionen": [
+   [
+    "1 Schüssel",
+    250
+   ]
+  ],
+  "quelle": "Ø aus 55 Produkten"
+ },
+ {
+  "name": "Kartoffelsuppe",
+  "aliase": [
+   "Kartoffeleintopf"
+  ],
+  "kcal": 70,
+  "protein": 2,
+  "kh": 8,
+  "fett": 3,
+  "portionen": [
+   [
+    "1 Teller",
+    350
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Tomatensuppe",
+  "aliase": [
+   "Tomatencremesuppe"
+  ],
+  "kcal": 50,
+  "protein": 1,
+  "kh": 7,
+  "fett": 2,
+  "portionen": [
+   [
+    "1 Teller",
+    300
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Linsensuppe",
+  "aliase": [
+   "Linseneintopf"
+  ],
+  "kcal": 90,
+  "protein": 5,
+  "kh": 10,
+  "fett": 3,
+  "portionen": [
+   [
+    "1 Teller",
+    350
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Fischstäbchen",
+  "aliase": [
+   "Fischstäbchen"
+  ],
+  "kcal": 190,
+  "protein": 12.9,
+  "kh": 16,
+  "fett": 8.3,
+  "portionen": [
+   [
+    "1 Stück",
+    30
+   ]
+  ],
+  "quelle": "Ø aus 53 Produkten"
+ },
+ {
+  "name": "Salat mit Dressing",
+  "aliase": [
+   "gemischter Salat",
+   "Beilagensalat"
+  ],
+  "kcal": 70,
+  "protein": 1.5,
+  "kh": 4,
+  "fett": 5,
+  "portionen": [
+   [
+    "1 Schüssel",
+    250
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Laugenbrezel",
+  "aliase": [
+   "Brezel",
+   "Breze",
+   "Brezn"
+  ],
+  "kcal": 270,
+  "protein": 9,
+  "kh": 54,
+  "fett": 2,
+  "portionen": [
+   [
+    "1 Brezel",
+    80
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Laugenbrötchen",
+  "aliase": [
+   "Laugensemmel",
+   "Laugenstange"
+  ],
+  "kcal": 270,
+  "protein": 9,
+  "kh": 53,
+  "fett": 2.5,
+  "portionen": [
+   [
+    "1 Stück",
+    70
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Butterbrezel",
+  "aliase": [
+   "Butterbreze"
+  ],
+  "kcal": 330,
+  "protein": 8,
+  "kh": 45,
+  "fett": 13,
+  "portionen": [
+   [
+    "1 Stück",
+    100
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Berliner",
+  "aliase": [
+   "Krapfen",
+   "Pfannkuchen (Gebäck)"
+  ],
+  "kcal": 370,
+  "protein": 6,
+  "kh": 48,
+  "fett": 17,
+  "portionen": [
+   [
+    "1 Stück",
+    80
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Franzbrötchen",
+  "aliase": [
+   "Zimtschnecke"
+  ],
+  "kcal": 380,
+  "protein": 6,
+  "kh": 50,
+  "fett": 17,
+  "portionen": [
+   [
+    "1 Stück",
+    90
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Apfelstrudel",
+  "aliase": [
+   "Strudel"
+  ],
+  "kcal": 220,
+  "protein": 3,
+  "kh": 30,
+  "fett": 10,
+  "portionen": [
+   [
+    "1 Stück",
+    150
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Käsekuchen",
+  "aliase": [
+   "Quarkkuchen",
+   "Cheesecake"
+  ],
+  "kcal": 230,
+  "protein": 7,
+  "kh": 25,
+  "fett": 11,
+  "portionen": [
+   [
+    "1 Stück",
+    130
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Schokocroissant",
+  "aliase": [
+   "Pain au Chocolat",
+   "Schokoladencroissant"
+  ],
+  "kcal": 420,
+  "protein": 7,
+  "kh": 45,
+  "fett": 23,
+  "portionen": [
+   [
+    "1 Stück",
+    75
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Belegtes Brötchen (Käse)",
+  "aliase": [
+   "Käsebrötchen",
+   "Käsesemmel"
+  ],
+  "kcal": 260,
+  "protein": 11,
+  "kh": 30,
+  "fett": 10,
+  "portionen": [
+   [
+    "1 Stück",
+    120
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Magerquark",
+  "aliase": [
+   "Quark"
+  ],
+  "kcal": 66.0,
+  "protein": 11.8,
+  "kh": 4.0,
+  "fett": 0.2,
+  "portionen": [
+   [
+    "1 Becher",
+    250
+   ]
+  ],
+  "quelle": "Ø aus 40 Produkten"
+ },
+ {
+  "name": "Speisequark 20 %",
+  "aliase": [
+   "Quark 20%"
+  ],
+  "kcal": 99,
+  "protein": 10.8,
+  "kh": 3.6,
+  "fett": 4.4,
+  "portionen": [
+   [
+    "1 Becher",
+    250
+   ]
+  ],
+  "quelle": "Ø aus 35 Produkten"
+ },
+ {
+  "name": "Speisequark 40 %",
+  "aliase": [
+   "Quark 40%",
+   "Sahnequark"
+  ],
+  "kcal": 142,
+  "protein": 9,
+  "kh": 3.6,
+  "fett": 10,
+  "portionen": [
+   [
+    "1 Becher",
+    250
+   ]
+  ],
+  "quelle": "Ø aus 41 Produkten"
+ },
+ {
+  "name": "Proteinpudding",
+  "aliase": [
+   "High Protein Pudding"
+  ],
+  "kcal": 80.0,
+  "protein": 10.0,
+  "kh": 6.4,
+  "fett": 1.5,
+  "portionen": [
+   [
+    "1 Becher",
+    200
+   ]
+  ],
+  "quelle": "Ø aus 56 Produkten"
+ },
+ {
+  "name": "Schokopudding",
+  "aliase": [
+   "Pudding",
+   "Schokoladenpudding"
+  ],
+  "kcal": 111,
+  "protein": 2.9,
+  "kh": 16.4,
+  "fett": 4.1,
+  "portionen": [
+   [
+    "1 Becher",
+    125
+   ]
+  ],
+  "quelle": "Ø aus 25 Produkten"
+ },
+ {
+  "name": "Fruchtjoghurt",
+  "aliase": [
+   "Joghurt mit Frucht",
+   "Erdbeerjoghurt"
+  ],
+  "kcal": 92,
+  "protein": 3.3,
+  "kh": 13.2,
+  "fett": 2.8,
+  "portionen": [
+   [
+    "1 Becher",
+    150
+   ]
+  ],
+  "quelle": "Ø aus 51 Produkten"
+ },
+ {
+  "name": "Buttermilch",
+  "aliase": [
+   "Buttermilch"
+  ],
+  "kcal": 37.0,
+  "protein": 3.3,
+  "kh": 4.0,
+  "fett": 0.6,
+  "portionen": [
+   [
+    "1 Glas",
+    200
+   ]
+  ],
+  "quelle": "Ø aus 48 Produkten"
+ },
+ {
+  "name": "Kakao",
+  "aliase": [
+   "Schokomilch",
+   "Kakaomilch"
+  ],
+  "kcal": 73.0,
+  "protein": 3.5,
+  "kh": 9.8,
+  "fett": 1.9,
+  "portionen": [
+   [
+    "1 Glas",
+    250
+   ]
+  ],
+  "quelle": "Ø aus 44 Produkten"
+ },
+ {
+  "name": "Cappuccino",
+  "aliase": [
+   "Kaffee mit Milch"
+  ],
+  "kcal": 40,
+  "protein": 2.2,
+  "kh": 3.2,
+  "fett": 2,
+  "portionen": [
+   [
+    "1 Tasse",
+    200
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Latte Macchiato",
+  "aliase": [
+   "Milchkaffee",
+   "Latte"
+  ],
+  "kcal": 50,
+  "protein": 2.8,
+  "kh": 4,
+  "fett": 2.6,
+  "portionen": [
+   [
+    "1 Glas",
+    300
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Tzatziki",
+  "aliase": [
+   "Zaziki"
+  ],
+  "kcal": 180.0,
+  "protein": 4.0,
+  "kh": 7.0,
+  "fett": 13.9,
+  "portionen": [
+   [
+    "1 Portion",
+    50
+   ]
+  ],
+  "quelle": "Ø aus 36 Produkten"
+ },
+ {
+  "name": "Proteinshake mit Milch",
+  "aliase": [
+   "Shake",
+   "Whey Shake"
+  ],
+  "kcal": 94,
+  "protein": 10,
+  "kh": 5,
+  "fett": 3.5,
+  "portionen": [
+   [
+    "1 Shake",
+    330
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Gummibärchen",
+  "aliase": [
+   "Gummibären",
+   "Fruchtgummi",
+   "Haribo"
+  ],
+  "kcal": 333.0,
+  "protein": 5.7,
+  "kh": 76.4,
+  "fett": 0.5,
+  "portionen": [
+   [
+    "1 Handvoll",
+    30
+   ]
+  ],
+  "quelle": "Ø aus 42 Produkten"
+ },
+ {
+  "name": "Erdnussflips",
+  "aliase": [
+   "Flips"
+  ],
+  "kcal": 483,
+  "protein": 14,
+  "kh": 51,
+  "fett": 24.3,
+  "portionen": [
+   [
+    "1 Handvoll",
+    30
+   ]
+  ],
+  "quelle": "Ø aus 21 Produkten"
+ },
+ {
+  "name": "Müsliriegel",
+  "aliase": [
+   "Müsli Riegel",
+   "Haferriegel"
+  ],
+  "kcal": 420,
+  "protein": 7.2,
+  "kh": 64.5,
+  "fett": 14.2,
+  "portionen": [
+   [
+    "1 Riegel",
+    25
+   ]
+  ],
+  "quelle": "Ø aus 55 Produkten"
+ },
+ {
+  "name": "Proteinriegel",
+  "aliase": [
+   "Protein Riegel",
+   "Eiweißriegel"
+  ],
+  "kcal": 372.0,
+  "protein": 32.0,
+  "kh": 30.5,
+  "fett": 13.0,
+  "portionen": [
+   [
+    "1 Riegel",
+    55
+   ]
+  ],
+  "quelle": "Ø aus 56 Produkten"
+ },
+ {
+  "name": "Schokoriegel",
+  "aliase": [
+   "Snickers",
+   "Mars",
+   "Twix"
+  ],
+  "kcal": 480,
+  "protein": 8.6,
+  "kh": 60,
+  "fett": 23,
+  "portionen": [
+   [
+    "1 Riegel",
+    50
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Butterkeks",
+  "aliase": [
+   "Leibniz Keks"
+  ],
+  "kcal": 442.5,
+  "protein": 7.5,
+  "kh": 69.0,
+  "fett": 13.0,
+  "portionen": [
+   [
+    "1 Keks",
+    8
+   ]
+  ],
+  "quelle": "Ø aus 50 Produkten"
+ },
+ {
+  "name": "Studentenfutter",
+  "aliase": [
+   "Nussmischung mit Rosinen"
+  ],
+  "kcal": 491,
+  "protein": 13,
+  "kh": 39,
+  "fett": 30,
+  "portionen": [
+   [
+    "1 Handvoll",
+    30
+   ]
+  ],
+  "quelle": "Ø aus 49 Produkten"
+ },
+ {
+  "name": "Reiswaffel",
+  "aliase": [
+   "Reiswaffeln"
+  ],
+  "kcal": 387,
+  "protein": 8,
+  "kh": 81,
+  "fett": 3,
+  "portionen": [
+   [
+    "1 Stück",
+    8
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Cornflakes",
+  "aliase": [
+   "Corn Flakes"
+  ],
+  "kcal": 377.5,
+  "protein": 7.4,
+  "kh": 83.2,
+  "fett": 1.0,
+  "portionen": [
+   [
+    "1 Portion",
+    40
+   ]
+  ],
+  "quelle": "Ø aus 54 Produkten"
+ },
+ {
+  "name": "Müsli",
+  "aliase": [
+   "Früchtemüsli",
+   "Müsli ungesüßt"
+  ],
+  "kcal": 360,
+  "protein": 10,
+  "kh": 60,
+  "fett": 7,
+  "portionen": [
+   [
+    "1 Portion",
+    60
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Porridge mit Milch",
+  "aliase": [
+   "Haferbrei",
+   "Porridge"
+  ],
+  "kcal": 100,
+  "protein": 4,
+  "kh": 13,
+  "fett": 3,
+  "portionen": [
+   [
+    "1 Schüssel",
+    300
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Energy Drink",
+  "aliase": [
+   "Red Bull",
+   "Monster"
+  ],
+  "kcal": 45.0,
+  "protein": 0.0,
+  "kh": 11.0,
+  "fett": 0.0,
+  "portionen": [
+   [
+    "1 Dose",
+    250
+   ]
+  ],
+  "quelle": "Ø aus 54 Produkten"
+ },
+ {
+  "name": "Eistee",
+  "aliase": [
+   "Ice Tea",
+   "Pfirsich Eistee"
+  ],
+  "kcal": 25,
+  "protein": 0.1,
+  "kh": 6,
+  "fett": 0.1,
+  "portionen": [
+   [
+    "1 Glas",
+    250
+   ]
+  ],
+  "quelle": "Ø aus 53 Produkten"
+ },
+ {
+  "name": "Apfelschorle",
+  "aliase": [
+   "Apfelsaftschorle",
+   "Schorle"
+  ],
+  "kcal": 26.0,
+  "protein": 0.0,
+  "kh": 6.1,
+  "fett": 0.0,
+  "portionen": [
+   [
+    "1 Glas",
+    300
+   ]
+  ],
+  "quelle": "Ø aus 54 Produkten"
+ },
+ {
+  "name": "Cola Zero",
+  "aliase": [
+   "Coke Zero",
+   "Cola light"
+  ],
+  "kcal": 0.3,
+  "protein": 0,
+  "kh": 0,
+  "fett": 0,
+  "portionen": [
+   [
+    "1 Dose",
+    330
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Radler",
+  "aliase": [
+   "Alster",
+   "Bier mit Limo"
+  ],
+  "kcal": 40,
+  "protein": 0.3,
+  "kh": 9,
+  "fett": 0,
+  "portionen": [
+   [
+    "1 Flasche",
+    500
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Weizenbier",
+  "aliase": [
+   "Hefeweizen",
+   "Weißbier"
+  ],
+  "kcal": 45,
+  "protein": 0.5,
+  "kh": 3.5,
+  "fett": 0,
+  "portionen": [
+   [
+    "1 Glas",
+    500
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Spezi",
+  "aliase": [
+   "Cola-Mix",
+   "Mezzo Mix"
+  ],
+  "kcal": 40,
+  "protein": 0,
+  "kh": 10,
+  "fett": 0,
+  "portionen": [
+   [
+    "1 Glas",
+    330
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Smoothie",
+  "aliase": [
+   "Fruchtsmoothie"
+  ],
+  "kcal": 58,
+  "protein": 0.6,
+  "kh": 12,
+  "fett": 0.5,
+  "portionen": [
+   [
+    "1 Flasche",
+    250
+   ]
+  ],
+  "quelle": "Ø aus 49 Produkten"
+ }
+]

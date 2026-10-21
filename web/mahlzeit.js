@@ -9,6 +9,7 @@
 // und ausTabelle() aus naehrwerte.js.
 
 const OFT_ANZAHL = 6;
+let mzOffen = false; // "heute schon eingetragen" aufgeklappt?
 const ZULETZT_ANZAHL = 8;
 
 // Favoriten setzt man selbst mit dem Stern - im Gegensatz zum Gedaechtnis,
@@ -140,6 +141,13 @@ function zeichneMahlzeitSeite() {
   const s = summen(heuteHier.map(([e]) => e));
   $("mz-kcal").textContent = rund(s.kcal);
   $("mz-makros").textContent = heuteHier.length ? `${rund(s.protein)} P · ${rund(s.kh)} K · ${rund(s.fett)} F` : "";
+  $("mz-aufklappen").hidden = !heuteHier.length;
+  $("mz-aufklappen").setAttribute("aria-expanded", mzOffen);
+  $("mz-aufklappen").innerHTML = `<span class="aufklappen-text"></span><span class="pfeilchen" aria-hidden="true">${mzOffen ? "▴" : "▾"}</span>`;
+  $("mz-aufklappen").querySelector(".aufklappen-text").textContent = mzOffen
+    ? "Heute eingetragen – zuklappen"
+    : `Heute eingetragen: ${heuteHier.length} · ${rund(s.kcal)} kcal`;
+  $("mz-eintraege").hidden = !mzOffen || !heuteHier.length;
   $("mz-eintraege").replaceChildren(...heuteHier.map(([e, i]) => {
     const li = document.createElement("li");
     li.innerHTML = `<div class="was"><div class="name"></div><div class="detail"></div></div><div class="kcal">${rund(werte(e).kcal)}</div>`;
@@ -182,6 +190,11 @@ function zeichneMahlzeitSeite() {
   $("mz-oft-liste").replaceChildren(...oft.map((x) => vorschlagZeile(x.letzter, `${x.tage.size}× gegessen`)));
   $("mz-leer").hidden = Boolean(letztes || favs.length || zuletzt.length);
 }
+
+$("mz-aufklappen").addEventListener("click", () => {
+  mzOffen = !mzOffen;
+  zeichneMahlzeitSeite();
+});
 
 $("mz-alles-nochmal").addEventListener("click", () => {
   const letztes = frueher(aktuelleMahlzeit)[0];

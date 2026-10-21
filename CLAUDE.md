@@ -18,9 +18,11 @@ ohne Server. Suche, Mengen und Barcode passieren im Browser.
 | `web/schritte.js` | Schritte (#schritte): Ring bis zum Ziel, per Kurzbefehl → Zwischenablage → „Einfügen“ oder von Hand; `kalorien:schritte` |
 | `web/woche.js` | Wochenübersicht (#woche): Säulen je Tag + Ziel-Linie, Kennzahlen, Tagesliste; Woche-Kachel mit Mini-Balken |
 | `web/sicherung.js` | Datensicherung: alle `kalorien:*`-Werte als JSON (Teilen-Menü → iCloud), Wiederherstellen mit Vorschau + Rückgängig, Erinnerung nach 14 Tagen |
+| `web/scanner.js` | Barcode-Scanner: Live-Kamera (getUserMedia, nur https), Foto und Nummer-Eintippen als Notlösung |
 | `web/sw.js` | Service Worker: offline nutzbar, „Netz zuerst" damit Updates ankommen |
 | `web/daten/*.json` | Nährwerte, erzeugt von `daten/baue_daten.py` — nicht von Hand ändern |
 | `daten/deutsch.txt` | ~160 deutsche Namen → USDA-Eintrag, von Hand gepflegt |
+| `daten/baue_gerichte.py` | ~86 Gerichte/Klassiker (Döner, Quark …) → `web/daten/gerichte.json`; Median aus Open Food Facts oder Ø-Richtwert |
 | `werkzeuge/baue_hintergrund.py` | rechnet den lila Marmor-Hintergrund (hell + dunkel) nach `web/` |
 | `werkzeuge/baue_symbol.py` | App-Symbol: Flamme auf Marmor; neues Symbol = neuer Dateiname (iOS cacht pro Adresse) |
 | `server.py`, `ki.py` | nur zu Hause: Foto/Freitext über Claude, braucht `.env` mit Schlüssel |
@@ -46,8 +48,15 @@ damit dasselbe Lebensmittel immer dieselben Werte hat. Nur was nicht in
 `deutsch.txt` steht, behält Claudes Schätzung — die App markiert es als
 „geschätzt". Diese Trennung nicht aufweichen.
 
-Lieber ein Lebensmittel weglassen als falsch zuordnen: Quark, Gummibärchen,
-Laugenbrezel fehlen bewusst, weil die USDA kein echtes Gegenstück hat.
+Lieber ein Lebensmittel weglassen als falsch zuordnen. Was der USDA fehlt
+(Döner, Quark, Gummibärchen, Laugenbrezel …), steht in `gerichte.json`:
+für Verpacktes der **Median aus Open Food Facts** (nur bei ≥ 8 Produkten und
+≤ 30 % Abweichung vom Richtwert — sonst traf die Suche etwas anderes, z. B.
+Schoko-Reiswaffeln), für Frisches ein Ø-Richtwert, in der App als „Ø-Wert –
+je nach Zubereitung ± 20 %“ gekennzeichnet. Die OFF-Suche geht nur vom PC
+(im Browser blockiert sie CORS) — deshalb vorab gebaut, nicht live.
+Bei Tippfehler-Gleichstand: ganzes Wort vor Wortanfang, Grundnahrungsmittel
+vor Gericht.
 
 ## Mengen ohne KI
 
@@ -78,6 +87,9 @@ Das Gedächtnis hat **keinen eigenen Speicher**: Es zählt in `kalorien:tage`,
 an wie vielen Tagen (nicht wie oft) etwas zu dieser Mahlzeit gegessen wurde
 (ab 2 Tagen = „oft“) und schlägt die zuletzt gegessene Menge vor. Eigene
 Lebensmittel anlegen wollte der Nutzer ausdrücklich noch nicht.
+Listen sind **zugeklappt** (Essen-Seite je Mahlzeit, Mahlzeit-Seite „Heute
+eingetragen“) — sonst musste man für jede Mahlzeit an allen Einträgen
+vorbei scrollen. So gewünscht.
 Reihenfolge auf der Mahlzeit-Seite: ⭐ Favoriten (selbst per Stern,
 `kalorien:favoriten`, mit Menge) → Letztes Mal (diese Mahlzeit) →
 Zuletzt gegessen (alle Mahlzeiten) → Oft. Was weiter oben steht, wird

@@ -9,15 +9,25 @@
 let USDA = {};
 let DEUTSCH = [];
 let DEUTSCH_NACH_NAME = new Map();
+// Gerichte und Klassiker, die der USDA fehlen (Doener, Quark ...), mit
+// Durchschnittswerten - siehe daten/baue_gerichte.py.
+let GERICHTE = [];
+let GERICHT_NACH_NAME = new Map();
+// Alles, was die Suche auf Deutsch kennt: USDA-Zuordnungen und Gerichte.
+let KURATIERT = [];
 
 // Einmal laden; der Service Worker haelt die Dateien danach offline vor.
 const geladen = Promise.all([
   fetch("daten/usda.json").then((r) => r.json()),
   fetch("daten/lebensmittel.json").then((r) => r.json()),
-]).then(([usda, deutsch]) => {
+  fetch("daten/gerichte.json").then((r) => r.json()).catch(() => []),
+]).then(([usda, deutsch, gerichte]) => {
   USDA = usda;
   DEUTSCH = deutsch;
   DEUTSCH_NACH_NAME = new Map(deutsch.map((d) => [d.name, d]));
+  GERICHTE = gerichte;
+  GERICHT_NACH_NAME = new Map(gerichte.map((g) => [g.name, g]));
+  KURATIERT = [...deutsch, ...gerichte];
 });
 
 // Kleinschreibung ohne Umlaute - "Hähnchen" findet auch "hahnchen".
@@ -54,9 +64,24 @@ function ausUsda(fdc, name) {
   };
 }
 
+// Gerichte haben genau eine Portion ("1 Döner = 400 g") - die ist zugleich
+// das Stueckgewicht, damit "2 Döner" 800 g ergibt.
+function ausGericht(g) {
+  return {
+    name: g.name,
+    quelle: g.quelle,
+    pro100: { kcal: g.kcal, protein: g.protein, fett: g.fett, kh: g.kh },
+    portionen: g.portionen,
+    stueck: g.portionen[0]?.[1] ?? null,
+    gramm: g.portionen[0]?.[1] ?? 100,
+  };
+}
+
 function ausTabelle(name) {
   const d = DEUTSCH_NACH_NAME.get(name);
-  return d ? ausUsda(d.fdc, d.name) : null;
+  if (d) return ausUsda(d.fdc, d.name);
+  const g = GERICHT_NACH_NAME.get(name);
+  return g ? ausGericht(g) : null;
 }
 
 // Abstand zweier Woerter in Tippfehlern: einfuegen, loeschen, ersetzen und
@@ -100,8 +125,8 @@ function unscharf(q, w, grenze) {
   return best;
 }
 
-// Erst die deutsche Liste (kuratiert), dann die englische USDA-Datenbank
-// als Notnagel fuer alles, was dort fehlt.
+// Erst die deutschen Listen (USDA-Zuordnungen und Gerichte), dann die
+// englische USDA-Datenbank als Notnagel fuer alles, was dort fehlt.
 async function suche(anfrage, grenze = 20) {
   await geladen;
   const q = norm(anfrage.trim());
@@ -109,7 +134,7 @@ async function suche(anfrage, grenze = 20) {
   const wortanfang = new RegExp("\\b" + q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
   const treffer = [];
 
-  for (const d of DEUTSCH) {
+  for (const d of KURATIERT) {
     let rang = null;
     for (const wort of [d.name, ...d.aliase]) {
       const w = norm(wort);
@@ -132,15 +157,26 @@ async function suche(anfrage, grenze = 20) {
   const grenzeFehler = erlaubteFehler(q.replace(/\s/g, "").length);
   if (!treffer.length && grenzeFehler) {
     const ohneLeer = q.replace(/\s/g, "");
-    for (const d of DEUTSCH) {
+    for (const d of KURATIERT) {
       let best = grenzeFehler + 1;
+      let ganz = grenzeFehler + 1; // nur ganze Woerter, ohne Wortanfaenge
       for (const wort of [d.name, ...d.aliase]) {
         const w = norm(wort);
         best = Math.min(best, unscharf(q, w, grenzeFehler), unscharf(ohneLeer, w.replace(/\s/g, ""), grenzeFehler));
-        for (const teil of w.split(/[\s()-]+/)) if (teil.length >= 3) best = Math.min(best, unscharf(q, teil, grenzeFehler));
+        ganz = Math.min(ganz, tippAbstand(q, w, grenzeFehler));
+        for (const teil of w.split(/[\s()-]+/)) {
+          if (teil.length < 3) continue;
+          best = Math.min(best, unscharf(q, teil, grenzeFehler));
+          ganz = Math.min(ganz, tippAbstand(q, teil, grenzeFehler));
+        }
       }
       if (best <= grenzeFehler) {
-        treffer.push([2.5 + best / 10, d.name.length, () => ({ ...ausTabelle(d.name), aehnlich: true })]);
+        // Bei gleichem Abstand gewinnt das ganze Wort: "dönr" ist "Döner"
+        // (1 Fehler im ganzen Wort), nicht "Donut" (nur der Anfang "donu" passt).
+        // Und Grundnahrungsmittel vor Gerichten: "hänchen" meint eher die
+        // Hähnchenbrust als die "Hähnchen Nuggets".
+        const rang = 2.5 + best / 10 + (ganz > best ? 0.05 : 0) + (GERICHT_NACH_NAME.has(d.name) ? 0.02 : 0);
+        treffer.push([rang, d.name.length, () => ({ ...ausTabelle(d.name), aehnlich: true })]);
       }
     }
   }
@@ -197,8 +233,12 @@ async function barcodeNachschlagen(code) {
 const ZXING = "https://cdn.jsdelivr.net/npm/zxing-wasm@3.1.5/dist/es/reader/index.js";
 async function liesBarcode(bilddaten) {
   const { readBarcodes } = await import(ZXING);
+  // tryRotate: Viele Packungen tragen den Code hochkant. tryDownscale hilft,
+  // wenn das Bild sehr gross und der Code darin klein ist.
   const ergebnisse = await readBarcodes(bilddaten, {
     tryHarder: true,
+    tryRotate: true,
+    tryDownscale: true,
     formats: ["EAN13", "EAN8", "UPCA", "UPCE"],
     maxNumberOfSymbols: 1,
   });
