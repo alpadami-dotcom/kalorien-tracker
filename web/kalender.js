@@ -19,9 +19,12 @@ const ARTEN = {
   training: { zeichen: "🏋️", name: "Training" },
   termin: { zeichen: "📅", name: "Termin" },
   geburtstag: { zeichen: "🎂", name: "Geburtstag" },
+  medizin: { zeichen: "💊", name: "Medizin" },
   notiz: { zeichen: "📝", name: "Notiz" },
 };
 const WIEDERHOLUNG = { woche: "jede Woche", monat: "jeden Monat", jahr: "jedes Jahr" };
+// "Alle X Tage" (z. B. Tretinoin alle 5 Tage) - X steht im Eintrag als "alle".
+const wiederholungText = (e) => (e.wiederholung === "tage" ? `alle ${e.alle} Tage` : WIEDERHOLUNG[e.wiederholung]);
 
 let kalenderMonat = null; // "2026-10"
 let kalAuswahl = null;    // angetippter Tag im Kalender, "2026-10-21"
@@ -37,13 +40,14 @@ const tageImMonat = (j, m) => new Date(j, m, 0).getDate(); // m: 1-12
 // Monats- und Jahresdaten, die es nicht gibt (31. im April, 29. Februar im
 // Nicht-Schaltjahr), rutschen auf den letzten Tag des Monats - sonst fiele
 // ein Geburtstag am 29.2. drei von vier Jahren einfach aus.
-function trifft(wiederholung, start, d) {
+function trifft(wiederholung, start, d, alle = 7) {
   if (!wiederholung || d <= start) return false;
   const [sj, sm, st] = start.split("-").map(Number);
   const [j, m, t] = d.split("-").map(Number);
-  if (wiederholung === "woche") {
-    return (Date.UTC(j, m - 1, t) - Date.UTC(sj, sm - 1, st)) % (7 * 86400000) === 0;
-  }
+  // Ueber UTC rechnen: keine Zeitumstellung, also immer genau 24-h-Tage.
+  const tage = Math.round((Date.UTC(j, m - 1, t) - Date.UTC(sj, sm - 1, st)) / 86400000);
+  if (wiederholung === "woche") return tage % 7 === 0;
+  if (wiederholung === "tage") return alle >= 1 && tage % alle === 0;
   if (wiederholung === "jahr" && m !== sm) return false;
   return t === Math.min(st, tageImMonat(j, m));
 }
@@ -54,7 +58,7 @@ function eintraegeAm(d, alle = kalEintraege()) {
   const liste = (alle[d] ?? []).map((e) => ({ ...e, start: d }));
   for (const [start, eintraege] of Object.entries(alle)) {
     if (start >= d) continue;
-    for (const e of eintraege) if (trifft(e.wiederholung, start, d)) liste.push({ ...e, start });
+    for (const e of eintraege) if (trifft(e.wiederholung, start, d, e.alle)) liste.push({ ...e, start });
   }
   return sortiert(liste);
 }
@@ -132,7 +136,7 @@ function zeichneAlleEintraege() {
     // Bei Wiederholungen zaehlt der naechste Termin, nicht der allererste.
     for (let i = 0; i <= 366; i++) {
       const d = new Date(new Date(h + "T12:00:00").getTime() + i * 86400000).toISOString().slice(0, 10);
-      if (trifft(e.wiederholung, e.d, d)) return d;
+      if (trifft(e.wiederholung, e.d, d, e.alle)) return d;
     }
     return e.d;
   };
@@ -151,7 +155,7 @@ function zeichneAlleEintraege() {
     // Geburtstag im September, als laege er schon hinter einem.
     const jahr = e.wann.slice(0, 4) !== h.slice(0, 4) ? ` ${e.wann.slice(0, 4)}` : "";
     li.querySelector(".detail").textContent = langesDatum(e.wann) + jahr + (e.zeit ? `, ${e.zeit} Uhr` : "")
-      + (e.wiederholung ? ` · 🔁 ${WIEDERHOLUNG[e.wiederholung]}` : "") + (e.wann < h ? " · vorbei" : "");
+      + (e.wiederholung ? ` · 🔁 ${wiederholungText(e)}` : "") + (e.wann < h ? " · vorbei" : "");
     li.addEventListener("click", () => {
       kalAuswahl = e.wann;
       kalenderMonat = e.wann.slice(0, 7);
@@ -211,7 +215,7 @@ function zeichneTagDetail() {
     li.querySelector(".notiz-zeichen").textContent = ARTEN[e.art]?.zeichen ?? "📝";
     li.querySelector(".name").textContent = e.text;
     li.querySelector(".detail").textContent = (ARTEN[e.art]?.name ?? "Notiz")
-      + (e.wiederholung ? ` · 🔁 ${WIEDERHOLUNG[e.wiederholung]}` : "");
+      + (e.wiederholung ? ` · 🔁 ${wiederholungText(e)}` : "");
     li.querySelector(".notiz-zeit").textContent = e.zeit ? `${e.zeit} Uhr` : "";
     li.addEventListener("click", () => oeffneNotiz(d, e));
     return li;
@@ -235,6 +239,8 @@ function oeffneNotiz(datum, eintrag) {
   $("notiz-datum").value = ursprung;
   $("notiz-zeit").value = eintrag?.zeit ?? "";
   $("notiz-wiederholung").value = eintrag?.wiederholung ?? "";
+  $("notiz-alle").value = eintrag?.alle ?? "";
+  $("notiz-alle-zeile").hidden = $("notiz-wiederholung").value !== "tage";
   $("notiz-serie-hinweis").hidden = !eintrag?.wiederholung;
   $("notiz-loeschen").hidden = !eintrag;
   $("notiz-loeschen").textContent = eintrag?.wiederholung ? "Ganze Reihe löschen" : "Eintrag löschen";
@@ -258,8 +264,14 @@ $("notiz-speichern").addEventListener("click", (ev) => {
   // Beim Aendern alten Eintrag entfernen - er kann auf einen anderen Tag gewandert sein.
   const id = notizBearbeitet?.id ?? `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
   if (notizBearbeitet) entferneNotiz(alle, notizBearbeitet.datum, id);
+  const wiederholung = $("notiz-wiederholung").value;
+  const alleTageZahl = parseInt($("notiz-alle").value, 10);
+  if (wiederholung === "tage" && !(alleTageZahl >= 2 && alleTageZahl <= 365)) {
+    ev.preventDefault();
+    return meldung("Bitte eintragen, alle wie viele Tage – z. B. 5.");
+  }
   (alle[datum] ??= []).push({ id, art: gewaehlteArt(), text, zeit: $("notiz-zeit").value,
-    wiederholung: $("notiz-wiederholung").value });
+    wiederholung, ...(wiederholung === "tage" ? { alle: alleTageZahl } : {}) });
   schreib(SPEICHER_KALENDER, alle);
 
   kalAuswahl = datum;
@@ -278,6 +290,11 @@ $("notiz-loeschen").addEventListener("click", () => {
 });
 
 $("notiz-abbrechen").addEventListener("click", () => $("notiz-dialog").close());
+$("notiz-wiederholung").addEventListener("change", () => {
+  const tage = $("notiz-wiederholung").value === "tage";
+  $("notiz-alle-zeile").hidden = !tage;
+  if (tage && !$("notiz-alle").value) $("notiz-alle").focus();
+});
 for (const b of $("notiz-art").children) {
   b.setAttribute("role", "radio");
   b.addEventListener("click", () => {

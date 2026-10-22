@@ -490,6 +490,7 @@
       <button type="button" data-wert="training"><span>🏋️</span>Training</button>
       <button type="button" data-wert="termin"><span>📅</span>Termin</button>
       <button type="button" data-wert="geburtstag"><span>🎂</span>Geburtstag</button>
+      <button type="button" data-wert="medizin"><span>💊</span>Medizin</button>
       <button type="button" data-wert="notiz"><span>📝</span>Notiz</button>
     </div>
     <label class="zeile">Was?<input id="notiz-text" type="text" autocomplete="off" enterkeyhint="done" placeholder="z. B. Beine, Zahnarzt, Lisa"></label>
@@ -502,7 +503,11 @@
         <option value="woche">Jede Woche</option>
         <option value="monat">Jeden Monat</option>
         <option value="jahr">Jedes Jahr</option>
+        <option value="tage">Alle X Tage …</option>
       </select>
+    </label>
+    <label class="zeile" id="notiz-alle-zeile" hidden>Alle wie viele Tage?
+      <input id="notiz-alle" type="number" inputmode="numeric" min="2" max="365" placeholder="z. B. 5">
     </label>
     <p class="klein" id="notiz-serie-hinweis" hidden>Wiederholt sich – Ändern und Löschen gilt für alle Termine dieser Reihe.</p>
     <div class="aktionen">

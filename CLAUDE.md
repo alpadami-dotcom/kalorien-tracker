@@ -115,7 +115,8 @@ so gewünscht.
   einen Hinweis. Diese Untergrenze nicht entfernen.
 - Wasser: `kalorien:wasser` je Tag in ml, ein Glas = 250 ml.
 - Kalender-Einträge dürfen in der Zukunft liegen (planen), Essen nicht.
-  Wiederholungen (Woche/Monat/Jahr; Geburtstag = automatisch jährlich)
+  Wiederholungen (Woche/Monat/Jahr/„alle X Tage“ mit Feld `alle`;
+  Geburtstag = automatisch jährlich; Art 💊 Medizin z. B. für Tretinoin)
   liegen **einmal** am Ursprungstag; `eintraegeAm()` rechnet die Termine aus.
   Ändern/Löschen gilt für die ganze Reihe. 31. und 29.2. rutschen auf den
   letzten Tag des Monats.
