@@ -660,3 +660,7 @@ dialog.scanner:not([open]) { display: none; }
 .scanner-hinweis { text-align: center; margin: 12px 16px 8px; font-size: 15px; }
 .scanner-knoepfe { display: grid; grid-template-columns: 1fr 1fr 1.3fr; gap: 8px; padding: 0 16px; }
 .scanner-knoepfe .breit { margin: 0; }
+
+/* Fuenf Arten in einer Zeile: etwas enger */
+.segmente.arten button { font-size: 11px; padding: 6px 1px; }
+.zeile[hidden] { display: none; }
