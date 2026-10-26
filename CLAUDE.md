@@ -10,19 +10,19 @@ ohne Server. Suche, Mengen und Barcode passieren im Browser.
 
 | Datei | Rolle |
 |---|---|
-| `web/naehrwerte.js` | Suche (deutsche Liste + USDA), Stückgewichte, Barcode lesen + Open Food Facts |
+| `web/naehrwerte.js` | Suche (deutsche Liste + Gerichte + USDA, mit Tippfehlern), Stückgewichte, Barcode lesen + Open Food Facts |
 | `web/app.js` | Oberfläche, Mengen-Parser `zerlege()`, Speichern im localStorage |
 | `web/mahlzeit.js` | Mahlzeit-Seite (#mahlzeit-fruehstueck …): eintragen + Gedächtnis „Letztes Mal“ / „Oft gegessen“ aus `kalorien:tage` |
 | `web/gewicht.js` | Gewichtsverlauf: Kurve (SVG, ohne Bibliothek), Eintragen, Liste |
-| `web/kalender.js` | Kalender (#kalender): Monat, Tagesdetail, eigene Einträge (Training/Termin/Notiz, `kalorien:kalender`), Wochenstreifen + nächster Eintrag in der Kachel |
+| `web/kalender.js` | Kalender (#kalender): Monat, Tagesdetail, „Alle Einträge“, eigene Einträge (Training/Termin/Geburtstag/Medizin/Notiz, `kalorien:kalender`); Kachel = Datum + nächster Eintrag |
 | `web/schritte.js` | Schritte (#schritte): Ring bis zum Ziel, per Kurzbefehl → Zwischenablage → „Einfügen“ oder von Hand; `kalorien:schritte` |
-| `web/woche.js` | Wochenübersicht (#woche): Säulen je Tag + Ziel-Linie, Kennzahlen, Tagesliste; Woche-Kachel mit Mini-Balken |
+| `web/woche.js` | Wochenübersicht (#woche): Säulen je Tag + Ziel-Linie, Kennzahlen, Tagesliste; Woche-Kachel mit Mini-Balken Mo–So |
 | `web/sicherung.js` | Datensicherung: alle `kalorien:*`-Werte als JSON (Teilen-Menü → iCloud), Wiederherstellen mit Vorschau + Rückgängig, Erinnerung nach 14 Tagen |
 | `web/scanner.js` | Barcode-Scanner: Live-Kamera (getUserMedia, nur https), Foto und Nummer-Eintippen als Notlösung |
-| `web/sw.js` | Service Worker: offline nutzbar, „Netz zuerst" damit Updates ankommen |
+| `web/sw.js` | Service Worker: offline nutzbar, „Netz zuerst" damit Updates ankommen; nach 3 s ohne Antwort (Funkloch) gilt der Speicher |
 | `web/daten/*.json` | Nährwerte, erzeugt von `daten/baue_daten.py` — nicht von Hand ändern |
-| `daten/deutsch.txt` | ~160 deutsche Namen → USDA-Eintrag, von Hand gepflegt |
-| `daten/baue_gerichte.py` | ~86 Gerichte/Klassiker (Döner, Quark …) → `web/daten/gerichte.json`; Median aus Open Food Facts oder Ø-Richtwert |
+| `daten/deutsch.txt` | ~230 deutsche Namen → USDA-Eintrag, von Hand gepflegt; optionale 4. Spalte = Stückgewicht, wo die USDA danebenliegt (Donut, Brötchen) |
+| `daten/baue_gerichte.py` | ~90 Gerichte/Klassiker (Döner, Quark …) → `web/daten/gerichte.json`; Median aus Open Food Facts oder Ø-Richtwert |
 | `werkzeuge/baue_hintergrund.py` | rechnet den lila Marmor-Hintergrund (hell + dunkel) nach `web/` |
 | `werkzeuge/baue_symbol.py` | App-Symbol: Flamme auf Marmor; neues Symbol = neuer Dateiname (iOS cacht pro Adresse) |
 | `server.py`, `ki.py` | nur zu Hause: Foto/Freitext über Claude, braucht `.env` mit Schlüssel |
@@ -31,9 +31,9 @@ Veröffentlichen: `veroeffentlichen.bat` schiebt `web/` auf den Zweig
 `gh-pages`, GitHub Pages liefert ihn aus. Kein Actions-Workflow, weil der
 gh-Login keine `workflow`-Berechtigung hat und das Hochladen sonst scheitert.
 
-**Ansichten:** Beim Öffnen die Übersicht mit Kacheln (Kalorien, Wasser,
-Gewicht, Kalender, Woche); jede Kachel öffnet eine Unterseite. Gewählt wird über
-die Adresse (`#essen`, `#mahlzeit-<schlüssel>`, `#wasser`, `#gewicht`, `#kalender`, `#woche`, leer = Übersicht)
+**Ansichten:** Beim Öffnen die Übersicht mit Kacheln (Kalorien; Wasser |
+Schritte; Gewicht | Woche; Kalender flach unten); jede Kachel öffnet eine Unterseite. Gewählt wird über
+die Adresse (`#essen`, `#mahlzeit-<schlüssel>`, `#wasser`, `#schritte`, `#gewicht`, `#kalender`, `#woche`, leer = Übersicht)
 in `zeigeAnsicht()` — kein eigener Router. Plus-Knöpfe auf Kacheln liegen
 *neben* dem Link, nie darin. Nach >10 Min. im Hintergrund zurück zur Übersicht.
 
@@ -63,6 +63,15 @@ vor Gericht.
 `zerlege()` versteht „2 Bananen", „200 g Reis", „eine kleine Banane",
 „2 EL Olivenöl", „ein Glas Milch". Das Gewicht eines Stücks kommt aus
 `stueckGewicht()` (bevorzugt Etiketten, die mit „1 mittel" *anfangen*).
+
+Ohne Mengenangabe schlägt `startMenge()` vor: Fett/Öl ≥ 550 kcal → 1 EL,
+Stücke über 350 g (Ananas, Melone) → 100 g, sonst ein Stück bzw. eine
+Scheibe, kalorienreiches Trockenes (> 400 kcal, Nüsse, Chips) → 30 g,
+alles andere 100 g. Packungsgrößen („1 bag“) zählen nie als Stück.
+
+Kennt ein Lebensmittel die genannte Einheit nicht („1 Scheibe Gurke“),
+nie still auf Stück oder 100 g ausweichen: grober Richtwert
+(`UNSICHERE_MENGE`) plus „Menge unsicher“. „l“ und „kg“ zählen ×1000.
 
 Tippfehler: Findet die deutsche Liste nichts, sucht `suche()` unscharf
 (Damerau-Levenshtein, auch gegen Wortanfänge, 1 Fehler ab 4, 2 ab 6

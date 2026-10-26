@@ -131,7 +131,10 @@ def baue_deutsch(usda: dict) -> list:
             continue
         teile = [t.strip() for t in zeile.split("|")]
         deutsch, englisch = teile[0], teile[1]
-        aliase = [a.strip() for a in teile[2].split(",")] if len(teile) > 2 else []
+        aliase = [a.strip() for a in teile[2].split(",") if a.strip()] if len(teile) > 2 else []
+        # Optional: Gewicht eines Stuecks, wo die USDA-Etiketten danebenliegen
+        # (beim Donut gewinnt sonst das "doughnut hole" mit 13 g).
+        stueck = float(teile[3]) if len(teile) > 3 and teile[3] else None
 
         fdc = nach_name.get(englisch)
         if not fdc:
@@ -145,7 +148,7 @@ def baue_deutsch(usda: dict) -> list:
         if not fdc:
             fehler.append(f"{deutsch}: '{englisch}' nicht gefunden")
             continue
-        liste.append({"name": deutsch, "aliase": aliase, "fdc": fdc})
+        liste.append({"name": deutsch, "aliase": aliase, "fdc": fdc, **({"stueck": stueck} if stueck else {})})
 
     if fehler:
         print("FEHLER in deutsch.txt:\n  " + "\n  ".join(fehler))

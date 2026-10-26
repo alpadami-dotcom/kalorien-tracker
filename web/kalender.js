@@ -24,7 +24,7 @@ const ARTEN = {
 };
 const WIEDERHOLUNG = { woche: "jede Woche", monat: "jeden Monat", jahr: "jedes Jahr" };
 // "Alle X Tage" (z. B. Tretinoin alle 5 Tage) - X steht im Eintrag als "alle".
-const wiederholungText = (e) => (e.wiederholung === "tage" ? `alle ${e.alle} Tage` : WIEDERHOLUNG[e.wiederholung]);
+const wiederholungText = (e) => (e.wiederholung !== "tage" ? WIEDERHOLUNG[e.wiederholung] : e.alle === 1 ? "jeden Tag" : `alle ${e.alle} Tage`);
 
 let kalenderMonat = null; // "2026-10"
 let kalAuswahl = null;    // angetippter Tag im Kalender, "2026-10-21"
@@ -266,7 +266,7 @@ $("notiz-speichern").addEventListener("click", (ev) => {
   if (notizBearbeitet) entferneNotiz(alle, notizBearbeitet.datum, id);
   const wiederholung = $("notiz-wiederholung").value;
   const alleTageZahl = parseInt($("notiz-alle").value, 10);
-  if (wiederholung === "tage" && !(alleTageZahl >= 2 && alleTageZahl <= 365)) {
+  if (wiederholung === "tage" && !(alleTageZahl >= 1 && alleTageZahl <= 365)) {
     ev.preventDefault();
     return meldung("Bitte eintragen, alle wie viele Tage – z. B. 5.");
   }
@@ -300,7 +300,11 @@ for (const b of $("notiz-art").children) {
   b.addEventListener("click", () => {
     setzeArt(b.dataset.wert);
     // Geburtstage kommen jedes Jahr wieder - das soll man nicht extra waehlen muessen.
-    if (b.dataset.wert === "geburtstag" && !$("notiz-wiederholung").value) $("notiz-wiederholung").value = "jahr";
+    // Und beim Zurueckwechseln wieder weg, wenn es nur deshalb gesetzt war.
+    const w = $("notiz-wiederholung");
+    if (b.dataset.wert === "geburtstag" && !w.value) { w.value = "jahr"; w.dataset.auto = "1"; }
+    else if (b.dataset.wert !== "geburtstag" && w.dataset.auto && w.value === "jahr") w.value = "";
+    if (b.dataset.wert !== "geburtstag") delete w.dataset.auto;
   });
 }
 

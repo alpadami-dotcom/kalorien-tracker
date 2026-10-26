@@ -87,6 +87,9 @@ GERICHTE = [
     ("Franzbrötchen", "Zimtschnecke", (380, 6, 50, 17), ("1 Stück", 90), None),
     ("Apfelstrudel", "Strudel", (220, 3, 30, 10), ("1 Stück", 150), None),
     ("Käsekuchen", "Quarkkuchen, Cheesecake", (230, 7, 25, 11), ("1 Stück", 130), None),
+    ("Apfelkuchen", "gedeckter Apfelkuchen", (250, 3, 35, 11), ("1 Stück", 120), "Apfelkuchen"),
+    ("Bananenbrot", "Banana Bread", (300, 5, 45, 11), ("1 Scheibe", 70), "Bananenbrot"),
+    ("Zwiebelkuchen", "", (230, 7, 20, 14), ("1 Stück", 200), "Zwiebelkuchen"),
     ("Schokocroissant", "Pain au Chocolat, Schokoladencroissant", (420, 7, 45, 23), ("1 Stück", 75), None),
     ("Belegtes Brötchen (Käse)", "Käsebrötchen, Käsesemmel", (260, 11, 30, 10), ("1 Stück", 120), None),
     # --- Milchprodukte ---
@@ -101,6 +104,10 @@ GERICHTE = [
     ("Cappuccino", "Kaffee mit Milch", (40, 2.2, 3.2, 2), ("1 Tasse", 200), None),
     ("Latte Macchiato", "Milchkaffee, Latte", (50, 2.8, 4, 2.6), ("1 Glas", 300), None),
     ("Tzatziki", "Zaziki", (160, 4, 4, 14), ("1 Portion", 50), "Tzatziki"),
+    ("Hafermilch", "Haferdrink, Oatly", (46, 1, 6.6, 1.5), ("1 Glas", 200), "Haferdrink"),
+    ("Mascarpone", "Mascarpone", (435, 4.6, 3.5, 44), ("1 EL", 15), "Mascarpone"),
+    ("Halloumi", "Grillkäse", (320, 22, 2, 25), ("1 Portion", 100), "Halloumi"),
+    ("Gnocchi", "Kartoffelgnocchi", (150, 3.5, 33, 0.3), ("1 Portion", 200), "Gnocchi"),
     ("Proteinshake mit Milch", "Shake, Whey Shake", (94, 10, 5, 3.5), ("1 Shake", 330), None),
     # --- Süßes und Snacks ---
     ("Gummibärchen", "Gummibären, Fruchtgummi, Haribo", (343, 6.9, 77, 0.5), ("1 Handvoll", 30), "Gummibärchen"),

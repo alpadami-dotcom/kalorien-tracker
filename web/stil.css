@@ -5,7 +5,7 @@
   --karte: rgb(255 255 255 / 88%);
   --blatt: #fbf9fe;
   --tinte: #22152f;
-  --leise: #6a5c78;
+  --leise: #5f5170;
   --linie: #e4dbee;
   --akzent: #6b3fc4;
   --akzent-text: #ffffff;
@@ -63,7 +63,7 @@ h2 { font-size: 15px; font-weight: 600; color: var(--leise); margin: 24px 0 8px;
   display: flex; align-items: center; justify-content: center; gap: 8px;
   max-width: 560px; margin: 0 auto; padding: 12px 16px 4px;
 }
-.datum { background: none; border: 0; font-size: 17px; font-weight: 600; min-width: 190px; padding: 4px 8px; line-height: 1.2; }
+.datum { background: none; border: 0; font-size: 17px; font-weight: 600; flex: 0 1 190px; min-width: 0; padding: 4px 8px; line-height: 1.2; }
 .datum-voll { display: block; font-size: 13px; font-weight: 400; color: var(--leise); }
 .pfeil { background: none; border: 0; font-size: 26px; width: 44px; height: 44px; color: var(--leise); }
 
@@ -100,7 +100,6 @@ h2 { font-size: 15px; font-weight: 600; color: var(--leise); margin: 24px 0 8px;
 }
 .knopf[hidden] { display: none; }
 .knoepfe:has(.knopf[hidden]) { grid-template-columns: 1fr; }
-.hinweis { font-size: 13px; color: var(--leise); margin-top: 8px; }
 
 .vorschlaege { list-style: none; margin: 8px 0 0; padding: 0; background: var(--karte); border-radius: 12px; box-shadow: var(--schatten); overflow: hidden; }
 .vorschlaege:empty { display: none; }
@@ -165,22 +164,19 @@ dialog::backdrop { background: rgb(0 0 0 / 40%); }
 .kreisel { width: 36px; height: 36px; border: 3px solid rgb(255 255 255 / 30%); border-top-color: #fff; border-radius: 50%; animation: dreh 1s linear infinite; }
 @keyframes dreh { to { transform: rotate(360deg); } }
 .meldung {
-  position: fixed; left: 16px; right: 16px; bottom: calc(env(safe-area-inset-bottom) + 16px);
+  position: fixed; left: 16px; right: 16px; bottom: calc(env(safe-area-inset-bottom) + 16px + var(--tastatur, 0px));
   max-width: 528px; margin: 0 auto; background: var(--tinte); color: var(--papier);
   padding: 12px 14px; border-radius: 12px; z-index: 11; font-size: 15px;
 }
 
-/* Einstellungen-Knopf oben rechts */
-.kopf { position: relative; }
+/* Einstellungen-Knopf rechts in der Kopfzeile. Nicht absolut darueber
+   gelegt: Auf 375-393 px Breite lag es sonst auf dem Pfeil "naechster Tag". */
 .zahnrad {
-  position: absolute; right: 12px; top: 50%; transform: translateY(-40%);
-  width: 44px; height: 44px; border: 0; background: none; font-size: 22px; color: var(--leise);
+  flex: none; width: 44px; height: 44px; border: 0; background: none; font-size: 22px; color: var(--leise);
 }
 
 /* Wasser: ein Glas = 250 ml, antippen fuellt bis dorthin */
 .wasser { background: var(--karte); border-radius: 16px; padding: 14px 16px; box-shadow: var(--schatten); margin-top: 12px; }
-.wasser-kopf { display: flex; justify-content: space-between; align-items: baseline; font-weight: 600; }
-.wasser-kopf b { color: var(--tinte); font-variant-numeric: tabular-nums; }
 .glaeser { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px 10px; margin-top: 10px; } /* 6 pro Reihe: 3 L = zwei volle Reihen */
 .glas {
   height: 44px; width: 100%; max-width: 34px; justify-self: center; border: 2px solid var(--wasser); border-top-width: 1px; padding: 0;
@@ -207,6 +203,10 @@ dialog::backdrop { background: rgb(0 0 0 / 40%); }
 .segmente { display: flex; background: var(--papier); border-radius: 10px; padding: 3px; gap: 3px; margin: 0 0 12px; }
 .segmente button { flex: 1; border: 0; background: none; padding: 8px 4px; border-radius: 8px; font-size: 14px; color: var(--leise); }
 .segmente button[aria-checked=true] { background: var(--karte); color: var(--tinte); font-weight: 600; box-shadow: var(--schatten); }
+/* Dunkel sind --karte und --papier fast gleich hell - die Auswahl braucht einen Rand. */
+@media (prefers-color-scheme: dark) {
+  .segmente button[aria-checked=true] { box-shadow: inset 0 0 0 1.5px var(--akzent); }
+}
 
 /* Einstellungen */
 .blatt h3 { font-size: 14px; color: var(--leise); font-weight: 600; margin: 18px 0 8px; }
@@ -253,6 +253,7 @@ dialog { overflow-y: auto; }
 .linie-key { width: 14px; height: 2px; border-radius: 1px; background: var(--kurve-schnitt); }
 .legende { display: flex; gap: 16px; font-size: 13px; color: var(--leise); margin-top: 6px; }
 .legende > span { display: inline-flex; align-items: center; gap: 6px; }
+.legende[hidden] { display: none; }
 .gewicht-karte .leer { padding: 8px 0; margin: 0; }
 .gewicht-alle { margin-top: 10px; }
 .gewicht-alle summary { font-size: 14px; color: var(--leise); cursor: pointer; padding: 4px 0; }
@@ -305,7 +306,7 @@ html { touch-action: manipulation; }
 /* ===== Ansichten: Uebersicht mit Kacheln, Unterseiten mit Zurueck-Leiste ===== */
 .ansicht[hidden] { display: none; }
 
-.kacheln { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px; }
+.kacheln { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 8px; }
 .kachel {
   display: block; background: var(--karte); border-radius: 16px; padding: 14px 16px;
   box-shadow: var(--schatten); color: inherit; text-decoration: none;
@@ -326,12 +327,6 @@ html { touch-action: manipulation; }
 .wasser-balken div { background: var(--wasser); }
 
 /* Wochenstreifen in der Kalender-Kachel */
-.woche { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; }
-.woche-tag { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 4px 0; border-radius: 10px; font-size: 13px; color: var(--leise); }
-.woche-tag.gewaehlt { background: var(--papier); color: var(--tinte); font-weight: 600; }
-.woche-punkt { width: 8px; height: 8px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px var(--linie); }
-.woche-punkt.im-ziel { background: var(--akzent); box-shadow: none; }
-.woche-punkt.drueber { background: var(--warn); box-shadow: none; }
 
 /* Unterseiten */
 .leiste {
@@ -346,7 +341,6 @@ html { touch-action: manipulation; }
 body:has(.ansicht:not(#ansicht-start):not([hidden])) { padding-top: 0; }
 .essen-summe { display: flex; justify-content: space-between; align-items: baseline; padding: 4px 2px 0; }
 .essen-summe b { font-size: 20px; }
-#ansicht-essen .eingabe { margin-top: 10px; }
 .wasser-gross { font-size: 40px; font-weight: 700; }
 .wasser-gross .klein { font-size: 18px; }
 .link-knopf { background: none; border: 0; color: var(--akzent); font-size: 15px; padding: 12px 0 0; }
@@ -420,7 +414,6 @@ dialog { background: var(--blatt); }
 #ansicht-start .kcal-rest { font-size: 26px; }
 #ansicht-start .kachel-wert { font-size: 34px; }
 #ansicht-start .kachel-titel { font-size: 15px; margin-bottom: 0; }
-#ansicht-start .woche { margin-top: auto; }
 
 /* Makros mit eigenem Ziel und Fortschritt */
 .makros { gap: 12px; }
@@ -445,7 +438,6 @@ dialog { background: var(--blatt); }
 .kal-tag.makro { background: color-mix(in srgb, var(--protein) 22%, transparent); font-weight: 600; }
 
 .kal-key.makro { width: 12px; height: 12px; border-radius: 4px; background: color-mix(in srgb, var(--protein) 35%, transparent); }
-.woche-tag.makro { background: color-mix(in srgb, var(--protein) 22%, transparent); color: var(--tinte); }
 
 .link-knopf.inline { padding: 0; font-size: 13px; }
 
@@ -550,9 +542,6 @@ a.mahlzeit-kopf .plus { display: inline-flex; align-items: center; justify-conte
 }
 
 /* ===== Schritte ===== */
-.schritte-balken div { background: var(--protein); }
-.schritte-balken div.erreicht { background: var(--protein); }
-#ansicht-schritte .balken { margin: 10px 0; height: 10px; }
 #ansicht-schritte .felder.zwei .breit { margin-top: 4px; }
 .schritte-form { display: flex; gap: 8px; margin-top: 14px; }
 .schritte-form input {
@@ -574,22 +563,9 @@ a.mahlzeit-kopf .plus { display: inline-flex; align-items: center; justify-conte
 .kennzahl:last-child:nth-child(odd) { grid-column: 1 / -1; } /* ungerade Anzahl: letzte Karte ueber die ganze Breite */
 
 /* ===== Aktivitaet: Bewegen-Ring ===== */
-:root { --bewegen: #e3335f; }
-@media (prefers-color-scheme: dark) { :root { --bewegen: #ff5c86; } }
-.ring-spur { stroke: color-mix(in srgb, var(--bewegen) 18%, transparent); }
-.ring-wert { stroke: var(--bewegen); transition: stroke-dasharray .4s; }
-.aktiv-zeile { display: flex; align-items: center; gap: 10px; }
-.kachel-ring { display: inline-flex; flex: none; }
+.aktiv-zeile { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
 #ansicht-start .aktiv-wert { font-size: 26px; }
-.aktiv-gross { position: relative; width: 168px; height: 168px; margin: 4px auto 0; }
-.aktiv-ring { position: absolute; inset: 0; }
-.aktiv-mitte { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-.aktiv-mitte b { font-size: 38px; line-height: 1.1; }
 .aktiv-status { text-align: center; font-weight: 600; margin: 8px 0 14px; min-height: 1.4em; }
-.schritte-zeile { font-size: 18px; }
-.schritte-form input + input { margin-left: 0; }
-.ziel-links { display: flex; gap: 18px; }
-.mini-ring { display: inline-flex; flex: none; }
 
 /* ===== Schritt-Ring ===== */
 /* Verlauf Lila -> Pink wie der Marmor. Beim Ziel bleibt die Farbe gleich
