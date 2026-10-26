@@ -20,10 +20,16 @@ const kurzDatum = (t, mitTag) => new Date(t).toLocaleDateString("de-DE",
 // gemittelt, damit Luecken (Urlaub, vergessen) nichts verzerren.
 function mitSchnitt(punkte) {
   return punkte.map((p) => {
-    const fenster = punkte.filter((q) => q.t <= p.t && q.t > p.t - 7 * TAG_MS);
+    // Gerundete Tage statt Millisekunden: Ueber die Zeitumstellung waeren es
+    // sonst mal 8 Tage im 7-Tage-Schnitt.
+    const fenster = punkte.filter((q) => tageZwischen(q.t, p.t) >= 0 && tageZwischen(q.t, p.t) <= 6);
     return { ...p, schnitt: fenster.reduce((a, q) => a + q.kg, 0) / fenster.length };
   });
 }
+
+const tageZwischen = (von, bis) => Math.round((bis - von) / TAG_MS);
+// "+0,4 kg" / "−1,2 kg" - und keine "−0,0 kg", wenn sich nichts getan hat.
+const differenz = (d) => Math.abs(d) < 0.05 ? null : `${d > 0 ? "+" : "−"}${kg(Math.abs(d))} kg`;
 
 function zeichneGewicht() {
   const alle = mitSchnitt(Object.entries(gewichte())
@@ -31,15 +37,14 @@ function zeichneGewicht() {
     .sort((a, b) => a.t - b.t));
 
   const jetzt = alsZeit(heute());
-  const ab = zeitraum ? jetzt - (zeitraum - 1) * TAG_MS : -Infinity;
-  const sichtbar = alle.filter((p) => p.t >= ab);
+  const sichtbar = alle.filter((p) => !zeitraum || tageZwischen(p.t, jetzt) < zeitraum);
 
   const letzter = alle.at(-1);
   $("gewicht-aktuell").textContent = letzter ? kg(letzter.kg) : "–";
   $("kachel-gewicht").textContent = letzter ? kg(letzter.kg) : "–";
   if (sichtbar.length >= 2) {
     const d = sichtbar.at(-1).kg - sichtbar[0].kg;
-    const richtung = Math.abs(d) < 0.05 ? "gleich geblieben" : `${d > 0 ? "+" : "−"}${kg(Math.abs(d))} kg`;
+    const richtung = differenz(d) ?? "gleich geblieben";
     $("gewicht-delta").textContent = `${richtung} seit ${kurzDatum(sichtbar[0].t)}`;
   } else {
     $("gewicht-delta").textContent = letzter ? `zuletzt ${kurzDatum(letzter.t, true)}` : "";
@@ -47,9 +52,9 @@ function zeichneGewicht() {
 
   // Kachel in der Uebersicht: immer die letzten 30 Tage, unabhaengig vom
   // Zeitraum, den man auf der Gewicht-Seite gewaehlt hat.
-  const monat = alle.filter((p) => p.t > jetzt - 30 * TAG_MS);
+  const monat = alle.filter((p) => tageZwischen(p.t, jetzt) < 30);
   $("kachel-gewicht-delta").textContent = monat.length >= 2
-    ? `${monat.at(-1).kg - monat[0].kg > 0 ? "+" : "−"}${kg(Math.abs(monat.at(-1).kg - monat[0].kg))} kg in 30 Tagen`
+    ? `${differenz(monat.at(-1).kg - monat[0].kg) ?? "gleich"} in 30 Tagen`
     : letzter ? `zuletzt ${kurzDatum(letzter.t)}` : "Noch nichts eingetragen";
 
   const genug = sichtbar.length >= 2;
@@ -193,11 +198,16 @@ function tagEtikett(d) {
     : `${datum.getDate()}.${datum.getMonth() + 1}.`;
 }
 
+// Man tippt oft erst die Zahl und waehlt dann den Tag - das Getippte darf
+// dabei nicht vom gespeicherten Wert des Tages ueberschrieben werden.
+let gewichtGetippt = false;
+$("g-wert").addEventListener("input", () => { gewichtGetippt = true; });
+
 function waehleGewichtTag(d) {
   gewichtTag = d;
   for (const b of $("g-tage").children) b.setAttribute("aria-checked", b.dataset.wert === d);
   const w = gewichte()[d];
-  $("g-wert").value = w != null ? w.toLocaleString("de-DE") : "";
+  if (!gewichtGetippt) $("g-wert").value = w != null ? w.toLocaleString("de-DE") : "";
   $("g-loeschen").hidden = w == null;
 }
 
@@ -218,6 +228,7 @@ function oeffneGewicht(datum) {
     b.addEventListener("click", () => waehleGewichtTag(t));
     return b;
   }));
+  gewichtGetippt = false;
   waehleGewichtTag(d);
   $("gewicht-dialog").showModal();
 }
@@ -236,6 +247,7 @@ $("g-speichern").addEventListener("click", (ev) => {
 
   uebernimmNeuestes(g);
   zeichneGewicht();
+  zeichne(); // Protein-Ziel haengt am Gewicht
 });
 
 // Der neueste Wert ist das aktuelle Gewicht - der Kalorienrechner im
@@ -251,9 +263,11 @@ $("g-loeschen").addEventListener("click", () => {
   schreib(SPEICHER_GEWICHT, g);
   uebernimmNeuestes(g);
   zeichneGewicht();
+  zeichne();
 });
 
-$("gewicht-plus").addEventListener("click", () => oeffneGewicht());
+// Die Gewicht-Seite zeigt keinen Tag - also heute, nicht den Tag der Uebersicht.
+$("gewicht-plus").addEventListener("click", () => oeffneGewicht(heute()));
 $("kachel-gewicht-plus").addEventListener("click", () => oeffneGewicht(heute()));
 $("g-abbrechen").addEventListener("click", () => $("gewicht-dialog").close());
 
@@ -270,7 +284,11 @@ for (const b of $("gewicht-zeitraum").children) {
 let groessenUhr;
 window.addEventListener("resize", () => {
   clearTimeout(groessenUhr);
-  groessenUhr = setTimeout(zeichneGewicht, 150);
+  groessenUhr = setTimeout(() => {
+    zeichneGewicht();
+    if (location.hash === "#woche" && typeof zeichneWocheSeite === "function") zeichneWocheSeite();
+    if (location.hash === "#schritte" && typeof zeichneSchrittStatistik === "function") zeichneSchrittStatistik();
+  }, 150);
 });
 
 zeichneGewicht();

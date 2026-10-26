@@ -16,6 +16,9 @@ const NICHT_SICHERN = [SPEICHER_LETZTE_SICHERUNG, SPEICHER_ERINNERT];
 // Sicherung wandern, sonst wuerde jede Datei die vorige mitschleppen.
 const SPEICHER_VOR_IMPORT = "kalorien-vor-import";
 const ERINNERN_NACH_TAGEN = 14;
+// Rueckgaengig nur kurz anbieten: Monate spaeter wuerde es alles seitdem
+// Eingetragene wegwerfen.
+const RUECKGAENGIG_TAGE = 7;
 
 let wartendeSicherung = null; // gelesene Datei, bis der Nutzer bestaetigt
 
@@ -78,11 +81,29 @@ function zeigeSicherungsStand() {
   if (!zuletzt) {
     $("sicherung-stand").textContent = "Noch nie gesichert.";
   } else {
-    const tage = Math.floor((Date.now() - new Date(zuletzt)) / 86400000);
+    // Kalendertage, nicht 24-h-Bloecke: Sonntag 23 Uhr ist Montag frueh "gestern".
+    const tage = Math.round((new Date(heute() + "T12:00") - new Date(datumVon(zuletzt) + "T12:00")) / 86400000);
     const wann = tage === 0 ? "heute" : tage === 1 ? "gestern" : `vor ${tage} Tagen`;
     $("sicherung-stand").textContent = `Letzte Sicherung: ${wann}.`;
   }
-  $("import-rueckgaengig").hidden = !localStorage.getItem(SPEICHER_VOR_IMPORT);
+  $("import-rueckgaengig").hidden = !vorImport();
+}
+
+// Lokales Datum (YYYY-MM-DD) eines ISO-Zeitpunkts.
+function datumVon(iso) {
+  const d = new Date(iso);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+// Der gemerkte Stand von vor der Wiederherstellung, solange er noch gilt.
+function vorImport() {
+  try {
+    const s = JSON.parse(localStorage.getItem(SPEICHER_VOR_IMPORT));
+    if (!s?.zeit || Date.now() - new Date(s.zeit) > RUECKGAENGIG_TAGE * 86400000) return null;
+    return s;
+  } catch {
+    return null;
+  }
 }
 
 // ---------- Wiederherstellen ----------
@@ -95,13 +116,25 @@ async function leseDatei(datei) {
     return meldung("Das ist keine Sicherungsdatei dieser App.");
   }
   // Nur fremde oder kaputte Dateien abweisen - sonst landet Unsinn im Speicher.
+  // Eine leere Datei wuerde beim Einspielen alles loeschen; ein kaputter Tag
+  // die App beim naechsten Zeichnen abstuerzen lassen.
+  const tage = paket?.daten?.["kalorien:tage"];
   const gueltig = paket?.app === "kalorien-tracker" && paket.daten && typeof paket.daten === "object"
-    && Object.keys(paket.daten).every((k) => k.startsWith(PRAEFIX));
+    && Object.keys(paket.daten).every((k) => k.startsWith(PRAEFIX))
+    && tage && typeof tage === "object" && Object.values(tage).every(Array.isArray);
   if (!gueltig) return meldung("Das ist keine Sicherungsdatei dieser App.");
 
+  let zeilen;
+  try {
+    const datum = new Date(paket.erstellt);
+    zeilen = [
+      isNaN(datum) ? "Sicherung ohne Datum" : `Gesichert am ${datum.toLocaleDateString("de-DE", { day: "numeric", month: "long", year: "numeric" })}`,
+      ...zusammenfassung(paket.daten),
+    ];
+  } catch {
+    return meldung("Die Sicherungsdatei ist beschädigt.");
+  }
   wartendeSicherung = paket;
-  const erstellt = new Date(paket.erstellt).toLocaleDateString("de-DE", { day: "numeric", month: "long", year: "numeric" });
-  const zeilen = [`Gesichert am ${erstellt}`, ...zusammenfassung(paket.daten)];
   $("import-inhalt").replaceChildren(...zeilen.map((z) => {
     const li = document.createElement("li");
     li.textContent = z;
@@ -117,6 +150,16 @@ function ersetzeDaten(daten) {
   for (const [k, wert] of Object.entries(daten)) schreib(k, wert);
 }
 
+// "Fertig"/Schliessen von ⚙ speichert die Formularwerte. Nach dem Einspielen
+// stehen dort noch die alten Ziele - ohne Auffrischen wuerden sie die eben
+// wiederhergestellten ueberschreiben.
+function schliesseEinstellungen() {
+  $("z-kcal").value = ziel();
+  $("z-wasser").value = (wasserZiel() / 1000).toLocaleString("de-DE");
+  zeigeMakroFelder();
+  $("einstellungen").close();
+}
+
 function zeichneAlles() {
   zeichne();
   if (typeof zeichneGewicht === "function") zeichneGewicht();
@@ -130,24 +173,32 @@ $("import-ok").addEventListener("click", () => {
   if (!wartendeSicherung) return;
   // Vorher-Stand merken, damit ein Versehen (alte Datei erwischt) nicht
   // Wochen an Eintraegen kostet.
-  try {
-    localStorage.setItem(SPEICHER_VOR_IMPORT, JSON.stringify(sammleDaten()));
-  } catch {
-    // Speicher voll: lieber ohne Rueckgaengig weitermachen als gar nicht.
+  // Zwei falsche Dateien hintereinander: Der erste Vorher-Stand ist der echte,
+  // ihn also einen Tag lang nicht ueberschreiben.
+  const gemerkt = vorImport();
+  if (!gemerkt || Date.now() - new Date(gemerkt.zeit) > 86400000) {
+    try {
+      localStorage.setItem(SPEICHER_VOR_IMPORT, JSON.stringify({ zeit: new Date().toISOString(), daten: sammleDaten() }));
+    } catch {
+      // Speicher voll: lieber ohne Rueckgaengig weitermachen als gar nicht -
+      // aber kein aelterer Stand darf stattdessen stehen bleiben.
+      localStorage.removeItem(SPEICHER_VOR_IMPORT);
+    }
   }
   ersetzeDaten(wartendeSicherung.daten);
   wartendeSicherung = null;
-  $("einstellungen").close();
+  schliesseEinstellungen();
   zeichneAlles();
   meldung("Wiederhergestellt ✓");
 });
 
 $("import-rueckgaengig").addEventListener("click", () => {
-  const vorher = localStorage.getItem(SPEICHER_VOR_IMPORT);
-  if (!vorher || !confirm("Den Stand von vor der Wiederherstellung zurückholen?")) return;
-  ersetzeDaten(JSON.parse(vorher));
+  const vorher = vorImport();
+  const wann = new Date(vorher?.zeit).toLocaleDateString("de-DE", { day: "numeric", month: "long" });
+  if (!vorher || !confirm(`Den Stand vom ${wann} zurückholen? Was du seitdem eingetragen hast, geht verloren.`)) return;
+  ersetzeDaten(vorher.daten);
   localStorage.removeItem(SPEICHER_VOR_IMPORT);
-  $("einstellungen").close();
+  schliesseEinstellungen();
   zeichneAlles();
   meldung("Rückgängig gemacht ✓");
 });
@@ -162,7 +213,6 @@ $("import-abbrechen").addEventListener("click", () => {
   wartendeSicherung = null;
   $("import-dialog").close();
 });
-$("einstellungen-knopf").addEventListener("click", zeigeSicherungsStand);
 
 // ---------- Erinnerung ----------
 

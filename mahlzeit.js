@@ -72,7 +72,9 @@ function frueher(schluessel) {
 // Haeufigste Lebensmittel: zaehlt Tage, nicht Eintraege - zweimal Banane am
 // selben Morgen ist kein Lieblingsessen. Menge = die zuletzt gegessene,
 // weil man meist bei seiner Portion bleibt.
-function oftGegessen(tage) {
+// "ohne" vor dem Kuerzen rausfiltern: Sonst verschwindet der Abschnitt,
+// sobald die ersten sechs schon weiter oben stehen.
+function oftGegessen(tage, ohne) {
   const nachName = new Map();
   for (const [d, liste] of tage) {
     for (const e of liste) {
@@ -83,7 +85,7 @@ function oftGegessen(tage) {
     }
   }
   return [...nachName.values()]
-    .filter((x) => x.tage.size >= 2) // einmal ist kein Muster
+    .filter((x) => x.tage.size >= 2 && !ohne.has(x.letzter.name)) // einmal ist kein Muster
     .sort((a, b) => b.tage.size - a.tage.size || b.letztesDatum.localeCompare(a.letztesDatum))
     .slice(0, OFT_ANZAHL);
 }
@@ -145,8 +147,8 @@ function zeichneMahlzeitSeite() {
   $("mz-aufklappen").setAttribute("aria-expanded", mzOffen);
   $("mz-aufklappen").innerHTML = `<span class="aufklappen-text"></span><span class="pfeilchen" aria-hidden="true">${mzOffen ? "▴" : "▾"}</span>`;
   $("mz-aufklappen").querySelector(".aufklappen-text").textContent = mzOffen
-    ? "Heute eingetragen – zuklappen"
-    : `Heute eingetragen: ${heuteHier.length} · ${rund(s.kcal)} kcal`;
+    ? "Eingetragen – zuklappen"
+    : `Eingetragen: ${heuteHier.length} · ${rund(s.kcal)} kcal`;
   $("mz-eintraege").hidden = !mzOffen || !heuteHier.length;
   $("mz-eintraege").replaceChildren(...heuteHier.map(([e, i]) => {
     const li = document.createElement("li");
@@ -163,7 +165,8 @@ function zeichneMahlzeitSeite() {
   $("mz-favoriten").hidden = !favs.length;
   $("mz-favoriten-liste").replaceChildren(...favs.map((f) => vorschlagZeile(f)));
   // Was schon weiter oben steht, nicht nochmal zeigen.
-  const schonDa = new Set(favs.map((f) => f.name));
+  // Gerade Eingetragenes ebenso - das steht oben schon in der Liste.
+  const schonDa = new Set([...favs, ...heuteHier.map(([e]) => e)].map((e) => e.name));
 
   // Gedaechtnis
   const tage = frueher(k);
@@ -184,7 +187,7 @@ function zeichneMahlzeitSeite() {
   $("mz-zuletzt").hidden = !zuletzt.length;
   $("mz-zuletzt-liste").replaceChildren(...zuletzt.map((e) => vorschlagZeile(e, wannText(e.datum))));
   for (const e of zuletzt) schonDa.add(e.name);
-  const oft = oftGegessen(tage).filter((x) => !schonDa.has(x.letzter.name));
+  const oft = oftGegessen(tage, schonDa);
   $("mz-oft").hidden = !oft.length;
   $("mz-oft-titel").textContent = k === "snack" ? "Oft als Snack" : `Oft zum ${titel}`;
   $("mz-oft-liste").replaceChildren(...oft.map((x) => vorschlagZeile(x.letzter, `${x.tage.size}× gegessen`)));

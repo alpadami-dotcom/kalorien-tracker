@@ -273,6 +273,9 @@ function bearbeite(i) {
 let meldungsUhr;
 function meldung(text) {
   const m = $("meldung");
+  // Offene Dialoge liegen in der obersten Ebene, ueber allem anderen - die
+  // Meldung muss mit hinein, sonst bleibt sie unsichtbar dahinter.
+  (document.querySelector("dialog[open]") ?? document.body).append(m);
   m.textContent = text;
   m.hidden = false;
   clearTimeout(meldungsUhr);
@@ -319,7 +322,7 @@ async function verkleinere(datei, maxKante) {
 
 // Ohne KI muss die App einfache Mengen selbst verstehen:
 // "2 bananen", "200g hähnchen", "eine kleine banane", "1,5 brötchen".
-const ZAHLWOERTER = { ein: 1, eine: 1, einen: 1, zwei: 2, drei: 3, vier: 4, "fünf": 5, halbe: 0.5, halber: 0.5 };
+const ZAHLWOERTER = { ein: 1, eine: 1, einen: 1, zwei: 2, drei: 3, vier: 4, "fünf": 5, halb: 0.5, halbe: 0.5, halber: 0.5, halbes: 0.5, halben: 0.5 };
 
 // Einheit -> Anfang des USDA-Portionsetiketts. Glas und Flasche gibt es dort
 // nicht; die bekommen feste Mengen (200 ml bzw. 500 ml, Dichte ~1).
@@ -332,16 +335,24 @@ const EINHEITEN = [
   [/^flasche/, "Flasche"],
 ];
 const FESTE_MENGE = { Glas: 200, Flasche: 500, EL: 15, TL: 5, Tasse: 240 };
-const EINHEIT_MUSTER = /^(scheiben?|stücke?|stk\.?|portionen?|gläser|glas|becher|tassen?|el|tl|esslöffel|teelöffel|dosen?|flaschen?)\s+/;
+// Kennt das Lebensmittel die Einheit nicht ("1 Scheibe Gurke"), ist das
+// Stueckgewicht falsch (eine ganze Gurke) und 100 g auch. Dann ein grober
+// Richtwert - als "Menge unsicher" markiert, damit man nachschaut.
+const UNSICHERE_MENGE = { Scheibe: 25, Becher: 150, Portion: 150 };
+const EINHEIT_MUSTER = /^(scheiben?|stücke?|stk\.?|portion(?:en)?|gläser|glas|becher|tassen?|el|tl|esslöffel|teelöffel|dosen?|flaschen?)\s+/;
+// Liter und Kilo zaehlen in Gramm (Dichte ~1, wie bei Glas und Flasche).
+const TAUSENDER = new Set(["kg", "l", "liter"]);
 
 function zerlege(text) {
-  let rest = text.trim().toLowerCase();
+  // "ein halbes Brötchen" ist ein halbes, nicht eins.
+  let rest = text.trim().toLowerCase().replace(/^(ein|eine|einen)\s+(?=halbe?[rsn]?\s)/, "");
   let anzahl = null, gramm = null, groesse = null, einheit = null;
 
-  let m = rest.match(/^(\d+(?:[.,]\d+)?)\s*(g|gr|gramm|ml)?\b\s*/);
+  // "2x Banane" wie "2 Banane"; "0,5 l Milch" = 500 g.
+  let m = rest.match(/^(\d+(?:[.,]\d+)?)\s*(?:x\b\s*)?(kg|gramm|gr|g|liter|ml|l)?\b\s*/);
   if (m) {
     const zahl = parseFloat(m[1].replace(",", "."));
-    if (m[2]) gramm = zahl; else anzahl = zahl;
+    if (m[2]) gramm = TAUSENDER.has(m[2]) ? zahl * 1000 : zahl; else anzahl = zahl;
     rest = rest.slice(m[0].length);
   } else if ((m = rest.match(/^(\S+)\s+/)) && m[1] in ZAHLWOERTER) {
     anzahl = ZAHLWOERTER[m[1]];
@@ -371,10 +382,14 @@ function mitMenge(k, z) {
     // Nur Etiketten, die mit "1 klein" anfangen - "1 sehr klein" ist nicht gemeint.
     let stueck = k.stueck;
     if (z.einheit && z.einheit !== "Stück") {
-      // Auch "2 EL" oder "0.5 Tasse" taugen - dann auf eine Einheit umrechnen.
-      const muster = new RegExp("^(\\d+(?:\\.\\d+)?) " + z.einheit + "\\b");
+      // Auch "2 EL", "0.5 Tasse" oder "6 Scheiben" taugen - dann auf eine Einheit umrechnen.
+      const muster = new RegExp("^(\\d+(?:\\.\\d+)?) " + z.einheit + "n?\\b");
       const p = (k.portionen || []).map(([e, g]) => [e.match(muster), g]).find(([m]) => m);
-      stueck = p ? p[1] / parseFloat(p[0][1]) : (FESTE_MENGE[z.einheit] ?? stueck);
+      stueck = p ? p[1] / parseFloat(p[0][1]) : FESTE_MENGE[z.einheit] ?? UNSICHERE_MENGE[z.einheit] ?? k.gramm;
+      if (!p && !FESTE_MENGE[z.einheit]) k.sicherheit = "niedrig";
+    } else if (z.einheit && !stueck) {
+      stueck = k.gramm; // "1 Stück Käse": kein Stueckgewicht bekannt
+      k.sicherheit = "niedrig";
     }
     if (z.groesse) {
       const p = (k.portionen || []).find(([etikett]) => etikett.startsWith("1 " + z.groesse));
@@ -390,7 +405,7 @@ let suchUhr, suchNummer = 0, letzteTreffer = [];
 $("text").addEventListener("input", () => {
   clearTimeout(suchUhr);
   const z = zerlege($("text").value);
-  if (z.suche.length < 2) { letzteTreffer = []; return $("vorschlaege").replaceChildren(); }
+  if (z.suche.length < 2) { suchNummer++; letzteTreffer = []; return $("vorschlaege").replaceChildren(); }
   suchUhr = setTimeout(async () => {
     const nummer = ++suchNummer;
     const treffer = await suche(z.suche).catch(() => []);
@@ -431,7 +446,13 @@ $("text-form").addEventListener("submit", async (ev) => {
     // Ohne KI nimmt Enter einfach den obersten Treffer. Frisch suchen statt
     // letzteTreffer: wer schnell tippt, drueckt Enter vor dem Suchtakt.
     const z = zerlege(text);
-    letzteTreffer = (await suche(z.suche)).slice(0, 8).map((k) => mitMenge(k, z));
+    clearTimeout(suchUhr);
+    suchNummer++; // laufende Suche beim Tippen soll die Liste nicht wieder fuellen
+    try {
+      letzteTreffer = (await suche(z.suche)).slice(0, 8).map((k) => mitMenge(k, z));
+    } catch {
+      return meldung("Die Lebensmittel-Liste lädt nicht – Internet prüfen und nochmal.");
+    }
     if (!letzteTreffer.length) return meldung("Nichts gefunden – versuch ein anderes Wort.");
     $("text").blur();
     $("vorschlaege").replaceChildren();
@@ -468,7 +489,7 @@ $("foto").addEventListener("change", async (ev) => {
 // Die Naehrwerte kommen von hier - nur was nicht in der Liste steht,
 // behaelt Claudes Schaetzung und wird als solche markiert.
 async function kiZuKandidaten(r) {
-  await geladen;
+  await datenGeladen();
   return r.lebensmittel.map((l) => {
     let k = l.tabelle ? ausTabelle(l.tabelle) : null;
     if (!k) {
@@ -505,11 +526,13 @@ function oeffnePruefen(liste, rueckfrage, titel) {
     li.querySelector(".k-name").textContent = k.name;
 
     const info = [];
-    if (k.menge) info.push(k.menge);
+    // Menge und Quelle koennen aus einer Sicherungsdatei kommen: nur als Text.
+    const esc = (t) => String(t).replace(/[&<>"]/g, (z) => `&#${z.charCodeAt(0)};`);
+    if (k.menge) info.push(esc(k.menge));
     // "Ø-Wert": Durchschnitt fuer Zubereitetes (Doener ...) - ehrlich sagen,
     // dass das je nach Imbiss abweicht.
     info.push(k.quelle === "KI-Schätzung" ? '<span class="warn">Nährwerte geschätzt</span>'
-      : k.quelle === "Ø-Wert" ? "Ø-Wert – je nach Zubereitung ± 20 %" : k.quelle);
+      : k.quelle === "Ø-Wert" ? "Ø-Wert – je nach Zubereitung ± 20 %" : esc(k.quelle ?? ""));
     if (k.sicherheit === "niedrig") info.push('<span class="warn">Menge unsicher</span>');
     li.querySelector(".k-info").innerHTML = info.join(" · ");
     if (k.hinweis) li.querySelector(".k-info").append(" · " + k.hinweis);
@@ -529,7 +552,12 @@ function oeffnePruefen(liste, rueckfrage, titel) {
       li.querySelector(".k-kcal").textContent = rund(werte(k).kcal) + " kcal";
       summe();
     };
-    gramm.addEventListener("input", aktualisiere);
+    gramm.addEventListener("input", () => {
+      // Von Hand getippt: Das Portionsmenue soll keine alte Portion mehr anzeigen.
+      const g = parseFloat(gramm.value.replace(",", "."));
+      auswahl.value = [...auswahl.options].find((o) => o.value && Math.abs(o.value - g) < 0.5)?.value ?? "";
+      aktualisiere();
+    });
     auswahl.addEventListener("change", () => {
       if (auswahl.value) gramm.value = rund(parseFloat(auswahl.value));
       aktualisiere();
@@ -571,6 +599,10 @@ function summe() {
 // Beim Antippen speichern, nicht erst im "close"-Ereignis: Das kommt nur
 // verzoegert, wenn die Seite gerade im Hintergrund ist - dann ging der
 // Eintrag verloren, wenn man die App direkt danach wegwischte.
+// Abbrechen ist kein Absende-Knopf: Sonst waere es der Standard fuer Enter
+// im Grammfeld und wuerfe die Eingabe weg.
+$("pruefen-abbrechen").addEventListener("click", () => $("pruefen").close());
+
 $("eintragen").addEventListener("click", () => {
   const neu = kandidaten.filter((k) => k.an && k.gramm > 0).map((k) => ({
     name: k.name, gramm: k.gramm, pro100: k.pro100, quelle: k.quelle,
@@ -578,6 +610,11 @@ $("eintragen").addEventListener("click", () => {
   }));
   setzeEintraege([...eintraege(), ...neu]);
   $("text").value = "";
+  // Alte Vorschlaege weg - ein Tipp darauf traegt sonst schnell doppelt ein.
+  clearTimeout(suchUhr);
+  suchNummer++;
+  letzteTreffer = [];
+  $("vorschlaege").replaceChildren();
   zeichne();
 });
 
@@ -644,6 +681,7 @@ function oeffneEinstellungen() {
   $("z-wasser").value = (wasserZiel() / 1000).toLocaleString("de-DE");
   zeigeMakroFelder();
   berechne();
+  if (typeof zeigeSicherungsStand === "function") zeigeSicherungsStand();
   $("einstellungen").showModal();
 }
 
@@ -724,7 +762,7 @@ $("wasser-ziel-aendern").addEventListener("click", oeffneEinstellungen);
 $("kachel-wasser-plus").addEventListener("click", () => {
   setzeWasser(wasser() + GLAS_ML);
   zeichneWasser();
-  meldung(`+250 ml – ${(wasser() / 1000).toLocaleString("de-DE")} L heute`);
+  meldung(`+250 ml – ${(wasser() / 1000).toLocaleString("de-DE")} L ${tag === heute() ? "heute" : "an dem Tag"}`);
 });
 
 // Makro-Felder: eigene Werte zeigen, sonst leer mit dem Automatik-Wert als Platzhalter.

@@ -935,6 +935,55 @@
   "quelle": "Ø-Wert"
  },
  {
+  "name": "Apfelkuchen",
+  "aliase": [
+   "gedeckter Apfelkuchen"
+  ],
+  "kcal": 243.5,
+  "protein": 2.6,
+  "kh": 33.6,
+  "fett": 9.8,
+  "portionen": [
+   [
+    "1 Stück",
+    120
+   ]
+  ],
+  "quelle": "Ø aus 44 Produkten"
+ },
+ {
+  "name": "Bananenbrot",
+  "aliase": [
+   "Banana Bread"
+  ],
+  "kcal": 300,
+  "protein": 5,
+  "kh": 45,
+  "fett": 11,
+  "portionen": [
+   [
+    "1 Scheibe",
+    70
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
+  "name": "Zwiebelkuchen",
+  "aliase": [],
+  "kcal": 230,
+  "protein": 7,
+  "kh": 20,
+  "fett": 14,
+  "portionen": [
+   [
+    "1 Stück",
+    200
+   ]
+  ],
+  "quelle": "Ø-Wert"
+ },
+ {
   "name": "Schokocroissant",
   "aliase": [
    "Pain au Chocolat",
@@ -1161,6 +1210,75 @@
    ]
   ],
   "quelle": "Ø aus 36 Produkten"
+ },
+ {
+  "name": "Hafermilch",
+  "aliase": [
+   "Haferdrink",
+   "Oatly"
+  ],
+  "kcal": 44.0,
+  "protein": 0.8,
+  "kh": 7.2,
+  "fett": 1.4,
+  "portionen": [
+   [
+    "1 Glas",
+    200
+   ]
+  ],
+  "quelle": "Ø aus 56 Produkten"
+ },
+ {
+  "name": "Mascarpone",
+  "aliase": [
+   "Mascarpone"
+  ],
+  "kcal": 384.5,
+  "protein": 4.0,
+  "kh": 3.4,
+  "fett": 40.0,
+  "portionen": [
+   [
+    "1 EL",
+    15
+   ]
+  ],
+  "quelle": "Ø aus 42 Produkten"
+ },
+ {
+  "name": "Halloumi",
+  "aliase": [
+   "Grillkäse"
+  ],
+  "kcal": 317,
+  "protein": 22,
+  "kh": 2,
+  "fett": 24.6,
+  "portionen": [
+   [
+    "1 Portion",
+    100
+   ]
+  ],
+  "quelle": "Ø aus 49 Produkten"
+ },
+ {
+  "name": "Gnocchi",
+  "aliase": [
+   "Kartoffelgnocchi"
+  ],
+  "kcal": 154.0,
+  "protein": 3.3,
+  "kh": 32.5,
+  "fett": 0.6,
+  "portionen": [
+   [
+    "1 Portion",
+    200
+   ]
+  ],
+  "quelle": "Ø aus 50 Produkten"
  },
  {
   "name": "Proteinshake mit Milch",

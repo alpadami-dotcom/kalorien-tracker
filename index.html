@@ -404,7 +404,7 @@
     <ul id="kandidaten"></ul>
     <div class="summe" id="pruefen-summe"></div>
     <div class="aktionen">
-      <button value="abbruch" class="zweit">Abbrechen</button>
+      <button type="button" value="abbruch" id="pruefen-abbrechen" class="zweit">Abbrechen</button>
       <button value="ok" id="eintragen" class="erst">Eintragen</button>
     </div>
   </form>
@@ -475,7 +475,7 @@
     <button type="button" class="link-knopf" id="import-rueckgaengig" hidden>Letzte Wiederherstellung rückgängig machen</button>
 
     <div class="aktionen eins">
-      <button value="ok" id="fertig" class="erst">Fertig</button>
+      <button value="ok" id="fertig" class="erst" formnovalidate>Fertig</button>
     </div>
   </form>
 </dialog>
@@ -507,12 +507,12 @@
       </select>
     </label>
     <label class="zeile" id="notiz-alle-zeile" hidden>Alle wie viele Tage?
-      <input id="notiz-alle" type="number" inputmode="numeric" min="2" max="365" placeholder="z. B. 5">
+      <input id="notiz-alle" type="number" inputmode="numeric" min="1" max="365" placeholder="z. B. 5">
     </label>
     <p class="klein" id="notiz-serie-hinweis" hidden>Wiederholt sich – Ändern und Löschen gilt für alle Termine dieser Reihe.</p>
     <div class="aktionen">
       <button type="button" id="notiz-abbrechen" class="zweit">Abbrechen</button>
-      <button value="ok" id="notiz-speichern" class="erst">Speichern</button>
+      <button value="ok" id="notiz-speichern" class="erst" formnovalidate>Speichern</button>
     </div>
     <button type="button" id="notiz-loeschen" class="loeschen" hidden>Eintrag löschen</button>
   </form>
@@ -555,7 +555,7 @@
 </dialog>
 
 <div class="laden" id="laden" hidden><div class="kreisel"></div><span id="laden-text">Einen Moment …</span></div>
-<div class="meldung" id="meldung" hidden></div>
+<div class="meldung" id="meldung" role="status" hidden></div>
 
 <script src="naehrwerte.js"></script>
 <script src="app.js"></script>

@@ -17,18 +17,27 @@ let GERICHT_NACH_NAME = new Map();
 let KURATIERT = [];
 
 // Einmal laden; der Service Worker haelt die Dateien danach offline vor.
-const geladen = Promise.all([
-  fetch("daten/usda.json").then((r) => r.json()),
-  fetch("daten/lebensmittel.json").then((r) => r.json()),
-  fetch("daten/gerichte.json").then((r) => r.json()).catch(() => []),
-]).then(([usda, deutsch, gerichte]) => {
+// Scheitert es (kein Netz beim allerersten Start, Datei gerade im Upload),
+// versucht die naechste Suche es neu - sonst ginge bis zum Neustart nichts.
+let geladen = null;
+function datenGeladen() {
+  geladen ??= Promise.all([
+    fetch("daten/usda.json").then((r) => r.json()),
+    fetch("daten/lebensmittel.json").then((r) => r.json()),
+    fetch("daten/gerichte.json").then((r) => r.json()).catch(() => []),
+  ]).then(verarbeiteDaten).catch((e) => { geladen = null; throw e; });
+  return geladen;
+}
+datenGeladen().catch(() => {});
+
+function verarbeiteDaten([usda, deutsch, gerichte]) {
   USDA = usda;
   DEUTSCH = deutsch;
   DEUTSCH_NACH_NAME = new Map(deutsch.map((d) => [d.name, d]));
   GERICHTE = gerichte;
   GERICHT_NACH_NAME = new Map(gerichte.map((g) => [g.name, g]));
   KURATIERT = [...deutsch, ...gerichte];
-});
+}
 
 // Kleinschreibung ohne Umlaute - "Hähnchen" findet auch "hahnchen".
 function norm(text) {
@@ -38,7 +47,7 @@ function norm(text) {
 
 // Portionen, die kein "Stueck" sind: Masse, Volumen, US-Etiketten.
 // "2 Tomaten" soll nicht 2 Tassen Tomaten ergeben.
-const KEIN_STUECK = /^1 (oz|lb|Tasse|Tassen|cup|EL|TL|tablespoon|teaspoon|tbsp|tsp|fl|NLEA|Packung|liter|quart|pint|gallon)\b/i;
+const KEIN_STUECK = /^1 (oz|lb|Tasse|Tassen|cup|EL|TL|tablespoon|teaspoon|tbsp|tsp|fl|NLEA|Packung|bag|liter|quart|pint|gallon)\b/i;
 
 // Gewicht von einem Stueck: erst "1 mittel", dann ein Einzelstueck ohne
 // Groessenangabe, dann irgendeins. Nur Etiketten, die mit "1 mittel"
@@ -51,16 +60,39 @@ function stueckGewicht(portionen) {
   return (normal ?? stuecke[0])?.[1] ?? null;
 }
 
-function ausUsda(fdc, name) {
+// Startmenge, wenn man ein Lebensmittel ohne Zahl antippt. Ein Stueck nur,
+// wenn es ein sinnvolles Mass ist (Banane, Ei, Scheibe Brot) - sonst starteten
+// Pistazien bei 0,7 g (eine Nuss) und Rosenkohl bei 19 g (ein Roeschen).
+// Kleinkram: Energiereiches (Nuesse, Chips) eine Handvoll, der Rest 100 g.
+function startMenge(portionen, stueck, kcal) {
+  // Fett und Oel: ein Essloeffel. 100 g Olivenoel waeren 884 kcal.
+  if (kcal >= 550) {
+    const el = portionen.map(([e, g]) => [e.match(/^(\d+(?:\.\d+)?) EL\b/), g]).find(([m]) => m);
+    if (el) return Math.round((el[1] / parseFloat(el[0][1])) * 10) / 10;
+  }
+  // Ganze Ananas (905 g), Melone, Kohlkopf: als Stueck zaehlbar, aber als
+  // Startmenge viel zu viel.
+  if (stueck > 350) return 100;
+  if (stueck >= 25) return stueck;
+  const scheibe = portionen.find(([e, g]) => g === stueck && /Scheibe|slice|wafer|cracker/i.test(e));
+  if (scheibe) return stueck;
+  // Kleinkram (Nuesse, Kekse) oder ohne Stueckangabe energiereich (Chips):
+  // eine Handvoll. Getreide wie Haferflocken (~380 kcal) bleibt bei 100 g.
+  if (kcal > 400) return 30;
+  return 100;
+}
+
+function ausUsda(fdc, name, stueckFest) {
   const d = USDA[fdc];
-  const stueck = stueckGewicht(d.portionen);
+  const stueck = stueckFest ?? stueckGewicht(d.portionen);
   return {
     name: name || d.name,
     quelle: "USDA",
+    fdc,
     pro100: { kcal: d.kcal, protein: d.protein, fett: d.fett, kh: d.kh },
     portionen: d.portionen,
     stueck,
-    gramm: stueck ?? 100,
+    gramm: startMenge(d.portionen, stueck, d.kcal),
   };
 }
 
@@ -79,7 +111,7 @@ function ausGericht(g) {
 
 function ausTabelle(name) {
   const d = DEUTSCH_NACH_NAME.get(name);
-  if (d) return ausUsda(d.fdc, d.name);
+  if (d) return ausUsda(d.fdc, d.name, d.stueck);
   const g = GERICHT_NACH_NAME.get(name);
   return g ? ausGericht(g) : null;
 }
@@ -128,11 +160,12 @@ function unscharf(q, w, grenze) {
 // Erst die deutschen Listen (USDA-Zuordnungen und Gerichte), dann die
 // englische USDA-Datenbank als Notnagel fuer alles, was dort fehlt.
 async function suche(anfrage, grenze = 20) {
-  await geladen;
+  await datenGeladen();
   const q = norm(anfrage.trim());
   if (q.length < 2) return [];
   const wortanfang = new RegExp("\\b" + q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
   const treffer = [];
+  const gefunden = new Set(); // USDA-Nummern, die schon deutsch in der Liste stehen
 
   for (const d of KURATIERT) {
     let rang = null;
@@ -145,11 +178,17 @@ async function suche(anfrage, grenze = 20) {
       else if (w.startsWith(q)) r = 0;
       else if (wortanfang.test(w)) r = 1;
       else if (w.includes(q)) r = 2;
-      else if (w.length >= 4 && q.startsWith(w)) r = 1; // Mehrzahl: "tomaten"
+      // Mehrzahl: "tomaten" findet "Tomate" - aber nur bis 2 Buchstaben mehr,
+      // sonst fing "hafer" auch "hafermilsch" ab und die Tippfehler-Suche kam
+      // nie zum Zug.
+      else if (w.length >= 4 && q.startsWith(w) && q.length - w.length <= 2) r = 1;
       else continue;
       rang = rang === null ? r : Math.min(rang, r);
     }
-    if (rang !== null) treffer.push([rang, d.name.length, () => ausTabelle(d.name)]);
+    if (rang !== null) {
+      treffer.push([rang, d.name.length, () => ausTabelle(d.name)]);
+      if (d.fdc) gefunden.add(d.fdc);
+    }
   }
 
   // Tippfehler: nur wenn die deutsche Liste sonst nichts findet. Sonst
@@ -177,14 +216,18 @@ async function suche(anfrage, grenze = 20) {
         // Hähnchenbrust als die "Hähnchen Nuggets".
         const rang = 2.5 + best / 10 + (ganz > best ? 0.05 : 0) + (GERICHT_NACH_NAME.has(d.name) ? 0.02 : 0);
         treffer.push([rang, d.name.length, () => ({ ...ausTabelle(d.name), aehnlich: true })]);
+        if (d.fdc) gefunden.add(d.fdc);
       }
     }
   }
 
   // USDA: jedes Suchwort muss vorkommen. Kurze Namen zuerst, weil
   // "Bananas, raw" fast immer gemeint ist und nicht "Bananas, dehydrated ...".
+  // Was diese Suche schon mit deutschem Namen gefunden hat, nicht noch einmal
+  // englisch zeigen ("Sauerkraut" und "Sauerkraut, canned ...").
   const woerter = q.split(/\s+/);
   for (const [fdc, d] of Object.entries(USDA)) {
+    if (gefunden.has(fdc)) continue;
     const n = d.name.toLowerCase();
     if (woerter.every((w) => n.includes(w))) treffer.push([3, n.length, () => ausUsda(fdc)]);
   }

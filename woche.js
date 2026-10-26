@@ -91,7 +91,11 @@ function zeichneWocheSeite() {
   const sonntag = plusTage(wocheStart, 6);
   const von = new Date(wocheStart + "T12:00:00"), bis = new Date(sonntag + "T12:00:00");
   const gleicherMonat = von.getMonth() === bis.getMonth();
-  $("woche-titel").textContent = `KW ${kalenderwoche(wocheStart)}`;
+  // Jahr nur, wenn es nicht das aktuelle ist - sonst sieht KW 44 von 2025 aus wie diese.
+  // Die KW gehoert zum Jahr ihres Donnerstags (ISO).
+  const kwJahr = plusTage(wocheStart, 3).slice(0, 4);
+  const jahr = kwJahr === heute().slice(0, 4) ? "" : ` ${kwJahr}`;
+  $("woche-titel").textContent = `KW ${kalenderwoche(wocheStart)}${jahr}`;
   $("woche-zeitraum").textContent = `${von.getDate()}.${gleicherMonat ? "" : " " + von.toLocaleDateString("de-DE", { month: "short" })} – ${bis.toLocaleDateString("de-DE", { day: "numeric", month: "long" })}`;
   $("woche-vor").disabled = sonntag >= heute();
 
@@ -129,7 +133,7 @@ function zeichneWochenDiagramm(woche) {
   for (let v = 0; v <= oben; v += schritt) {
     svg.append(el("line", { x1: rand.l, x2: B - rand.r, y1: y(v), y2: y(v), class: "raster" }));
     const t = el("text", { x: rand.l - 6, y: y(v) + 4, class: "achse", "text-anchor": "end" });
-    t.textContent = v >= 1000 ? `${v / 1000}k` : v;
+    t.textContent = v >= 1000 ? `${(v / 1000).toLocaleString("de-DE")}k` : v;
     svg.append(t);
   }
 
@@ -196,7 +200,7 @@ function zeichneKennzahlen(woche) {
     ["Ø Schritte", woche.some((t) => t.schritte) ? zahl(schnitt(woche.filter((t) => t.schritte).map((t) => t.schritte))) : "–",
       typeof schrittZiel === "function" ? `Ziel ${zahl(schrittZiel())}` : ""],
     ["Gewicht", gewogen.length >= 2
-      ? `${gewogen.at(-1).gewicht - gewogen[0].gewicht > 0 ? "+" : "−"}${Math.abs(gewogen.at(-1).gewicht - gewogen[0].gewicht).toLocaleString("de-DE", { maximumFractionDigits: 1 })} kg`
+      ? differenz(gewogen.at(-1).gewicht - gewogen[0].gewicht) ?? "gleich"
       : gewogen.length ? `${gewogen[0].gewicht.toLocaleString("de-DE")} kg` : "–",
       gewogen.length >= 2 ? "in dieser Woche" : gewogen.length ? "einmal gewogen" : "nicht gewogen"],
   ];

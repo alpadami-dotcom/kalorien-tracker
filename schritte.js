@@ -33,13 +33,15 @@ function setzeSchritte(d, n) {
   if (vorher < schrittZiel() && n >= schrittZiel()) feiere();
 }
 
-// Eine Zahl aus Text. Je nach iPhone-Sprache kommt "8432", "8.432"
-// (Tausenderpunkt) oder "8432,0" - alles soll 8432 ergeben.
+// Eine Zahl aus Text. Je nach iPhone-Sprache kommt "8432", "8.432",
+// "8,432" (englisch), "8’432" oder "8432,0" - alles soll 8432 ergeben.
+// Nur eine reine Zahl zaehlt: Frueher wurde jede Ziffer herausgefischt, und
+// "Raum 204" oder ein Datum in der Zwischenablage ueberschrieb die Schritte.
 function leseZahl(text) {
-  const t = String(text).trim().replace(/\s/g, "").replace(/[^\d.,]/g, "");
-  if (/^\d{1,3}(\.\d{3})+$/.test(t)) return Number(t.replaceAll(".", ""));
-  const zahl = parseFloat(t.replace(/\.(?=\d{3}(,|$))/g, "").replace(",", "."));
-  return Number.isFinite(zahl) ? Math.round(zahl) : NaN;
+  const t = String(text).trim().replace(/\s/g, "").replace(/(schritte|steps)$/i, "");
+  const gruppen = t.match(/^(\d{1,3}(?:[.,’']\d{3})+)(?:[.,]\d+)?$/);
+  if (gruppen) return Number(gruppen[1].replace(/\D/g, ""));
+  return /^\d+(?:[.,]\d+)?$/.test(t) ? Math.round(parseFloat(t.replace(",", "."))) : NaN;
 }
 // Erste Zahl im Text - auch wenn ein alter Kurzbefehl "Schritte;kcal" liefert.
 const ersteZahl = (text) => String(text).split(/[;\n|]/).map(leseZahl).find(Number.isFinite);
@@ -219,6 +221,8 @@ for (const b of $("schritt-zeitraum").children) {
 let wartetAufEinfuegen = false;
 
 function holeSchritte() {
+  // Health kennt nur heute - und nur dort gibt es "Einfuegen".
+  if (tag !== heute()) { tag = heute(); zeichne(); }
   wartetAufEinfuegen = true;
   location.href = "shortcuts://run-shortcut?name=" + encodeURIComponent(KURZBEFEHL);
 }
@@ -230,6 +234,9 @@ document.addEventListener("visibilitychange", () => {
   if (location.hash !== "#schritte") location.hash = "schritte";
   $("schritte-einfuegen").classList.add("pulsiert");
   meldung("Jetzt auf „Einfügen“ tippen");
+  // Nur einmal erinnern: Ging der Kurzbefehl schief, soll nicht jedes
+  // spaetere Oeffnen der App auf die Schritte-Seite springen.
+  wartetAufEinfuegen = false;
 });
 
 async function fuegeEin() {

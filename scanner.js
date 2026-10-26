@@ -10,16 +10,24 @@
 
 let scanStrom = null;   // MediaStream der Kamera
 let scanLaeuft = false;
+// Zaehlt jedes Oeffnen mit. Wer schliesst, waehrend die Kamera noch startet,
+// soll keinen verwaisten Strom samt Pruefschleife hinter sich lassen.
+let scanLauf = 0;
+let scanFehler = 0; // Fehlversuche in Folge
+const scanBild = document.createElement("canvas"); // einmal, nicht alle 150 ms neu
 
 async function oeffneScanner() {
+  const lauf = ++scanLauf;
+  scanFehler = 0;
   $("scanner").showModal();
   $("scanner-hinweis").textContent = "Halte den Barcode in den Rahmen.";
   if (!navigator.mediaDevices?.getUserMedia) {
     $("scanner-hinweis").textContent = "Live-Kamera geht hier nicht – nimm „Foto“ oder tipp die Nummer ein.";
     return;
   }
+  let strom;
   try {
-    scanStrom = await navigator.mediaDevices.getUserMedia({
+    strom = await navigator.mediaDevices.getUserMedia({
       video: { facingMode: { ideal: "environment" }, width: { ideal: 1920 }, height: { ideal: 1080 } },
       audio: false,
     });
@@ -27,15 +35,19 @@ async function oeffneScanner() {
     $("scanner-hinweis").textContent = "Kein Zugriff auf die Kamera – in den iPhone-Einstellungen erlauben, oder „Foto“ nehmen.";
     return;
   }
+  if (lauf !== scanLauf || !$("scanner").open) return strom.getTracks().forEach((t) => t.stop());
+  scanStrom = strom;
   const video = $("scanner-video");
-  video.srcObject = scanStrom;
+  video.srcObject = strom;
   await video.play().catch(() => {});
+  if (lauf !== scanLauf || !$("scanner").open) return;
   scanLaeuft = true;
-  pruefeBild();
+  pruefeBild(lauf);
 }
 
 function schliesseScanner() {
   scanLaeuft = false;
+  scanLauf++;
   scanStrom?.getTracks().forEach((t) => t.stop()); // Kamera wirklich aus, sonst bleibt der gruene Punkt an
   scanStrom = null;
   $("scanner-video").srcObject = null;
@@ -44,26 +56,29 @@ function schliesseScanner() {
 
 // Nur den Rahmen in der Mitte pruefen und auf ~1000 px verkleinern: Das ist
 // schneller und meist genauer als das ganze Kamerabild.
-async function pruefeBild() {
+async function pruefeBild(lauf) {
   const video = $("scanner-video");
-  if (!scanLaeuft) return;
-  if (video.videoWidth) {
-    const bw = video.videoWidth * 0.8, bh = video.videoHeight * 0.45;
-    const x = (video.videoWidth - bw) / 2, y = (video.videoHeight - bh) / 2;
-    const f = Math.min(1, 1000 / bw);
-    const c = document.createElement("canvas");
-    c.width = Math.round(bw * f);
-    c.height = Math.round(bh * f);
-    const ctx = c.getContext("2d", { willReadFrequently: true });
-    ctx.drawImage(video, x, y, bw, bh, 0, 0, c.width, c.height);
-    try {
+  if (!scanLaeuft || lauf !== scanLauf) return;
+  try {
+    if (video.videoWidth) {
+      const bw = video.videoWidth * 0.8, bh = video.videoHeight * 0.45;
+      const x = (video.videoWidth - bw) / 2, y = (video.videoHeight - bh) / 2;
+      const f = Math.min(1, 1000 / bw);
+      const c = scanBild;
+      c.width = Math.round(bw * f);
+      c.height = Math.round(bh * f);
+      const ctx = c.getContext("2d", { willReadFrequently: true });
+      ctx.drawImage(video, x, y, bw, bh, 0, 0, c.width, c.height);
       const code = await liesBarcode(ctx.getImageData(0, 0, c.width, c.height));
-      if (code && scanLaeuft) return gefunden(code);
-    } catch {
-      // Bibliothek laedt noch oder Bild unbrauchbar - einfach naechstes Bild
+      scanFehler = 0;
+      if (code && scanLaeuft && lauf === scanLauf) return gefunden(code);
     }
+  } catch {
+    // Bibliothek laedt noch oder Bild unbrauchbar - einfach naechstes Bild.
+    // Scheitert es dauerhaft (offline, Bibliothek fehlt), das auch sagen.
+    if (++scanFehler === 20) $("scanner-hinweis").textContent = "Scanner lädt nicht – tipp die Nummer ein.";
   }
-  setTimeout(pruefeBild, 150);
+  setTimeout(() => pruefeBild(lauf), 150);
 }
 
 async function gefunden(code) {
