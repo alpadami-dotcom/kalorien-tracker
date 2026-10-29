@@ -16,7 +16,8 @@ function montagVon(d) {
   return datum.toISOString().slice(0, 10);
 }
 const plusTage = (d, n) => new Date(new Date(d + "T12:00:00").getTime() + n * TAG).toISOString().slice(0, 10);
-const zahl = (x) => Math.round(x).toLocaleString("de-DE");
+const WOCHE_ZAHL = new Intl.NumberFormat("de-DE"); // einmal anlegen, siehe formatiere() in app.js
+const zahl = (x) => WOCHE_ZAHL.format(Math.round(x));
 
 // ISO-Kalenderwoche - die Zahl, die auch im Schulkalender steht.
 // Tage gerundet: Zwischen Januar und Oktober liegt die Zeitumstellung, ein
@@ -28,11 +29,12 @@ function kalenderwoche(montag) {
   return 1 + Math.floor(Math.round((donnerstag - jahresanfang) / TAG) / 7);
 }
 
-// Die sieben Tage einer Woche mit allem, was die Seite braucht.
-function wochenDaten(montag) {
-  const tage = alleTage();
+// Die sieben Tage einer Woche mit allem, was die Seite braucht. "tage" gibt
+// zeichne() mit, das den Speicher ohnehin schon gelesen hat.
+function wochenDaten(montag, tage = alleTage()) {
   const wasser = lies(SPEICHER_WASSER, {});
   const gewicht = lies(SPEICHER_GEWICHT, {});
+  const schritte = typeof schritteAlle === "function" ? schritteAlle() : {};
   const mz = makroZiele();
   const h = heute();
   return Array.from({ length: 7 }, (_, i) => {
@@ -43,7 +45,7 @@ function wochenDaten(montag) {
       d, s, zukunft: d > h, gegessen: liste.length > 0,
       makro: liste.length > 0 && makroGeschafft(s, mz),
       wasser: wasser[d] ?? 0, gewicht: gewicht[d] ?? null,
-      schritte: typeof schritteAlle === "function" ? (schritteAlle()[d] ?? 0) : 0,
+      schritte: schritte[d] ?? 0,
     };
   });
 }
@@ -56,8 +58,8 @@ function schnitt(werte) {
 
 // ---------- Kachel ----------
 
-function zeichneWocheKachel() {
-  const woche = wochenDaten(montagVon(heute()));
+function zeichneWocheKachel(tage) {
+  const woche = wochenDaten(montagVon(heute()), tage);
   const mitEssen = woche.filter((t) => t.gegessen);
   const avg = schnitt(mitEssen.map((t) => t.s.kcal));
   $("kachel-woche-schnitt").textContent = avg == null ? "–" : zahl(avg);
@@ -73,7 +75,7 @@ function zeichneWocheKachel() {
     balken.style.height = t.gegessen ? Math.max(6, (t.s.kcal / oben) * 100) + "%" : "";
     const name = document.createElement("span");
     name.className = "mini-name";
-    name.textContent = new Date(t.d + "T12:00:00").toLocaleDateString("de-DE", { weekday: "narrow" });
+    name.textContent = formatiere(new Date(t.d + "T12:00:00"), { weekday: "narrow" });
     spalte.append(balken, name);
     return spalte;
   }));
@@ -96,7 +98,7 @@ function zeichneWocheSeite() {
   const kwJahr = plusTage(wocheStart, 3).slice(0, 4);
   const jahr = kwJahr === heute().slice(0, 4) ? "" : ` ${kwJahr}`;
   $("woche-titel").textContent = `KW ${kalenderwoche(wocheStart)}${jahr}`;
-  $("woche-zeitraum").textContent = `${von.getDate()}.${gleicherMonat ? "" : " " + von.toLocaleDateString("de-DE", { month: "short" })} – ${bis.toLocaleDateString("de-DE", { day: "numeric", month: "long" })}`;
+  $("woche-zeitraum").textContent = `${von.getDate()}.${gleicherMonat ? "" : " " + formatiere(von, { month: "short" })} – ${formatiere(bis, { day: "numeric", month: "long" })}`;
   $("woche-vor").disabled = sonntag >= heute();
 
   zeichneWochenDiagramm(woche);
@@ -147,7 +149,7 @@ function zeichneWochenDiagramm(woche) {
       }));
     }
     const name = el("text", { x: mitte(i), y: H - 8, class: "achse" + (t.d === heute() ? " heute" : ""), "text-anchor": "middle" });
-    name.textContent = new Date(t.d + "T12:00:00").toLocaleDateString("de-DE", { weekday: "short" }).replace(".", "");
+    name.textContent = formatiere(new Date(t.d + "T12:00:00"), { weekday: "short" }).replace(".", "");
     svg.append(name);
   });
 
@@ -162,7 +164,7 @@ function zeichneWochenDiagramm(woche) {
   woche.forEach((t, i) => {
     const flaeche = el("rect", { x: mitte(i) - breite / 2, y: 0, width: breite, height: H, fill: "transparent", tabindex: 0 });
     const zeige = () => {
-      tip.querySelector(".tip-datum").textContent = new Date(t.d + "T12:00:00").toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "short" });
+      tip.querySelector(".tip-datum").textContent = formatiere(new Date(t.d + "T12:00:00"), { weekday: "long", day: "numeric", month: "short" });
       tip.querySelector(".tip-wert").textContent = t.gegessen ? `${zahl(t.s.kcal)} kcal` : t.zukunft ? "kommt noch" : "nichts eingetragen";
       tip.querySelector(".tip-makros").textContent = t.gegessen ? `${rund(t.s.protein)} P · ${rund(t.s.kh)} K · ${rund(t.s.fett)} F${t.makro ? " · ✓ Makros" : ""}` : "";
       tip.hidden = false;
@@ -219,7 +221,7 @@ function zeichneWochenListe(woche) {
   $("woche-liste").replaceChildren(...woche.filter((t) => !t.zukunft).reverse().map((t) => {
     const li = document.createElement("li");
     li.innerHTML = `<div class="was"><div class="name"></div><div class="detail"></div></div><div class="kcal"></div>`;
-    li.querySelector(".name").textContent = new Date(t.d + "T12:00:00").toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "short" })
+    li.querySelector(".name").textContent = formatiere(new Date(t.d + "T12:00:00"), { weekday: "long", day: "numeric", month: "short" })
       + (t.makro ? " ✓" : "");
     li.querySelector(".detail").textContent = t.gegessen
       ? `${rund(t.s.protein)} P · ${rund(t.s.kh)} K · ${rund(t.s.fett)} F${t.wasser ? ` · ${(t.wasser / 1000).toLocaleString("de-DE")} L` : ""}`

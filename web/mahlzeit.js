@@ -61,8 +61,10 @@ function alsVorschlag(e) {
 
 // Was es bei dieser Mahlzeit gab - neueste Tage zuerst, der offene Tag nicht
 // (der steht ja schon oben).
-function frueher(schluessel) {
-  return Object.entries(alleTage())
+// "alle" reicht zeichneMahlzeitSeite() durch: Die Seite las den ganzen
+// Speicher sonst dreimal pro Zeichnen.
+function frueher(schluessel, alle = alleTage()) {
+  return Object.entries(alle)
     .filter(([d]) => d !== tag)
     .sort(([a], [b]) => b.localeCompare(a))
     .map(([d, liste]) => [d, liste.filter((e) => mahlzeitVon(e) === schluessel)])
@@ -91,10 +93,10 @@ function oftGegessen(tage, ohne) {
 }
 
 // Die letzten verschiedenen Lebensmittel ueber alle Tage, ohne die in "ohne".
-function zuletztGegessen(ohne) {
+function zuletztGegessen(ohne, alle = alleTage()) {
   const gesehen = new Set(ohne);
   const ergebnis = [];
-  const tage = Object.entries(alleTage()).sort(([a], [b]) => b.localeCompare(a));
+  const tage = Object.entries(alle).sort(([a], [b]) => b.localeCompare(a));
   for (const [d, liste] of tage) {
     // Innerhalb eines Tages: zuletzt eingetragen zuerst.
     for (const e of [...liste].sort((a, b) => (b.zeit ?? "").localeCompare(a.zeit ?? ""))) {
@@ -112,7 +114,7 @@ function wannText(d) {
   const gestern = new Date(heute() + "T12:00:00");
   gestern.setDate(gestern.getDate() - 1);
   if (d === gestern.toISOString().slice(0, 10)) return "gestern";
-  return new Date(d + "T12:00:00").toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "short" });
+  return formatiere(new Date(d + "T12:00:00"), { weekday: "long", day: "numeric", month: "short" });
 }
 
 function vorschlagZeile(e, zusatz) {
@@ -139,7 +141,8 @@ function zeichneMahlzeitSeite() {
   $("text").placeholder = k === "snack" ? "Welcher Snack?" : `Was gab es zum ${titel}?`;
 
   // Was heute schon in dieser Mahlzeit steht - Index fuer bearbeite() mitnehmen.
-  const heuteHier = eintraege().map((e, i) => [e, i]).filter(([e]) => mahlzeitVon(e) === k);
+  const alle = alleTage();
+  const heuteHier = (alle[tag] ?? []).map((e, i) => [e, i]).filter(([e]) => mahlzeitVon(e) === k);
   const s = summen(heuteHier.map(([e]) => e));
   $("mz-kcal").textContent = rund(s.kcal);
   $("mz-makros").textContent = heuteHier.length ? `${rund(s.protein)} P · ${rund(s.kh)} K · ${rund(s.fett)} F` : "";
@@ -169,7 +172,7 @@ function zeichneMahlzeitSeite() {
   const schonDa = new Set([...favs, ...heuteHier.map(([e]) => e)].map((e) => e.name));
 
   // Gedaechtnis
-  const tage = frueher(k);
+  const tage = frueher(k, alle);
   const letztes = tage[0];
   $("mz-letztes").hidden = !letztes;
   if (letztes) {
@@ -183,7 +186,7 @@ function zeichneMahlzeitSeite() {
   // Zuletzt gegessen: ueber alle Mahlzeiten und Tage, Neuestes zuerst. Ergaenzt
   // "Letztes Mal", das nur diese Mahlzeit kennt - der Joghurt vom Mittag
   // kann ja auch ein Snack sein.
-  const zuletzt = zuletztGegessen(schonDa);
+  const zuletzt = zuletztGegessen(schonDa, alle);
   $("mz-zuletzt").hidden = !zuletzt.length;
   $("mz-zuletzt-liste").replaceChildren(...zuletzt.map((e) => vorschlagZeile(e, wannText(e.datum))));
   for (const e of zuletzt) schonDa.add(e.name);

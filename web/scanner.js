@@ -19,6 +19,7 @@ const scanBild = document.createElement("canvas"); // einmal, nicht alle 150 ms 
 async function oeffneScanner() {
   const lauf = ++scanLauf;
   scanFehler = 0;
+  bereiteBarcodeVor(); // laedt, waehrend die Kamera startet
   $("scanner").showModal();
   $("scanner-hinweis").textContent = "Halte den Barcode in den Rahmen.";
   if (!navigator.mediaDevices?.getUserMedia) {

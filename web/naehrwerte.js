@@ -274,6 +274,13 @@ async function barcodeNachschlagen(code) {
 // BarcodeDetector-Schnittstelle, weil Safari auf dem iPhone die nicht kennt.
 // Erst beim ersten Scan laden - die ~1 MB braucht sonst niemand.
 const ZXING = "https://cdn.jsdelivr.net/npm/zxing-wasm@3.1.5/dist/es/reader/index.js";
+
+// Schon beim Oeffnen des Scanners anwerfen, parallel zum Kamerastart: Sonst
+// laedt und uebersetzt der Leser erst beim ersten Bild, und der Scan hing.
+function bereiteBarcodeVor() {
+  import(ZXING).then((m) => m.prepareZXingModule({ fireImmediately: true })).catch(() => {});
+}
+
 async function liesBarcode(bilddaten) {
   const { readBarcodes } = await import(ZXING);
   // tryRotate: Viele Packungen tragen den Code hochkant. tryDownscale hilft,

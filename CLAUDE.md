@@ -19,7 +19,7 @@ ohne Server. Suche, Mengen und Barcode passieren im Browser.
 | `web/woche.js` | Wochenübersicht (#woche): Säulen je Tag + Ziel-Linie, Kennzahlen, Tagesliste; Woche-Kachel mit Mini-Balken Mo–So |
 | `web/sicherung.js` | Datensicherung: alle `kalorien:*`-Werte als JSON (Teilen-Menü → iCloud), Wiederherstellen mit Vorschau + Rückgängig, Erinnerung nach 14 Tagen |
 | `web/scanner.js` | Barcode-Scanner: Live-Kamera (getUserMedia, nur https), Foto und Nummer-Eintippen als Notlösung |
-| `web/sw.js` | Service Worker: offline nutzbar, „Netz zuerst" damit Updates ankommen; nach 3 s ohne Antwort (Funkloch) gilt der Speicher |
+| `web/sw.js` | Service Worker: Code „Netz zuerst" (Updates kommen an), nach 1,5 s ohne Antwort gilt der Speicher — dann 20 s lang alles aus dem Speicher; Daten/Bilder „Speicher zuerst" mit Auffrischen im Hintergrund; CDN-Speicher überlebt Updates |
 | `web/daten/*.json` | Nährwerte, erzeugt von `daten/baue_daten.py` — nicht von Hand ändern |
 | `daten/deutsch.txt` | ~230 deutsche Namen → USDA-Eintrag, von Hand gepflegt; optionale 4. Spalte = Stückgewicht, wo die USDA danebenliegt (Donut, Brötchen) |
 | `daten/baue_gerichte.py` | ~90 Gerichte/Klassiker (Döner, Quark …) → `web/daten/gerichte.json`; Median aus Open Food Facts oder Ø-Richtwert |
@@ -157,9 +157,36 @@ so gewünscht.
   Feld setzen, `appearance: none`.
 - In `<form method="dialog">` ist der **erste** Submit-Knopf der Standard für
   Enter — „Abbrechen" daher `type="button"`.
-- Zoom ist gesperrt (viewport-Meta + gesture-Ereignisse in app.js), weil
-  iOS `user-scalable=no` allein ignoriert. Eingabefelder brauchen ≥ 16 px
-  Schrift, sonst zoomt Safari beim Antippen trotzdem.
+- Zoom ist gesperrt (viewport-Meta, `touch-action: pan-x pan-y` am `html`
+  und gesture-Ereignisse in app.js), weil iOS `user-scalable=no` allein
+  ignoriert. Eingabefelder brauchen ≥ 16 px Schrift, sonst zoomt Safari beim
+  Antippen trotzdem. **Nie** einen `touchmove`/`touchstart`-Lauscher mit
+  `passive: false` aufs Dokument: Dann wartet jedes Scrollen aufs Skript und
+  ruckelt (so war es bis v25).
+
+## Tempo – was es langsam macht
+
+Gemessen mit zwei Jahren Testdaten (1,2 MB in `kalorien:tage`):
+
+- `toLocaleDateString`/`toLocaleString` bauen bei **jedem** Aufruf ein neues
+  Format (~36 µs). Datum immer über `formatiere(datum, optionen)` aus app.js,
+  Zahlen über ein einmal angelegtes `Intl.NumberFormat` (siehe `kg`,
+  `tausender`, `zahl`). Die Gewichtsliste brauchte sonst 40 ms.
+- `lies()` parst jedes Mal neu. Wer den Speicher schon gelesen hat, reicht
+  ihn weiter (`zeichne` → `zeichneWocheKachel(alle)`, Mahlzeit-Seite), statt
+  ihn mehrfach zu lesen. Einen gemeinsamen Zwischenspeicher bewusst nicht:
+  Schreibwege verändern die gelesenen Objekte vor `schreib()` — geteilte
+  Objekte wären eine Datenverlust-Falle.
+- Zugeklapptes (Gewichtsliste in `<details>`) erst beim Aufklappen bauen.
+- Antippen ändert nur, was sich ändert (Kalendertag: Markierung + Detail,
+  nicht der ganze Monat samt Terminliste).
+- Kein `:has()` am `body` — Safari prüft dann bei jeder Änderung alle Stile.
+  Unterseiten tragen dafür die Klasse `body.unterseite` (setzt `zeigeAnsicht`).
+- Keine Endlos-Animation auf `box-shadow` (zeichnet jedes Bild neu).
+- Zustand zurücksetzen, *bevor* gezeichnet wird, und Zeichenfehler in
+  `zeigeAnsicht()` abfangen: In v25 riss ein Fehler in der Gewichtskurve das
+  Zurücksetzen von `verstecktSeit` mit, und die App sprang danach jede Minute
+  zur Übersicht zurück.
 
 ## Design
 

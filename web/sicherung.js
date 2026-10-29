@@ -219,10 +219,12 @@ $("import-abbrechen").addEventListener("click", () => {
 // Einmal beim Oeffnen, wenn es Daten gibt und die letzte Sicherung lange her
 // ist. Nicht oefter als alle 14 Tage - sonst nervt es und wird weggewischt.
 (function erinnere() {
-  const daten = sammleDaten();
-  const hatDaten = Object.keys(daten["kalorien:tage"] ?? {}).length + Object.keys(daten["kalorien:gewicht"] ?? {}).length > 3;
   const lange = (iso) => !iso || Date.now() - new Date(iso) > ERINNERN_NACH_TAGEN * 86400000;
-  if (hatDaten && lange(lies(SPEICHER_LETZTE_SICHERUNG, null)) && lange(lies(SPEICHER_ERINNERT, null))) {
+  // Erst die billige Pruefung: Meist ist nichts faellig. Vorher wurde bei
+  // jedem Start der ganze Speicher gelesen, nur um Tage zu zaehlen.
+  if (!lange(lies(SPEICHER_LETZTE_SICHERUNG, null)) || !lange(lies(SPEICHER_ERINNERT, null))) return;
+  const hatDaten = Object.keys(lies(SPEICHER_TAGE, {})).length + Object.keys(lies(SPEICHER_GEWICHT, {})).length > 3;
+  if (hatDaten) {
     schreib(SPEICHER_ERINNERT, new Date().toISOString());
     setTimeout(() => meldung("💾 Zeit für eine Sicherung – im ⚙ Menü unter „Datensicherung“."), 1500);
   }

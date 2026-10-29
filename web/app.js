@@ -111,6 +111,18 @@ function heute() {
   const d = new Date();
   return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
 }
+
+// toLocaleDateString baut bei jedem Aufruf ein neues Datumsformat - in der
+// Gewichtsliste mit 700 Zeilen kostete allein das zehnmal mehr als der Rest.
+// Jedes Format deshalb nur einmal anlegen.
+const DATUMSFORMATE = new Map();
+function formatiere(datum, optionen) {
+  if (isNaN(datum)) return "";
+  const schluessel = JSON.stringify(optionen);
+  if (!DATUMSFORMATE.has(schluessel)) DATUMSFORMATE.set(schluessel, new Intl.DateTimeFormat("de-DE", optionen));
+  return DATUMSFORMATE.get(schluessel).format(datum);
+}
+
 function verschiebe(tage) {
   const d = new Date(tag + "T12:00:00");
   d.setDate(d.getDate() + tage);
@@ -122,7 +134,7 @@ function datumText() {
   const gestern = new Date(h + "T12:00:00"); gestern.setDate(gestern.getDate() - 1);
   if (tag === h) return "Heute";
   if (tag === gestern.toISOString().slice(0, 10)) return "Gestern";
-  return new Date(tag + "T12:00:00").toLocaleDateString("de-DE", { weekday: "long" });
+  return formatiere(new Date(tag + "T12:00:00"), { weekday: "long" });
 }
 
 // ---------- Zeichnen ----------
@@ -132,11 +144,12 @@ function zeichne() {
   // Bei "Heute"/"Gestern" gehoert der Wochentag in die Zeile darunter,
   // sonst steht er schon oben und wuerde doppelt erscheinen.
   const relativ = tag >= heute() || datumText() === "Gestern";
-  $("datum-voll").textContent = new Date(tag + "T12:00:00").toLocaleDateString("de-DE",
+  $("datum-voll").textContent = formatiere(new Date(tag + "T12:00:00"),
     relativ ? { weekday: "long", day: "numeric", month: "long" } : { day: "numeric", month: "long", year: "numeric" });
   $("tag-vor").style.visibility = tag >= heute() ? "hidden" : "visible";
 
-  const liste = eintraege();
+  const alle = alleTage(); // einmal lesen, die Wochen-Kachel bekommt es mit
+  const liste = alle[tag] ?? [];
   const s = summen(liste);
 
   const z = ziel();
@@ -162,7 +175,7 @@ function zeichne() {
 
   // Unterseiten zeigen den gewaehlten Tag mit Datum, damit klar ist,
   // wohin ein Eintrag geht, wenn man vorher in der Uebersicht geblaettert hat.
-  const tagText = datumText() + ", " + new Date(tag + "T12:00:00").toLocaleDateString("de-DE", { day: "numeric", month: "long" });
+  const tagText = datumText() + ", " + formatiere(new Date(tag + "T12:00:00"), { day: "numeric", month: "long" });
   $("essen-datum").textContent = tagText;
   $("wasser-datum").textContent = tagText;
   $("essen-kcal").textContent = rund(s.kcal);
@@ -171,7 +184,7 @@ function zeichne() {
   zeichneMahlzeiten(liste);
   zeichneWasser();
   if (typeof zeichneKalenderKachel === "function") zeichneKalenderKachel(); // kalender.js
-  if (typeof zeichneWocheKachel === "function") zeichneWocheKachel(); // woche.js
+  if (typeof zeichneWocheKachel === "function") zeichneWocheKachel(alle); // woche.js
   if (typeof zeichneSchritte === "function") zeichneSchritte(); // schritte.js
   if (aktuelleMahlzeit && typeof zeichneMahlzeitSeite === "function") zeichneMahlzeitSeite();
 }
@@ -412,7 +425,7 @@ $("text").addEventListener("input", () => {
     if (nummer !== suchNummer) return; // aeltere Antwort kam zu spaet
     letzteTreffer = treffer.slice(0, 8).map((k) => mitMenge(k, z));
     zeigeVorschlaege(letzteTreffer);
-  }, 200);
+  }, 100); // Die Suche selbst dauert nur wenige ms - laengeres Warten fuehlte sich traege an
 });
 
 function zeigeVorschlaege(treffer) {
@@ -738,9 +751,8 @@ $("datum").addEventListener("click", () => { location.hash = "kalender"; });
 // in einem alten Tag geblaettert hat.
 let letztesHeute = heute();
 let verstecktSeit = null;
-function pruefeTag() {
+function pruefeTag(lange = false) {
   const h = heute();
-  const lange = verstecktSeit && Date.now() - verstecktSeit > 10 * 60 * 1000;
   if (h === letztesHeute && !lange) return;
   if (tag === letztesHeute || lange) tag = h;
   // Wer die App nach einer Weile wieder oeffnet, startet in der Uebersicht.
@@ -751,11 +763,15 @@ function pruefeTag() {
 }
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) { verstecktSeit = Date.now(); return; }
-  pruefeTag();
+  // Erst zuruecksetzen, dann zeichnen: Warf das Zeichnen einen Fehler, blieb
+  // "verstecktSeit" stehen - und die App sprang danach jede Minute zurueck
+  // zur Uebersicht und auf heute.
+  const lange = verstecktSeit !== null && Date.now() - verstecktSeit > 10 * 60 * 1000;
   verstecktSeit = null;
+  pruefeTag(lange);
 });
-window.addEventListener("pageshow", pruefeTag);
-setInterval(pruefeTag, 60 * 1000);
+window.addEventListener("pageshow", () => pruefeTag());
+setInterval(() => pruefeTag(), 60 * 1000);
 $("wasser-ziel-aendern").addEventListener("click", oeffneEinstellungen);
 
 // Ein Glas direkt aus der Uebersicht, ohne die Wasser-Seite zu oeffnen.
@@ -827,13 +843,21 @@ function zeigeAnsicht() {
   }
   const ansicht = document.getElementById("ansicht-" + name) && (name !== "mahlzeit" || aktuelleMahlzeit) ? name : "start";
   for (const a of document.querySelectorAll(".ansicht")) a.hidden = a.id !== "ansicht-" + ansicht;
-  // Erst sichtbar gezeichnet kennen Kurve und Kalender ihre Breite.
-  if (ansicht === "gewicht" && typeof zeichneGewicht === "function") zeichneGewicht();
-  if (ansicht === "kalender" && typeof zeigeKalender === "function") zeigeKalender();
-  if (ansicht === "woche" && typeof zeigeWoche === "function") zeigeWoche();
-  if (ansicht === "schritte" && typeof zeichneSchrittStatistik === "function") zeichneSchrittStatistik();
-  if (ansicht === "mahlzeit" && typeof zeichneMahlzeitSeite === "function") zeichneMahlzeitSeite();
+  // Klasse statt "body:has(...)" im CSS: :has() am body laesst Safari bei
+  // jeder kleinen Aenderung irgendwo auf der Seite alle Stile neu pruefen.
+  document.body.classList.toggle("unterseite", ansicht !== "start");
   window.scrollTo(0, 0);
+  // Erst sichtbar gezeichnet kennen Kurve und Kalender ihre Breite. Ein
+  // Fehler in einem Diagramm darf das Umschalten nicht aufhalten.
+  try {
+    if (ansicht === "gewicht" && typeof zeichneGewicht === "function") zeichneGewicht();
+    if (ansicht === "kalender" && typeof zeigeKalender === "function") zeigeKalender();
+    if (ansicht === "woche" && typeof zeigeWoche === "function") zeigeWoche();
+    if (ansicht === "schritte" && typeof zeichneSchrittStatistik === "function") zeichneSchrittStatistik();
+    if (ansicht === "mahlzeit" && typeof zeichneMahlzeitSeite === "function") zeichneMahlzeitSeite();
+  } catch (e) {
+    console.error(e);
+  }
 }
 window.addEventListener("hashchange", zeigeAnsicht);
 $("einstellungen-knopf").addEventListener("click", oeffneEinstellungen);
@@ -852,9 +876,14 @@ fetch("api/status").then((r) => r.ok ? r.json() : { ki: false })
 // schiebt sich darueber. visualViewport kennt den noch sichtbaren Teil -
 // um dessen Abstand zum unteren Rand ruecken die Blaetter nach oben.
 if (window.visualViewport) {
+  let bisher = null;
   const passeAn = () => {
     const vv = window.visualViewport;
     const verdeckt = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+    // Nur bei Aenderung setzen: Jede neue Variable am Wurzelelement laesst
+    // den Browser alle Stile neu rechnen, und "scroll" feuert dauernd.
+    if (verdeckt === bisher) return;
+    bisher = verdeckt;
     document.documentElement.style.setProperty("--tastatur", verdeckt + "px");
   };
   visualViewport.addEventListener("resize", passeAn);
@@ -870,13 +899,14 @@ document.addEventListener("pointerdown", (ev) => {
 
 // Zoom sperren. iOS-Safari ignoriert "user-scalable=no" seit Jahren
 // absichtlich; das Zusammenziehen mit zwei Fingern laesst sich nur ueber
-// die Safari-eigenen gesture-Ereignisse abfangen.
+// die Safari-eigenen gesture-Ereignisse abfangen - und ueber
+// "touch-action: pan-x pan-y" im CSS.
+// Bewusst KEIN touchmove-Lauscher mit passive:false: Mit ihm musste Safari
+// bei jeder Fingerbewegung erst das Skript fragen, bevor es scrollen durfte -
+// war die App gerade beschaeftigt, ruckelte und hing das Scrollen.
 for (const art of ["gesturestart", "gesturechange", "gestureend"]) {
   document.addEventListener(art, (ev) => ev.preventDefault(), { passive: false });
 }
-document.addEventListener("touchmove", (ev) => {
-  if (ev.touches.length > 1) ev.preventDefault();
-}, { passive: false });
 
 // Offline-Faehigkeit und "Zum Home-Bildschirm". Fehler hier sind egal:
 // Die App laeuft auch ohne Service Worker, nur nicht offline.

@@ -33,7 +33,7 @@ let notizBearbeitet = null; // { datum, id } beim Aendern, sonst null
 const zuDatum = (j, m, t) => `${j}-${String(m).padStart(2, "0")}-${String(t).padStart(2, "0")}`;
 const kalEintraege = () => lies(SPEICHER_KALENDER, {});
 const sortiert = (liste) => [...liste].sort((a, b) => (a.zeit || "99").localeCompare(b.zeit || "99"));
-const langesDatum = (d) => new Date(d + "T12:00:00").toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "long" });
+const langesDatum = (d) => formatiere(new Date(d + "T12:00:00"), { weekday: "long", day: "numeric", month: "long" });
 const tageImMonat = (j, m) => new Date(j, m, 0).getDate(); // m: 1-12
 
 // Faellt eine Wiederholung, die am Tag "start" begann, auf Tag "d"?
@@ -76,7 +76,7 @@ function tagStatus(tage, d, z, mz = makroZiele()) {
 
 function zeichneKalender() {
   const [j, m] = kalenderMonat.split("-").map(Number);
-  $("kal-titel").textContent = new Date(j, m - 1, 15).toLocaleDateString("de-DE", { month: "long", year: "numeric" });
+  $("kal-titel").textContent = formatiere(new Date(j, m - 1, 15), { month: "long", year: "numeric" });
 
   const h = heute();
   // Planen ja, aber nicht endlos: ein Jahr nach vorn reicht.
@@ -117,13 +117,16 @@ function zeichneKalender() {
 
     b.addEventListener("click", () => {
       kalAuswahl = d;
-      zeichneKalender();
+      // Nur die Markierung umsetzen: Den ganzen Monat samt Terminliste neu
+      // zu bauen kostete bei jedem Antippen spuerbar Zeit.
+      $("kal-raster").querySelector(".gewaehlt")?.classList.remove("gewaehlt");
+      b.classList.add("gewaehlt");
+      zeichneTagDetail();
     });
     zellen.push(b);
   }
   $("kal-raster").replaceChildren(...zellen);
-  zeichneTagDetail();
-  zeichneAlleEintraege();
+  zeichneTagDetail(tage);
 }
 
 // Alle gespeicherten Eintraege, Kommendes zuerst (naechster oben), dann
@@ -173,16 +176,18 @@ function blaettereMonat(schritt) {
   zeichneKalender();
 }
 
-// Aufgerufen von zeigeAnsicht(), wenn #kalender geoeffnet wird.
+// Aufgerufen von zeigeAnsicht(), wenn #kalender geoeffnet wird. Die Liste
+// aller Eintraege haengt nicht am Monat - neu nur hier und nach Aenderungen.
 function zeigeKalender() {
   kalAuswahl = tag;
   kalenderMonat = tag.slice(0, 7);
   zeichneKalender();
+  zeichneAlleEintraege();
 }
 
 // ---------- Der angetippte Tag ----------
 
-function zeichneTagDetail() {
+function zeichneTagDetail(tage = alleTage()) {
   const d = kalAuswahl;
   const zukunft = d > heute();
   $("kal-tag-titel").textContent = d === heute() ? `Heute, ${langesDatum(d).split(", ")[1]}` : langesDatum(d);
@@ -191,7 +196,7 @@ function zeichneTagDetail() {
   if (zukunft) {
     $("kal-tag-summe").textContent = "Geplant";
   } else {
-    const liste = alleTage()[d] ?? [];
+    const liste = tage[d] ?? [];
     const kcal = liste.reduce((a, e) => a + werte(e).kcal, 0);
     const ml = lies(SPEICHER_WASSER, {})[d];
     const kg = lies(SPEICHER_GEWICHT, {})[d];
@@ -277,6 +282,7 @@ $("notiz-speichern").addEventListener("click", (ev) => {
   kalAuswahl = datum;
   kalenderMonat = datum.slice(0, 7);
   zeichneKalender();
+  zeichneAlleEintraege();
   zeichneNaechsten();
 });
 
@@ -286,6 +292,7 @@ $("notiz-loeschen").addEventListener("click", () => {
   schreib(SPEICHER_KALENDER, alle);
   $("notiz-dialog").close();
   zeichneKalender();
+  zeichneAlleEintraege();
   zeichneNaechsten();
 });
 
@@ -315,7 +322,7 @@ for (const b of $("notiz-art").children) {
 function zeichneKalenderKachel() {
   const h = new Date(heute() + "T12:00:00");
   $("kachel-kal-tag").textContent = h.getDate();
-  $("kachel-kal-monat").textContent = h.toLocaleDateString("de-DE", { month: "long" });
+  $("kachel-kal-monat").textContent = formatiere(h, { month: "long" });
   zeichneNaechsten();
 }
 
@@ -339,7 +346,7 @@ function zeichneNaechsten() {
   const feld = $("kachel-naechster");
   if (!kandidat) { feld.textContent = "Keine Einträge"; return; }
   const wann = kandidat.datum === h ? "Heute"
-    : new Date(kandidat.datum + "T12:00:00").toLocaleDateString("de-DE", { weekday: "short", day: "numeric", month: "short" });
+    : formatiere(new Date(kandidat.datum + "T12:00:00"), { weekday: "short", day: "numeric", month: "short" });
   feld.textContent = `${ARTEN[kandidat.art]?.zeichen ?? "📝"} ${wann}${kandidat.zeit ? " " + kandidat.zeit : ""} · ${kandidat.text}`;
 }
 
