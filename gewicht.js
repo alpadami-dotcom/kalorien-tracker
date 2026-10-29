@@ -9,21 +9,27 @@ const TAG_MS = 86400000;
 let zeitraum = 30; // Tage, oder 0 fuer alles
 
 const gewichte = () => lies(SPEICHER_GEWICHT, {});
-const kg = (x) => x.toLocaleString("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+const KG_FORMAT = new Intl.NumberFormat("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 }); // einmal anlegen, siehe formatiere()
+const kg = (x) => KG_FORMAT.format(x);
 const alsZeit = (datum) => new Date(datum + "T12:00:00").getTime();
-const kurzDatum = (t, mitTag) => new Date(t).toLocaleDateString("de-DE",
+const kurzDatum = (t, mitTag) => formatiere(new Date(t),
   mitTag ? { weekday: "short", day: "numeric", month: "short" } : { day: "numeric", month: "short" });
 
 // Taegliche Werte schwanken um 1-2 kg (Wasser, Salz, Verdauung). Der
 // 7-Tage-Schnitt zeigt, wohin es wirklich geht - deshalb ist er die Linie
 // und die einzelnen Messungen nur Punkte. Nach Zeit statt nach Anzahl
 // gemittelt, damit Luecken (Urlaub, vergessen) nichts verzerren.
+// Ein Fenster, das mitwandert, statt jeden Wert mit jedem zu vergleichen:
+// Die Punkte sind nach Datum sortiert, je Tag hoechstens einer. So waechst
+// die Rechenzeit nur mit der Anzahl, nicht mit ihrem Quadrat.
 function mitSchnitt(punkte) {
-  return punkte.map((p) => {
+  let anfang = 0, summe = 0;
+  return punkte.map((p, i) => {
+    summe += p.kg;
     // Gerundete Tage statt Millisekunden: Ueber die Zeitumstellung waeren es
     // sonst mal 8 Tage im 7-Tage-Schnitt.
-    const fenster = punkte.filter((q) => tageZwischen(q.t, p.t) >= 0 && tageZwischen(q.t, p.t) <= 6);
-    return { ...p, schnitt: fenster.reduce((a, q) => a + q.kg, 0) / fenster.length };
+    while (tageZwischen(punkte[anfang].t, p.t) > 6) summe -= punkte[anfang++].kg;
+    return { ...p, schnitt: summe / (i - anfang + 1) };
   });
 }
 
@@ -66,9 +72,14 @@ function zeichneGewicht() {
     : sichtbar.length < 2 && alle.length >= 2
       ? "In diesem Zeitraum gibt es weniger als zwei Werte – wähle „Alles“."
       : "Noch ein Wert, dann gibt es eine Kurve.";
+  // Die Achse beginnt am Anfang des Zeitraums - oder beim ersten Wert, wenn der spaeter liegt.
+  const ab = zeitraum ? jetzt - (zeitraum - 1) * TAG_MS : -Infinity;
   if (genug) zeichneKurve(sichtbar, Math.max(ab, sichtbar[0].t), jetzt);
 
-  zeichneGewichtsliste(alle);
+  // Die Liste aller Werte ist zugeklappt - erst bauen, wenn sie offen ist.
+  // Nach zwei Jahren waeren das sonst 700 Zeilen bei jedem Zeichnen.
+  $("gewicht-anzahl").textContent = alle.length ? `(${alle.length})` : "";
+  if ($("gewicht-liste").parentElement.open) zeichneGewichtsliste(alle);
 }
 
 // Runde Achsenschritte: 0,5 / 1 / 2 / 5 kg, so dass etwa vier Linien entstehen.
@@ -164,7 +175,6 @@ function zeichneKurve(punkte, von, bis) {
 }
 
 function zeichneGewichtsliste(alle) {
-  $("gewicht-anzahl").textContent = alle.length ? `(${alle.length})` : "";
   $("gewicht-liste").replaceChildren(...[...alle].reverse().map((p) => {
     const li = document.createElement("li");
     li.innerHTML = `<div class="was"><div class="name"></div></div><div class="kcal"></div>`;
@@ -194,7 +204,7 @@ function tagEtikett(d) {
   if (abstand === 1) return "Gestern";
   const datum = new Date(d + "T12:00:00");
   return abstand <= 6
-    ? `${datum.toLocaleDateString("de-DE", { weekday: "short" }).replace(".", "")} ${datum.getDate()}.`
+    ? `${formatiere(datum, { weekday: "short" }).replace(".", "")} ${datum.getDate()}.`
     : `${datum.getDate()}.${datum.getMonth() + 1}.`;
 }
 
@@ -269,6 +279,10 @@ $("g-loeschen").addEventListener("click", () => {
 // Die Gewicht-Seite zeigt keinen Tag - also heute, nicht den Tag der Uebersicht.
 $("gewicht-plus").addEventListener("click", () => oeffneGewicht(heute()));
 $("kachel-gewicht-plus").addEventListener("click", () => oeffneGewicht(heute()));
+// Aufklappen baut die Liste ("toggle" kommt auch beim Zuklappen - dann nichts tun).
+$("gewicht-liste").parentElement.addEventListener("toggle", (ev) => {
+  if (ev.target.open) zeichneGewicht();
+});
 $("g-abbrechen").addEventListener("click", () => $("gewicht-dialog").close());
 
 for (const b of $("gewicht-zeitraum").children) {

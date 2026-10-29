@@ -18,7 +18,8 @@ const KURZBEFEHL = "Schritte kopieren"; // muss exakt so heissen wie in der Kurz
 const schritteAlle = () => lies(SPEICHER_SCHRITTE, {});
 const schritteAm = (d) => schritteAlle()[d] ?? 0;
 const schrittZiel = () => lies(SPEICHER_SCHRITTZIEL, 10000);
-const tausender = (x) => Math.round(x).toLocaleString("de-DE");
+const GANZZAHL = new Intl.NumberFormat("de-DE"); // einmal anlegen, siehe formatiere() in app.js
+const tausender = (x) => GANZZAHL.format(Math.round(x));
 const kurz = (x) => (x >= 1000 ? `${(x / 1000).toLocaleString("de-DE", { maximumFractionDigits: 1 })}k` : String(x));
 
 function setzeSchritte(d, n) {
@@ -153,7 +154,7 @@ function zeichneSchrittStatistik() {
     if (zeigen) {
       const datum = new Date(t.d + "T12:00:00");
       const text = el("text", { x: mitte(i), y: H - 7, class: "achse" + (t.d === heute() ? " heute" : ""), "text-anchor": "middle" });
-      text.textContent = schrittTage <= 7 ? datum.toLocaleDateString("de-DE", { weekday: "short" }).replace(".", "") : `${datum.getDate()}.${datum.getMonth() + 1}.`;
+      text.textContent = schrittTage <= 7 ? formatiere(datum, { weekday: "short" }).replace(".", "") : `${datum.getDate()}.${datum.getMonth() + 1}.`;
       svg.append(text);
     }
   });
@@ -168,7 +169,7 @@ function zeichneSchrittStatistik() {
   tage.forEach((t, i) => {
     const flaeche = el("rect", { x: mitte(i) - breite / 2, y: 0, width: breite, height: H, fill: "transparent", tabindex: 0 });
     const zeige = () => {
-      tip.querySelector(".tip-datum").textContent = new Date(t.d + "T12:00:00").toLocaleDateString("de-DE", { weekday: "long", day: "numeric", month: "short" });
+      tip.querySelector(".tip-datum").textContent = formatiere(new Date(t.d + "T12:00:00"), { weekday: "long", day: "numeric", month: "short" });
       tip.querySelector(".tip-wert").textContent = t.n ? `${tausender(t.n)} Schritte${t.n >= z ? " 🏆" : ""}` : "nicht eingetragen";
       tip.hidden = false;
       tip.style.left = Math.min(Math.max(mitte(i) - tip.offsetWidth / 2, 0), B - tip.offsetWidth) + "px";
@@ -191,7 +192,7 @@ function zeichneSchrittStatistik() {
   const bester = mit.reduce((a, t) => (t.n > (a?.n ?? -1) ? t : a), null);
   const kennzahlen = [
     ["Ø Schritte", mit.length ? tausender(summe / mit.length) : "–", mit.length ? `an ${mit.length} ${mit.length === 1 ? "Tag" : "Tagen"}` : "noch nichts"],
-    ["Bester Tag", bester ? tausender(bester.n) : "–", bester ? new Date(bester.d + "T12:00:00").toLocaleDateString("de-DE", { weekday: "short", day: "numeric", month: "short" }) : ""],
+    ["Bester Tag", bester ? tausender(bester.n) : "–", bester ? formatiere(new Date(bester.d + "T12:00:00"), { weekday: "short", day: "numeric", month: "short" }) : ""],
     ["Ziel geknackt", mit.length ? `${mit.filter((t) => t.n >= z).length} / ${mit.length}` : "–", `Tage 🏆 ≥ ${kurz(z)}`],
     // 0,7 m pro Schritt ist ein ueblicher Mittelwert fuer Erwachsene.
     ["Zusammen", summe ? tausender(summe) : "–", summe ? `≈ ${(summe * 0.0007).toLocaleString("de-DE", { maximumFractionDigits: 1 })} km` : ""],
